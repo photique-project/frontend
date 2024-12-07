@@ -1,6 +1,6 @@
 import styled from 'styled-components';
 
-const Card = styled.div`
+const Container = styled.div`
     width: 500px;
     height: 250px;
     padding: 30px;
@@ -78,14 +78,14 @@ const IntroCard: React.FC<IntroCardProps> = (props) => {
     const { icon, mainText, subText } = props;
 
     return (
-        <Card>
+        <Container>
             <IconBox>
                 <Icon src={icon} />
             </IconBox>
 
             <MainText>{mainText}</MainText>
             <SubText>{subText}</SubText>
-        </Card>
+        </Container>
     );
 }
 

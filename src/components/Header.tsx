@@ -1,14 +1,17 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 
 import styled from 'styled-components';
-import logo from '../assets/logo.png';
+
 import ShortButton from '../components/ShortButton';
+import LoginModal from '../components/LoginModal';
+
+import logo from '../assets/logo.png';
 import menuIcon from '../assets/menu.png';
 
 
-const HeaderContainer = styled.header`
+const Container = styled.header`
     width: 100%;
-    height: 80px;
+    height: 60px;
     border-bottom: 1px solid rgba(0, 0, 0, 0.2);
     background-color: #F9FBFF;
 
@@ -19,12 +22,6 @@ const HeaderContainer = styled.header`
     flex-shrink: 0;
     cursor: pointer;
 
-
-    /* 태블릿 */
-    @media (max-width: 768px) {
-        height: 60px;
-    }
-
     /* 모바일 */
     @media (max-width: 480px) {
         height: 50px;
@@ -32,18 +29,13 @@ const HeaderContainer = styled.header`
 `;
 
 const Logo = styled.img`
-    margin-left: 19px;
-
-    /* 태블릿 */
-    @media (max-width: 768px) {
-        margin-left: 10px;
-        height: 35px;
-    }
+    margin-left: 10px;
+    height: 35px;
 
     /* 휴대폰 */
     @media (max-width: 480px) {
         margin-left: 10px;
-        height: 30px; /* 로고 크기 더 축소 */
+        height: 30px; 
     }
 `;
 
@@ -91,7 +83,7 @@ const HeaderMenuIcon = styled.img`
     height: 24px;
 `;
 
-const HeaderMenu = styled.div<{ isOpen: false | true }>`
+const HeaderMenu = styled.div<{ isOpen: boolean }>`
     width: 240px;
     height: 100%;
     margin-top: 60px;
@@ -148,36 +140,46 @@ const MenuButton = styled.div`
 
 const Header = () => {
     const [isMenuOpen, setIsMenuOpen] = useState<boolean>(false);
+    const [isLoginModalOpen, setLoginModalOpen] = useState<boolean>(false);
 
     const openMenu = () => {
         setIsMenuOpen((prev) => !prev);
     };
 
+    const showLoginModal = () => {
+        if (isLoginModalOpen) {
+            setLoginModalOpen(false);
+            return;
+        }
+
+        setLoginModalOpen(true);
+    }
+
+
     return (
         <>
-            <HeaderContainer>
+            <Container>
                 <Logo src={logo}></Logo>
 
                 <HeaderButtonBox>
-                    <ShortButton text="로그인" type="white"></ShortButton>
-                    <ShortButton text="회원가입" type="black"></ShortButton>
-                    <ShortButton text="고객센터" type="none"></ShortButton>
+                    <ShortButton text="로그인" type="white" action={showLoginModal}></ShortButton>
+                    <ShortButton text="회원가입" type="black" action={showLoginModal}></ShortButton>
+                    <ShortButton text="고객센터" type="none" action={showLoginModal}></ShortButton>
                 </HeaderButtonBox>
 
                 <HeaderMenuButtonBox onClick={openMenu}>
-                    <HeaderMenuIcon src={menuIcon}>
-
-                    </HeaderMenuIcon>
+                    <HeaderMenuIcon src={menuIcon} />
                 </HeaderMenuButtonBox>
 
-            </HeaderContainer>
+            </Container>
 
             <HeaderMenu isOpen={isMenuOpen}>
                 <MenuButton>로그인</MenuButton>
                 <MenuButton>회원가입</MenuButton>
                 <MenuButton>고객센터</MenuButton>
-
             </HeaderMenu>
+
+            <LoginModal display={isLoginModalOpen} closeModal={showLoginModal} />
         </>
     );
 }

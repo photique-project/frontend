@@ -3,7 +3,7 @@ import mailIcon from '../assets/mail.png';
 import githubIcon from '../assets/github.png';
 import discordIcon from '../assets/discord.png';
 
-const FooterContainer = styled.footer`
+const Container = styled.footer`
     margin-top: 100px;
     width: 100%;
     height: 120px;
@@ -49,7 +49,7 @@ const FooterContentText = styled.div`
 
 const Footer = () => {
     return (
-        <FooterContainer>
+        <Container>
             <FooterContentBox>
                 <FooterContent>
                     <FooterContentIcon src={mailIcon}></FooterContentIcon>
@@ -64,7 +64,7 @@ const Footer = () => {
                     <FooterContentText>정민성#0060</FooterContentText>
                 </FooterContent>
             </FooterContentBox>
-        </FooterContainer>
+        </Container>
     );
 }
 

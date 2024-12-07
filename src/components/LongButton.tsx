@@ -1,9 +1,11 @@
 import styled from 'styled-components';
 
-const Button = styled.button<{ type: "white" | "black" | "none" }>`
-    width: 90px;
-    height: 40px;
-    border-radius: 5px;
+const Button = styled.button<{ type: "white" | "black" | "none", marginTop: number }>`
+    width: 300px;
+    height: 50px;
+    margin-top: ${({ marginTop }) => `${marginTop}px`};
+
+    border-radius: 7px;
     font-size:16px;
     cursor: pointer;
 
@@ -21,34 +23,27 @@ const Button = styled.button<{ type: "white" | "black" | "none" }>`
         type === "white" || type === "none" ? "rgba(0, 0, 0, 0.07)" : "rgba(0, 0, 0, 0.7)"};
     }
 
-    /* 태블릿 */
-    @media (max-width: 768px) {
-        width: 80px;
-        height: 40px;
-        font-size: 14px;
-    }
-
-    /* 휴대폰 */
-    @media (max-width: 480px) {
-        width: 100%;
+    @media (max-width: 420px) {
+        width:100%;
+        height: 30px;
         font-size: 14px;
     }
 `;
 
-interface ShortButtonProps {
+interface LongButtonProps {
     text: string;
     type: "white" | "black" | "none";
-    action: () => void;
+    marginTop: number;
 }
 
-const ShortButton: React.FC<ShortButtonProps> = (props) => {
-    const { text, type, action } = props;
+const LongButton: React.FC<LongButtonProps> = (props) => {
+    const { text, type, marginTop } = props;
 
     return (
-        <Button type={type} onClick={action}>
+        <Button type={type} marginTop={marginTop}>
             {text}
         </Button>
     )
 }
 
-export default ShortButton;
+export default LongButton;

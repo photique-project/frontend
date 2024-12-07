@@ -1,15 +1,18 @@
+import { useState } from 'react';
+
 import styled from 'styled-components';
+
 import Header from '../components/Header';
 import IntroCard from '../components/IntroCard';
 import Footer from '../components/Footer';
+import LoginModal from '../components/LoginModal';
 
 import cameraIcon from '../assets/camera.png';
 import exhibitionIcon from '../assets/exhibition.png';
 import personIcon from '../assets/person.png';
 import searchIcon from '../assets/search.png';
 
-
-const HomeContainer = styled.div`
+const Container = styled.div`
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -209,9 +212,15 @@ const ThirdIntroBoxSubText = styled.div`
     }
 `;
 
+
+
+
+
+
 const Home = () => {
+
     return (
-        <HomeContainer>
+        <Container>
             <Header />
 
             <BodyBox>
@@ -249,8 +258,9 @@ const Home = () => {
 
             </BodyBox>
 
+        </Container >
 
-        </HomeContainer >
+
     )
 }
 
