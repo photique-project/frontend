@@ -12,7 +12,7 @@ import menuIcon from '../assets/menu.png';
 const Container = styled.header`
     width: 100%;
     height: 60px;
-    border-bottom: 1px solid rgba(0, 0, 0, 0.2);
+    border-bottom: 2px solid rgba(0, 0, 0, 0.2);
     background-color: #F9FBFF;
 
     display: flex;
@@ -140,19 +140,19 @@ const MenuButton = styled.div`
 
 const Header = () => {
     const [isMenuOpen, setIsMenuOpen] = useState<boolean>(false);
-    const [isLoginModalOpen, setLoginModalOpen] = useState<boolean>(false);
+    const [loginModalDisplay, setLoginModalDisplay] = useState<'flex' | 'none'>('none');
 
     const openMenu = () => {
         setIsMenuOpen((prev) => !prev);
     };
 
     const showLoginModal = () => {
-        if (isLoginModalOpen) {
-            setLoginModalOpen(false);
+        if (loginModalDisplay === 'flex') {
+            setLoginModalDisplay('none');
             return;
         }
 
-        setLoginModalOpen(true);
+        setLoginModalDisplay('flex');
     }
 
 
@@ -179,7 +179,7 @@ const Header = () => {
                 <MenuButton>고객센터</MenuButton>
             </HeaderMenu>
 
-            <LoginModal display={isLoginModalOpen} closeModal={showLoginModal} />
+            <LoginModal display={loginModalDisplay} closeModal={showLoginModal} />
         </>
     );
 }

@@ -1,11 +1,12 @@
 import styled from 'styled-components';
+
 import naverIcon from '../assets/naver.png';
 import googleIcon from '../assets/google.png';
 import kakaoIcon from '../assets/kakao.png';
 
-const Container = styled.div`
+const Container = styled.div<{ marginTop: number }>`
     width: 300px;
-    margin-top: 12px;
+    margin-top: ${({ marginTop }) => `${marginTop}px`};
 
     display: flex;
     flex-direction: row;
@@ -23,9 +24,15 @@ const Icon = styled.img`
     cursor: pointer;
 `;
 
-const OAuthIcons = () => {
+interface OAuthIconsProps {
+    marginTop: number;
+}
+
+const OAuthIcons: React.FC<OAuthIconsProps> = (props) => {
+    const { marginTop } = props;
+
     return (
-        <Container>
+        <Container marginTop={marginTop}>
             <Icon src={naverIcon} />
             <Icon src={googleIcon} />
             <Icon src={kakaoIcon} />

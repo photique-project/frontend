@@ -1,22 +1,22 @@
 import styled from 'styled-components';
 
-import ShortNormalInput from '../components/ShortNormalInput';
+import ShortNormalInput from './input/ShortNormalInput';
 import LongButton from '../components/LongButton';
 import CheckBox from '../components/CheckBox';
 import LoginModalNav from '../components/LoginModalNav';
-import LoginModalLine from '../components/LoginModalLine';
+import SNSLine from '../components/SNSLine';
 
 import logoIcon from '../assets/logo.png';
 import closeIcon from '../assets/close.png';
-import PasswordInput from './PasswordInput';
+import PasswordInput from './input/PasswordInput';
 import OAuthIcons from './OAuthIcons';
 
-const Container = styled.div<{ display: boolean }>`
+const Container = styled.div<{ display: 'flex' | 'none' }>`
     width: 100%;
     height: 100%;
 
     display: flex;
-    display: ${({ display }) => display ? 'flex' : 'none'};
+    display: ${({ display }) => display};
     flex-direction: column;
     align-items: center;
     justify-content: center;
@@ -75,7 +75,7 @@ const LogoIcon = styled.img`
 `;
 
 interface LoginModalProps {
-    display: boolean;
+    display: 'flex' | 'none';
     closeModal: () => void;
 }
 
@@ -98,12 +98,12 @@ const LoginModal: React.FC<LoginModalProps> = (props) => {
 
                 <LogoIcon src={logoIcon} />
                 <ShortNormalInput placeHolder='이메일' marginTop={20} />
-                <PasswordInput placeHolder='비밀번호' marginTop={5} />
+                <PasswordInput placeHolder='비밀번호' marginTop={8} />
                 <CheckBox text='자동 로그인' marginTop={5} />
                 <LongButton text='로그인' type='black' marginTop={10} />
                 <LoginModalNav />
-                <LoginModalLine />
-                <OAuthIcons />
+                <SNSLine text='간편 로그인' marginTop={30} />
+                <OAuthIcons marginTop={12} />
 
             </LoginModalBox>
         </Container >

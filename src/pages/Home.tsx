@@ -5,7 +5,6 @@ import styled from 'styled-components';
 import Header from '../components/Header';
 import IntroCard from '../components/IntroCard';
 import Footer from '../components/Footer';
-import LoginModal from '../components/LoginModal';
 
 import cameraIcon from '../assets/camera.png';
 import exhibitionIcon from '../assets/exhibition.png';
@@ -109,7 +108,7 @@ const MainShortcutButton = styled.button`
     line-height: 20px;
     
     border-radius: 10px;
-    border: 0.5px solid rgba(0, 0, 0, 0.2);
+    border: 1px solid rgba(0, 0, 0, 0.2);
     background-color: #F9FBFF;
     cursor: pointer;
     

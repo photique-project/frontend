@@ -1,8 +1,8 @@
 import styled from 'styled-components';
 
-const Container = styled.div`
-    width: 300px;  
-    margin-top: 30px;
+const Container = styled.div<{ marginTop: number }>`
+    width: 350px;  
+    margin-top: ${({ marginTop }) => `${marginTop}px`};
 
     font-size: 10px;
     color: rgba(0, 0, 0, 0.4);
@@ -23,14 +23,21 @@ const Line = styled.div`
     background-color: rgba(0, 0, 0, 0.2);
 `;
 
-const LoginModalLine = () => {
+interface SNSLineProps {
+    text: string;
+    marginTop: number;
+}
+
+const SNSLine: React.FC<SNSLineProps> = (props) => {
+    const { text, marginTop } = props;
+
     return (
-        <Container>
+        <Container marginTop={marginTop}>
             <Line />
-            간편 로그인
+            {text}
             <Line />
         </Container>
     );
 }
 
-export default LoginModalLine;
+export default SNSLine;

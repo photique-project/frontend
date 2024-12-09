@@ -1,8 +1,7 @@
 import { useState } from 'react';
 
-import eyeIcon from '../assets/eye.png';
-import eyeOffIcon from '../assets/eye-off.png';
-
+import eyeIcon from '../../assets/eye.png';
+import eyeOffIcon from '../../assets/eye-off.png';
 
 import styled from 'styled-components';
 
@@ -35,7 +34,7 @@ const Input = styled.input`
     line-height: 17px;
 
 
-    border: 1px solid rgba(0, 0, 0, 0.2);
+    border: 2px solid rgba(0, 0, 0, 0.2);
     border-radius: 6px;
     
     &::placeholder {

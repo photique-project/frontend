@@ -14,7 +14,7 @@ const Button = styled.button<{ type: "white" | "black" | "none" }>`
         type === "white" || type === "none" ? "#000000" : "#FFFFFF"};
 
     border: ${({ type }) =>
-        type === "white" || type === "black" ? "0.5px solid rgba(0, 0, 0, 0.2)" : "none"};
+        type === "white" || type === "black" ? "1px solid rgba(0, 0, 0, 0.2)" : "none"};
 
     &:hover {
         background-color: ${({ type }) =>

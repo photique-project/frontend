@@ -1,6 +1,9 @@
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
-import Home from './pages/Home';
 import styled from 'styled-components';
+import Home from './pages/Home';
+import Join from './pages/Join';
+import SNSJoin from './pages/SNSJoin';
+import ResetPassword from './pages/ResetPassword';
 
 const AppContainer = styled.div`
   margin: 0;
@@ -16,6 +19,9 @@ function App() {
       <AppContainer>
         <Routes>
           <Route path="/" element={<Home />} />
+          <Route path="/join" element={<Join />} />
+          <Route path="/sns-join" element={<SNSJoin />} />
+          <Route path="/reset-password" element={<ResetPassword />} />
 
         </Routes>
       </AppContainer>
