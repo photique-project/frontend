@@ -157,12 +157,17 @@ const SecondIntroBoxMainText = styled.div`
 
 const SecondIntroBoxCardBox = styled.div`
     margin-top: 40px;
+    width: 1200px;
     
     display: flex;
     flex-direction: row;
     justify-content: center;
     flex-wrap: wrap;
     gap: 40px;
+
+    @media (max-width: 1200px) {
+        width: 90%;
+    }
 `;
 
 const ThirdIntroBox = styled.div`

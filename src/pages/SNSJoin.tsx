@@ -1,11 +1,13 @@
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import styled from 'styled-components';
 
 import Header from '../components/Header';
-import ProfileImageInput from '../components/input/ProfileImageInput';
+import ImageInput from '../components/input/ImageInput';
 import CheckInput from '../components/input/CheckInput';
 import LongButton from '../components/LongButton';
 import EmailAuthModal from '../components/EmailAuthModal';
+import HelperText from '../components/HelperText';
+import useFetch from '../hooks/useFetch';
 
 
 const Container = styled.div`
@@ -88,7 +90,25 @@ const ProfileImageInputText = styled.div`
 `;
 
 const SNSJoin = () => {
+    const {
+        loading: emailLoading,
+        statusCode: emailStatusCode,
+        data: emailData,
+        fetchRequest: emailFetchRequest
+    } = useFetch<void>();
+
     const [emailAuthModalDisplay, setEmailAuthModalDisplay] = useState<'flex' | null>(null);
+
+    const [validProfileImage, setValidProfileImage] = useState<boolean | null>(null);
+    const [profileImage, setProfileImage] = useState<string | undefined>(undefined);
+    const [profileImageHelperTextVisibility, setProfileImageHelperTextVisibility] = useState<'visible' | 'hidden'>('hidden');
+    const [profileImageDisabled, setProfileImageDisalbled] = useState<boolean>(false);
+
+    const [validEmail, setValidEmail] = useState<boolean | null>(null);
+    const [email, setEmail] = useState<string>('');
+    const [emailDisabled, setEmailDisalbled] = useState<boolean>(true);
+
+    const [nickname, setNickname] = useState<string>('');
 
     const showEmailAuthModal = () => {
         if (emailAuthModalDisplay === 'flex') {
@@ -97,6 +117,18 @@ const SNSJoin = () => {
         }
 
         setEmailAuthModalDisplay('flex');
+    }
+
+    const handleEmailChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        setEmail(e.target.value);
+    };
+
+    const handleNicknameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        setNickname(e.target.value);
+    };
+
+    const handleJoin = () => {
+
     }
 
     return (
@@ -108,14 +140,15 @@ const SNSJoin = () => {
 
                 <JoinFormBox>
                     <ProfileImageInputText>프로필 이미지</ProfileImageInputText>
-                    <ProfileImageInput marginTop={5} />
-                    <CheckInput placeHolder='이메일' marginTop={20} action={showEmailAuthModal} />
-                    <CheckInput placeHolder='닉네임' marginTop={20} action={() => null} />
-                    <LongButton text='가입하기' type='black' marginTop={40} />
+                    <ImageInput marginTop={5} image={profileImage} setImage={setProfileImage} setValidImage={setValidProfileImage} inputDisabled={profileImageDisabled} />
+                    <HelperText text='*PNG, JPG 파일만 가능하며, 최대 크기는 5MB입니다.' visibility={profileImageHelperTextVisibility} color='red' />
+                    <CheckInput placeHolder='이메일' marginTop={20} action={showEmailAuthModal} text={email} handleChange={handleEmailChange} setValidText={setValidEmail} loading={emailLoading} inputDisabled={emailDisabled} />
+                    <CheckInput placeHolder='닉네임' marginTop={20} action={() => null} text={email} handleChange={handleNicknameChange} setValidText={setValidEmail} loading={emailLoading} inputDisabled={emailDisabled} />
+                    <LongButton text='가입하기' type='black' marginTop={40} onClick={handleJoin} />
                 </JoinFormBox>
 
             </BodyBox>
-            {emailAuthModalDisplay && <EmailAuthModal display={emailAuthModalDisplay} closeModal={showEmailAuthModal} />}
+            {emailAuthModalDisplay && <EmailAuthModal email={email} closeModal={showEmailAuthModal} validEmail={validEmail} setValidEmail={setValidEmail} />}
 
         </Container>
     );

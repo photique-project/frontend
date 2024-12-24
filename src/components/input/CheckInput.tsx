@@ -1,5 +1,6 @@
-import { useState, useEffect } from 'react';
-import styled from 'styled-components';
+import { Dispatch, SetStateAction } from 'react';
+import styled, { keyframes } from 'styled-components';
+import loadingIcon from '../../assets/loading.png';
 
 
 const Container = styled.div<{ marginTop: number }>`
@@ -21,7 +22,6 @@ const Container = styled.div<{ marginTop: number }>`
     }
 `;
 
-
 const Input = styled.input`
     width: 275px;
     height: 47px;
@@ -32,7 +32,7 @@ const Input = styled.input`
     line-height: 17px;
 
 
-    border: 2px solid rgba(0, 0, 0, 0.2);
+    border: 1.5px solid rgba(0, 0, 0, 0.2);
     border-radius: 6px;
     
     &::placeholder {
@@ -53,17 +53,23 @@ const Input = styled.input`
 `;
 
 const ValidateButton = styled.button`
-    width: 30px;
-    height: 20px;
+    width: 32px;
+    height: 30px;
     right: 12px;
+
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
 
     border-radius: 5px;
     border: 1px solid rgba(0, 0, 0, 0.2);
 
     background-color: white;
     
-    font-size: 8px;
-    line-height: 8px;
+    font-size: 10px;
+    font-weight: 500;
+    line-height: 11px;
 
     position: absolute;
 
@@ -73,28 +79,33 @@ const ValidateButton = styled.button`
         background-color: rgba(0, 0, 0, 0.07);
     }
 `;
+const rotate = keyframes`
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+`;
+
+const Loading = styled.img`
+  width: 20px;
+  animation: ${rotate} 1.2s ease-in-out infinite;
+`;
 
 interface CheckInputProps {
-    placeHolder: string | null;
+    placeHolder: string | number;
     marginTop: number;
     action: () => void;
+    text: string;
+    handleChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
+    setValidText?: Dispatch<SetStateAction<boolean>>;
+    loading: boolean;
+    inputDisabled: boolean;
 }
 
 const CheckInput: React.FC<CheckInputProps> = (props) => {
-    const { placeHolder, marginTop, action } = props;
-    const [timeLimit, setTimeLimit] = useState<number | null>(placeHolder === null ? 180 : null); // 3분(180초)
-
-    useEffect(() => {
-        if (timeLimit === null) {
-            return;
-        }
-
-        const timer = setInterval(() => {
-            setTimeLimit((prev) => (prev !== null && prev > 0 ? prev - 1 : null));
-        }, 1000);
-
-        return () => clearInterval(timer);
-    }, [timeLimit]);
+    const { placeHolder, marginTop, action, text, handleChange, setValidText, loading, inputDisabled } = props;
 
     const formatTime = (seconds: number) => {
         const minutes = Math.floor(seconds / 60);
@@ -102,11 +113,17 @@ const CheckInput: React.FC<CheckInputProps> = (props) => {
         return `${minutes}:${remainingSeconds < 10 ? `0${remainingSeconds}` : remainingSeconds}`;
     };
 
-
     return (
         <Container marginTop={marginTop}>
-            <Input placeholder={placeHolder === null ? (timeLimit !== null ? formatTime(timeLimit) : '') : placeHolder} />
-            <ValidateButton onClick={action}>확인</ValidateButton>
+            <Input
+                placeholder={typeof placeHolder === 'number' ? formatTime(placeHolder) : placeHolder}
+                value={text}
+                onChange={handleChange}
+                disabled={loading || inputDisabled}
+            />
+            <ValidateButton onClick={action} disabled={loading || inputDisabled}>
+                {loading ? <Loading src={loadingIcon} alt="로딩" /> : "확인"}
+            </ValidateButton>
         </Container>
     );
 }

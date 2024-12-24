@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 
 import styled from 'styled-components';
 
@@ -11,7 +12,7 @@ import menuIcon from '../assets/menu.png';
 
 const Container = styled.header`
     width: 100%;
-    height: 60px;
+    height: 80px;
     border-bottom: 2px solid rgba(0, 0, 0, 0.2);
     background-color: #F9FBFF;
 
@@ -22,6 +23,11 @@ const Container = styled.header`
     flex-shrink: 0;
     cursor: pointer;
 
+    /* 태블릿 */
+    @media (max-width: 768px) {
+        height: 60px;
+    }
+
     /* 모바일 */
     @media (max-width: 480px) {
         height: 50px;
@@ -29,7 +35,7 @@ const Container = styled.header`
 `;
 
 const Logo = styled.img`
-    margin-left: 10px;
+    margin-left: 20px;
     height: 35px;
 
     /* 휴대폰 */
@@ -139,8 +145,13 @@ const MenuButton = styled.div`
 
 
 const Header = () => {
+    const navigate = useNavigate();
     const [isMenuOpen, setIsMenuOpen] = useState<boolean>(false);
     const [loginModalDisplay, setLoginModalDisplay] = useState<'flex' | 'none'>('none');
+
+    const navigateToJoinPage = () => {
+        navigate('/join');
+    };
 
     const openMenu = () => {
         setIsMenuOpen((prev) => !prev);
@@ -163,7 +174,7 @@ const Header = () => {
 
                 <HeaderButtonBox>
                     <ShortButton text="로그인" type="white" action={showLoginModal}></ShortButton>
-                    <ShortButton text="회원가입" type="black" action={showLoginModal}></ShortButton>
+                    <ShortButton text="회원가입" type="black" action={navigateToJoinPage}></ShortButton>
                     <ShortButton text="고객센터" type="none" action={showLoginModal}></ShortButton>
                 </HeaderButtonBox>
 
@@ -174,8 +185,8 @@ const Header = () => {
             </Container>
 
             <HeaderMenu isOpen={isMenuOpen}>
-                <MenuButton>로그인</MenuButton>
-                <MenuButton>회원가입</MenuButton>
+                <MenuButton onClick={showLoginModal}>로그인</MenuButton>
+                <MenuButton onClick={navigateToJoinPage}>회원가입</MenuButton>
                 <MenuButton>고객센터</MenuButton>
             </HeaderMenu>
 

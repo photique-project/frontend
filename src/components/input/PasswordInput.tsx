@@ -34,7 +34,7 @@ const Input = styled.input`
     line-height: 17px;
 
 
-    border: 2px solid rgba(0, 0, 0, 0.2);
+    border: 1.5px solid rgba(0, 0, 0, 0.2);
     border-radius: 6px;
     
     &::placeholder {
@@ -67,10 +67,13 @@ const ViewIcon = styled.img`
 interface PasswordInputProps {
     placeHolder: string;
     marginTop: number
+    text: string;
+    handleChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
+    inputDisabled: boolean;
 }
 
 const PasswordInput: React.FC<PasswordInputProps> = (props) => {
-    const { placeHolder, marginTop } = props;
+    const { placeHolder, marginTop, text, handleChange, inputDisabled } = props;
 
     const [isOpen, setOpen] = useState<boolean>(true);
     const [inputType, setInputType] = useState<'password' | 'text'>('password');
@@ -88,7 +91,7 @@ const PasswordInput: React.FC<PasswordInputProps> = (props) => {
 
     return (
         <Container marginTop={marginTop}>
-            <Input placeholder={placeHolder} type={inputType}></Input>
+            <Input placeholder={placeHolder} type={inputType} value={text} onChange={handleChange} disabled={inputDisabled}></Input>
             <ViewIcon src={isOpen ? eyeIcon : eyeOffIcon} onClick={handleOpen}></ViewIcon>
 
 

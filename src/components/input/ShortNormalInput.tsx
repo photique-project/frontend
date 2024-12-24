@@ -24,7 +24,7 @@ const Input = styled.input`
     font-size: 16px;
     line-height: 17px;
     
-    border: 2px solid rgba(0, 0, 0, 0.2);
+    border: 1.5px solid rgba(0, 0, 0, 0.2);
     border-radius: 6px;
     
     &::placeholder {

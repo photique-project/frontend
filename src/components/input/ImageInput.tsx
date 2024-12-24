@@ -1,6 +1,4 @@
-import { useState } from 'react';
-
-import HelperText from '../HelperText';
+import { useState, Dispatch, SetStateAction } from 'react';
 
 import imageIcon from '../../assets/add-image.png';
 import cancelIcon from '../../assets/cancel.png';
@@ -29,7 +27,7 @@ const Container = styled.label<{ marginTop: number, isDragging: boolean }>`
     }
 `;
 
-const ImageInput = styled.input`
+const Input = styled.input`
     display: none;
 `;
 
@@ -42,16 +40,16 @@ const ImageInputIcon = styled.img<{ textDisplay: 'block' | 'none' }>`
 
 const ImageInputFristText = styled.div<{ textDisplay: 'block' | 'none' }>`
     margin-top: 15px;
-    font-size: 10px;
-    line-height: 11px;
+    font-size: 14px;
+    line-height: 14px;
 
     display: ${({ textDisplay }) => textDisplay};
 `;
 
 const ImageInputSecondText = styled.div<{ textDisplay: 'block' | 'none' }>`
     margin-top: 5px;
-    font-size: 10px;
-    line-height: 11px;
+    font-size: 14px;
+    line-height: 14px;
 
     display: ${({ textDisplay }) => textDisplay};
 `;
@@ -61,7 +59,7 @@ const ProfileImagePreview = styled.img<{ previewDisplay: 'block' | 'none' }>`
     aspect-ratio: 1;
 
     position: absolute;
-
+    
     border-radius: 15px;
 
     display: ${({ previewDisplay }) => previewDisplay};
@@ -96,23 +94,41 @@ const CancelIcon = styled.img`
     height: 25px;
 `
 
-interface ProfileImageInputProps {
+interface ImageInputProps {
     marginTop: number;
+    image: string | undefined;
+    setImage: Dispatch<SetStateAction<string | undefined>>;
+    setValidImage: Dispatch<SetStateAction<boolean | null>>;
+    inputDisabled: boolean;
 }
 
-const ProfileImageInput: React.FC<ProfileImageInputProps> = (props) => {
-    const { marginTop } = props;
+const ImageInput: React.FC<ImageInputProps> = (props) => {
+    const { marginTop, image, setImage, setValidImage, inputDisabled } = props;
     const [previewDisplay, setPreviewDisplay] = useState<'block' | 'none'>('block');
     const [cancelDisplay, setCancelDisplay] = useState<'flex' | 'none'>('none');
     const [textDisplay, setTextDisplay] = useState<'block' | 'none'>('block');
-    const [profileImage, setProfileImage] = useState<string | undefined>(undefined);
     const [isDragging, setIsDragging] = useState<boolean>(false);
-    const [helperTextVisibility, setHelperTextVisibility] = useState<'visible' | 'hidden'>('hidden');
 
-    const isValidProfilImage = (file: File) => {
+    const isValidImage = (image: File) => {
         const validTypes = ['image/png', 'image/jpg', 'image/jpeg'];
         const maxSize = 5 * 1024 * 1024;
-        return validTypes.includes(file.type) && file.size <= maxSize;
+
+        if (validTypes.includes(image.type) && image.size <= maxSize) {
+            setValidImage(true);
+            const imageUrl = URL.createObjectURL(image);
+            setImage(imageUrl);
+            setPreviewDisplay('block');
+            setCancelDisplay('flex');
+            setTextDisplay('none');
+
+            return;
+        }
+
+        setValidImage(false);
+        setImage(undefined);
+        setPreviewDisplay('none');
+        setCancelDisplay('none');
+        setTextDisplay('block');
     };
 
     const handleDrop = (e: React.DragEvent<HTMLLabelElement>) => {
@@ -120,17 +136,9 @@ const ProfileImageInput: React.FC<ProfileImageInputProps> = (props) => {
         setIsDragging(false);
 
         const profileImage = e.dataTransfer.files?.[0];
+
         if (profileImage) {
-            if (isValidProfilImage(profileImage)) {
-                const imageUrl = URL.createObjectURL(profileImage);
-                setProfileImage(imageUrl);
-                setPreviewDisplay('block');
-                setCancelDisplay('flex');
-                setTextDisplay('none');
-                setHelperTextVisibility('hidden');
-            } else {
-                setHelperTextVisibility('visible');
-            }
+            isValidImage(profileImage);
         }
     };
 
@@ -144,34 +152,24 @@ const ProfileImageInput: React.FC<ProfileImageInputProps> = (props) => {
     };
 
 
-    const handleProfileImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const profileImage = e.target.files?.[0];
 
         if (profileImage) {
-            if (isValidProfilImage(profileImage)) {
-                const imageUrl = URL.createObjectURL(profileImage);
-                setProfileImage(imageUrl);
-                setPreviewDisplay('block');
-                setCancelDisplay('flex');
-                setTextDisplay('none');
-                setHelperTextVisibility('hidden');
-            } else {
-                setHelperTextVisibility('visible');
-            }
+            isValidImage(profileImage)
         }
     };
 
-    const removeProfileImage = () => {
-        setProfileImage(undefined);
+    const removeImage = () => {
+        setImage(undefined);
         setPreviewDisplay('none');
         setCancelDisplay('none');
         setTextDisplay('block');
-        setHelperTextVisibility('hidden');
     }
 
     const preventClickWhenImageExists = (e: React.MouseEvent<HTMLLabelElement>) => {
-        if (profileImage) {
-            e.preventDefault(); // 클릭 이벤트를 막음
+        if (image) {
+            e.preventDefault();
         }
     };
 
@@ -180,26 +178,25 @@ const ProfileImageInput: React.FC<ProfileImageInputProps> = (props) => {
         <>
             <Container
                 marginTop={marginTop}
-                htmlFor='ProfileImageInput'
+                htmlFor='ImageInput'
                 onClick={preventClickWhenImageExists}
                 isDragging={isDragging}
                 onDragOver={handleDragOver}
                 onDragLeave={handleDragLeave}
                 onDrop={handleDrop}>
 
-                <ImageInput id='ProfileImageInput' type='file' onChange={handleProfileImageChange} />
+                <Input id='ImageInput' type='file' onChange={handleImageChange} disabled={inputDisabled} />
                 <ImageInputIcon src={imageIcon} textDisplay={textDisplay} />
                 <ImageInputFristText textDisplay={textDisplay}><strong>클릭하여 업로드</strong> 또는 <strong>드래그 & 드랍</strong></ImageInputFristText>
                 <ImageInputSecondText textDisplay={textDisplay}>PNG, JPG (최대 5MB)</ImageInputSecondText>
-                <ProfileImagePreview src={profileImage} previewDisplay={previewDisplay} />
+                <ProfileImagePreview src={image} previewDisplay={previewDisplay} />
 
-                <PreviewRemoveIcon cancelDisplay={cancelDisplay} onClick={removeProfileImage}>
+                <PreviewRemoveIcon cancelDisplay={cancelDisplay} onClick={removeImage}>
                     <CancelIcon src={cancelIcon} />
                 </PreviewRemoveIcon>
             </Container>
-            <HelperText text='*PNG, JPG 파일만 가능하며, 최대 크기는 5MB입니다.' visibility={helperTextVisibility} color='red' />
         </>
     );
 }
 
-export default ProfileImageInput;
+export default ImageInput;

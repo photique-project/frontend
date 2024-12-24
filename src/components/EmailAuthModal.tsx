@@ -1,20 +1,22 @@
-import { useState } from 'react';
-
-import styled from 'styled-components';
+import { useState, useEffect, Dispatch, SetStateAction } from 'react';
+import { API_BASE_URL } from '../config/environment';
+import ENDPOINTS from '../api/endpoints';
+import styled, { keyframes } from 'styled-components';
 
 import HelperText from './HelperText';
 
 import CheckInput from './input/CheckInput';
 
 import closeIcon from '../assets/close.png';
+import loadingIcon from '../assets/loading.png';
+import useFetch from '../hooks/useFetch';
 
 
-const Container = styled.div<{ display: 'flex' | 'none' }>`
+const Container = styled.div`
     width: 100%;
     height: 100%;
 
     display: flex;
-    display: ${({ display }) => display};
     flex-direction: column;
     align-items: center;
     justify-content: center;
@@ -26,7 +28,7 @@ const Container = styled.div<{ display: 'flex' | 'none' }>`
 
 const ModalBox = styled.div`
     width: 300px;
-    padding: 30px;
+    padding: 20px;
 
     display: flex;
     flex-direction: column;
@@ -50,8 +52,8 @@ const CloseButtonBox = styled.div`
 `;
 
 const CloseIcon = styled.img`  
-    width: 36px;
-    height: 36px;
+    width: 32px;
+    height: 32px;
 
     cursor: pointer;
 
@@ -69,47 +71,251 @@ const MainText = styled.div`
 `;
 
 const ResendButton = styled.button`
-    margin-top: 5px;
+    margin-top: 10px;
     width: 60px;
-    height: 17px;
+    height: 30px;
 
     border-radius: 5px;
     border: 1px solid rgba(0, 0, 0, 0.2);
 
-    font-size: 10px;
-    line-height: 11px;
+    font-size: 12px;
+    line-height: 12px;
     color: rgba(0, 0, 0, 0.7);  
 
+    background-color: white;
+
     cursor: pointer;
+
+    &:hover {
+        background-color: rgba(0, 0, 0, 0.07);
+    }
 `;
 
 const CompleteButton = styled.button`
     margin-top: 20px;
-    width: 100px;
-    height: 30px;
+    width: 100%;
+    height: 40px;
 
     border-radius: 7px;
 
     color: white;
-    background-color: black;
+    background-color: rgba(0, 0, 0, 0.7);
 
     cursor: pointer;
+
+    &:hover {
+        background-color: black;
+    }
 `;
 
 interface EmailAuthModalProps {
-    display: 'flex' | 'none';
+    email: string,
     closeModal: () => void;
+    validEmail: boolean | null;
+    setValidEmail: Dispatch<SetStateAction<boolean>>;
 }
 
+type Method = 'GET' | 'POST' | 'PATCH' | 'DELETE';
+
+interface FetchRequestOptions {
+    url: string;
+    method: 'GET' | 'POST' | 'DELETE' | 'PATCH';
+    headers: Record<string, string>;
+    credentials: 'include' | 'same-origin';
+    contentType: 'application/json' | 'multipart/form-data';
+    body?: Record<string, any> | FormData | null;
+}
+
+const rotate = keyframes`
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+`;
+
+const Loading = styled.img`
+  width: 20px;
+  animation: ${rotate} 1.2s ease-in-out infinite;
+`;
+
 const EmailAuthModal: React.FC<EmailAuthModalProps> = (props) => {
-    const { display, closeModal } = props;
+    const {
+        loading: authCodeLoading,
+        statusCode: authCodeStatusCode,
+        data: authCodeData,
+        fetchRequest: authCodeFetchRequest
+    } = useFetch<void>();
+
+    const {
+        loading: resendLoading,
+        statusCode: resendStatusCode,
+        data: resendData,
+        fetchRequest: resendFetchRequest
+    } = useFetch<void>();
+
+    const { email, closeModal, validEmail, setValidEmail } = props;
 
     const [helperText, setHelperText] = useState<string>('*입력한 이메일로 발송된 인증번호를 입력해주세요');
     const [helperTextVisibility, setHelperTextVisibility] = useState<'visible' | 'hidden'>('visible');
-    const [helperTextColor, setHelperTextColor] = useState<'red' | 'blue'>('blue');
+    const [helperTextColor, setHelperTextColor] = useState<'red' | 'blue' | 'green'>('blue');
+    const [code, setCode] = useState<string>('');
+    const [timeLimit, setTimeLimit] = useState<number | null>(180);
+
+    const [authCodeDisabled, setAuthCodeDisabled] = useState<boolean>(false)
+    const [resendDisabled, setResendDisabled] = useState<boolean>(false)
+
+    useEffect(() => {
+        const timer = setInterval(() => {
+            setTimeLimit((prev) => (prev > 0 ? prev - 1 : 0));
+        }, 1000);
+
+        return () => clearInterval(timer);
+    }, [timeLimit]);
+
+    const validateAuthcode = async () => {
+        // 입력한 인증코드 인증요청 fetch
+        // 결과에따른 useEffect작성
+        if (code === '') {
+            setHelperText('*인증코드를 입력해주세요');
+            setHelperTextColor('red');
+            setHelperTextVisibility('visible');
+            return;
+        }
+
+        const method: Method = 'POST'
+        const headers = {
+            'Content-Type': 'application/json',
+        }
+
+        const requestBody = {
+            email: email,
+            code: code
+        }
+
+        const options: FetchRequestOptions = {
+            url: `${API_BASE_URL}${ENDPOINTS.AUTH.VALIDATE_CODE}`,
+            method: method,
+            headers: headers,
+            credentials: 'include',
+            contentType: 'application/json',
+            body: requestBody
+        }
+
+        await authCodeFetchRequest(options);
+    }
+
+    useEffect(function validateEmailFetch() {
+        if (authCodeStatusCode === 204) {
+            setHelperText('*인증 성공 !');
+            setHelperTextColor('green');
+            setHelperTextVisibility('visible');
+            setValidEmail(true);
+            return;
+        }
+
+        if (authCodeStatusCode === 400) {
+            setHelperText('*유효하지 않은 이메일 형식입니다');
+            setHelperTextColor('red');
+            setHelperTextVisibility('visible');
+            setValidEmail(false);
+            return;
+        }
+
+        if (authCodeStatusCode === 401) {
+            setHelperText('*인증 코드가 올바르지 않습니다');
+            setHelperTextColor('red');
+            setHelperTextVisibility('visible');
+            setValidEmail(false);
+        }
+
+        if (authCodeStatusCode === 410) {
+            setHelperText('*인증 코드가 만료되었습니다');
+            setHelperTextColor('red');
+            setHelperTextVisibility('visible');
+            setValidEmail(false);
+        }
+
+        if (authCodeStatusCode === 500) {
+            setHelperText('*서버 에러');
+            setHelperTextColor('red');
+            setHelperTextVisibility('visible');
+            setValidEmail(false);
+        }
+    }, [authCodeStatusCode])
+
+    const handleAuthComplete = () => {
+        if (!validEmail) {
+            setHelperText('*이메일 인증을 진행해주세요');
+            setHelperTextColor('red');
+            setHelperTextVisibility('visible');
+            return;
+        }
+
+        closeModal();
+    }
+
+    useEffect(function closeAuthCodeInput() {
+        if (helperTextColor === 'green') {
+            setAuthCodeDisabled(true);
+            setResendDisabled(true);
+        }
+
+    }, [helperTextColor])
+
+    const handleResend = async () => {
+        const method: Method = 'POST'
+        const headers = {
+            'Content-Type': 'application/json',
+        }
+
+        const requestBody = {
+            email: email,
+            type: "JOIN"
+        }
+
+        const options: FetchRequestOptions = {
+            url: `${API_BASE_URL}${ENDPOINTS.AUTH.SEND_MAIL}`,
+            method: method,
+            headers: headers,
+            credentials: 'include',
+            contentType: 'application/json',
+            body: requestBody
+        }
+
+        await resendFetchRequest(options);
+    }
+
+    useEffect(function validateEmailFetch() {
+        if (resendStatusCode === 201) {
+            setHelperText('*인증코드가 재전송되었습니다');
+            setHelperTextColor('blue');
+            setHelperTextVisibility('visible');
+            setTimeLimit(180);
+            return;
+        }
+
+        if (resendStatusCode === 409) {
+            setHelperText('*이미 가입된 이메일입니다');
+            setHelperTextColor('red');
+            setHelperTextVisibility('visible');
+            return;
+        }
+
+        if (resendStatusCode === 500) {
+            setHelperText('*서버 에러');
+            setHelperTextColor('red');
+            setHelperTextVisibility('visible');
+        }
+    }, [resendStatusCode])
+
+    const handleCodeChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        setCode(e.target.value);
+    };
 
     return (
-        <Container display={display}>
+        <Container>
             <ModalBox>
 
                 <CloseButtonBox>
@@ -117,10 +323,13 @@ const EmailAuthModal: React.FC<EmailAuthModalProps> = (props) => {
                 </CloseButtonBox>
 
                 <MainText>이메일 인증</MainText>
-                <CheckInput placeHolder={null} marginTop={40} action={() => null} />
+
+                <CheckInput placeHolder={timeLimit} marginTop={20} action={validateAuthcode} text={code} handleChange={handleCodeChange} loading={authCodeLoading} inputDisabled={authCodeDisabled} />
                 <HelperText text={helperText} visibility={helperTextVisibility} color={helperTextColor} />
-                <ResendButton>재전송</ResendButton>
-                <CompleteButton>완료</CompleteButton>
+
+                <ResendButton disabled={resendDisabled} onClick={handleResend}>{resendLoading ? <Loading src={loadingIcon} alt="로딩" /> : "재전송"}</ResendButton>
+
+                <CompleteButton onClick={handleAuthComplete}>완료</CompleteButton>
 
             </ModalBox>
         </Container>

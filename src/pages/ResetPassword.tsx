@@ -6,6 +6,7 @@ import CheckInput from '../components/input/CheckInput';
 import EmailAuthModal from '../components/EmailAuthModal';
 import PasswordInput from '../components/input/PasswordInput';
 import LongButton from '../components/LongButton';
+import useFetch from '../hooks/useFetch';
 
 const Container = styled.div`
     display: flex;
@@ -82,7 +83,32 @@ const FormBox = styled.div`
 `;
 
 const ResetPassword = () => {
+    const {
+        loading: emailLoading,
+        statusCode: emailStatusCode,
+        data: emailData,
+        fetchRequest: emailFetchRequest
+    } = useFetch<void>();
+
     const [emailAuthModalDisplay, setEmailAuthModalDisplay] = useState<'flex' | null>(null);
+
+    const [validEmail, setValidEmail] = useState<boolean | null>(null);
+    const [email, setEmail] = useState<string>('');
+    const [emailDisabled, setEmailDisabled] = useState<boolean>(false);
+
+    const [validPassword, setValidPassword] = useState<boolean | null>(null);
+    const [password, setPassword] = useState<string>('');
+    const [passwordHelperText, setPasswordHelperText] = useState<string>('');
+    const [passwordHelperTextColor, setPasswordHelperTextColor] = useState<'red' | 'green'>('red');
+    const [passwordHelperTextVisibility, setPasswordHelperTextVisibility] = useState<'visible' | 'hidden'>('hidden');
+    const [passwordDisabled, setPasswordDisalbled] = useState<boolean>(false);
+
+    const [validRepassword, setValidRepassword] = useState<boolean | null>(null);
+    const [repassword, setRepassword] = useState<string>('');
+    const [repasswordHelperText, setRepasswordHelperText] = useState<string>('');
+    const [repasswordHelperTextColor, setRepasswordHelperTextColor] = useState<'red' | 'green'>('red');
+    const [repasswordHelperTextVisibility, setRepasswordHelperTextVisibility] = useState<'visible' | 'hidden'>('hidden');
+    const [repasswordDisabled, setRepasswordDisalbled] = useState<boolean>(false);
 
     const showEmailAuthModal = () => {
         if (emailAuthModalDisplay === 'flex') {
@@ -93,21 +119,37 @@ const ResetPassword = () => {
         setEmailAuthModalDisplay('flex');
     }
 
+    const handleEmailChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        setEmail(e.target.value);
+    };
+
+    const handlePasswordChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        setPassword(e.target.value);
+    };
+
+    const handleRepasswordChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        setRepassword(e.target.value);
+    };
+
+    const handleResetPassword = () => {
+
+    }
+
     return (
         <Container>
             <Header />
             <BodyBox>
                 <Maintext>이메일 인증을 완료하고 비밀번호를 재설정해주세요 !</Maintext>
                 <FormBox>
-                    <CheckInput placeHolder='이메일' marginTop={40} action={showEmailAuthModal} />
-                    <PasswordInput placeHolder='새 비밀번호' marginTop={25} />
-                    <PasswordInput placeHolder='비밀번호 확인' marginTop={25} />
-                    <LongButton text='재설정하기' type='black' marginTop={65} />
+                    <CheckInput placeHolder='이메일' marginTop={40} action={showEmailAuthModal} text={email} handleChange={handleEmailChange} setValidText={setValidEmail} loading={emailLoading} inputDisabled={emailDisabled} />
+                    <PasswordInput placeHolder='새 비밀번호' marginTop={25} text={password} handleChange={handlePasswordChange} inputDisabled={passwordDisabled} />
+                    <PasswordInput placeHolder='비밀번호 확인' marginTop={25} text={repassword} handleChange={handleRepasswordChange} inputDisabled={repasswordDisabled} />
+                    <LongButton text='재설정하기' type='black' marginTop={65} onClick={handleResetPassword} />
 
                 </FormBox>
 
             </BodyBox>
-            {emailAuthModalDisplay && <EmailAuthModal display={emailAuthModalDisplay} closeModal={showEmailAuthModal} />}
+            {emailAuthModalDisplay && <EmailAuthModal email={email} closeModal={showEmailAuthModal} validEmail={validEmail} setValidEmail={setValidEmail} />}
         </Container>
     )
 }

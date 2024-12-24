@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import styled from 'styled-components';
 
 import ShortNormalInput from './input/ShortNormalInput';
@@ -27,8 +28,8 @@ const Container = styled.div<{ display: 'flex' | 'none' }>`
 `;
 
 const LoginModalBox = styled.div`
-    width: 340px;
-    height: 412px;
+    width: 360px;
+    height: 452px;
     padding: 20px;
 
     display: flex;
@@ -74,6 +75,7 @@ const LogoIcon = styled.img`
     }
 `;
 
+
 interface LoginModalProps {
     display: 'flex' | 'none';
     closeModal: () => void;
@@ -81,12 +83,22 @@ interface LoginModalProps {
 
 const LoginModal: React.FC<LoginModalProps> = (props) => {
     const { display, closeModal } = props;
+    const [password, setPassword] = useState<string>('');
+    const [passwordDisabled, setPasswordDisalbled] = useState<boolean>(false);
 
     const handleContainerClick = (e: React.MouseEvent<HTMLDivElement>) => {
         if (e.target === e.currentTarget) {
             closeModal();
         }
     };
+
+    const handlePasswordChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        setPassword(e.target.value);
+    };
+
+    const handleLogin = () => {
+
+    }
 
     return (
         <Container display={display} onClick={handleContainerClick}>
@@ -97,10 +109,10 @@ const LoginModal: React.FC<LoginModalProps> = (props) => {
                 </CloseButtonBox>
 
                 <LogoIcon src={logoIcon} />
-                <ShortNormalInput placeHolder='이메일' marginTop={20} />
-                <PasswordInput placeHolder='비밀번호' marginTop={8} />
+                <ShortNormalInput placeHolder='이메일' marginTop={30} />
+                <PasswordInput placeHolder='비밀번호' marginTop={10} text={password} handleChange={handlePasswordChange} inputDisabled={passwordDisabled} />
                 <CheckBox text='자동 로그인' marginTop={5} />
-                <LongButton text='로그인' type='black' marginTop={10} />
+                <LongButton text='로그인' type='black' marginTop={20} onClick={handleLogin} />
                 <LoginModalNav />
                 <SNSLine text='간편 로그인' marginTop={30} />
                 <OAuthIcons marginTop={12} />
