@@ -1,5 +1,4 @@
-import { useState } from 'react';
-
+import { useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
 
 import Header from '../components/Header';
@@ -58,8 +57,6 @@ const FirstIntroBox = styled.div`
     
     background-color: black;
 
-
-    /* 태블릿 */
     @media (max-width: 768px) {
         height: 380px;
     }
@@ -74,7 +71,6 @@ const MainText = styled.div`
     font-weight: 700;
     line-height: 40px;
 
-    /* 태블릿 */
     @media (max-width: 768px) {
         font-size: 24px;
         line-height: 24px;
@@ -90,7 +86,6 @@ const SubText = styled.div`
     line-height: 30px;
     color: white;
 
-    /* 태블릿 */
     @media (max-width: 768px) {
         font-size: 20px;
         line-height: 20px;
@@ -116,7 +111,6 @@ const MainShortcutButton = styled.button`
         background-color: rgba(255, 255, 255, 0.9);
     }
 
-    /* 태블릿 */
     @media (max-width: 768px) {
         width: 200px;
         height: 50px;
@@ -221,7 +215,12 @@ const ThirdIntroBoxSubText = styled.div`
 
 
 
-const Home = () => {
+const Intro = () => {
+    const navigate = useNavigate();
+
+    const navigateToHomePage = () => {
+        navigate('/home');
+    };
 
     return (
         <Container>
@@ -232,7 +231,7 @@ const Home = () => {
                 <FirstIntroBox>
                     <MainText>Photique에서 당신의 독창적인 시선을 남겨주세요 !</MainText>
                     <SubText>작품을 꺼내고 전시회를 열어보세요</SubText>
-                    <MainShortcutButton>photique 바로가기</MainShortcutButton>
+                    <MainShortcutButton onClick={navigateToHomePage}>photique 바로가기</MainShortcutButton>
                 </FirstIntroBox>
 
                 <SecondIntroBox>
@@ -268,4 +267,4 @@ const Home = () => {
     )
 }
 
-export default Home;
+export default Intro;

@@ -23,12 +23,10 @@ const Container = styled.header`
     flex-shrink: 0;
     cursor: pointer;
 
-    /* 태블릿 */
     @media (max-width: 768px) {
         height: 60px;
     }
 
-    /* 모바일 */
     @media (max-width: 480px) {
         height: 50px;
     }
@@ -38,7 +36,6 @@ const Logo = styled.img`
     margin-left: 20px;
     height: 35px;
 
-    /* 휴대폰 */
     @media (max-width: 480px) {
         margin-left: 10px;
         height: 30px; 
@@ -46,15 +43,14 @@ const Logo = styled.img`
 `;
 
 const HeaderButtonBox = styled.div`
-    width: 310px;
     height: 80px;
     margin-right: 20px;
     display: flex;
     flex-direction: row;
     justify-content: space-between;
     align-items: center;
+    gap:10px;
 
-    /* 태블릿 */
     @media (max-width: 768px) {
         display: none;
     }
@@ -78,7 +74,6 @@ const HeaderMenuButtonBox = styled.div`
         background-color: rgba(0, 0, 0, 0.07);
     }
 
-    /* 태블릿 */
     @media (max-width: 768px) {
         display: flex;
     }
@@ -108,6 +103,8 @@ const HeaderMenu = styled.div<{ isOpen: boolean }>`
 
     transform: translateX(${({ isOpen }) => (isOpen ? '0' : '100%')}); 
     transition: transform 0.3s ease-in-out; 
+
+    z-index: 999;
 
     @media (max-width: 240px) {
         width: 100%;
@@ -153,6 +150,14 @@ const Header = () => {
         navigate('/join');
     };
 
+    const navigateToIntroPage = () => {
+        navigate('/');
+    };
+
+    const navigateToHomePage = () => {
+        navigate('/home');
+    };
+
     const openMenu = () => {
         setIsMenuOpen((prev) => !prev);
     };
@@ -170,11 +175,12 @@ const Header = () => {
     return (
         <>
             <Container>
-                <Logo src={logo}></Logo>
+                <Logo src={logo} onClick={navigateToHomePage}></Logo>
 
                 <HeaderButtonBox>
                     <ShortButton text="로그인" type="white" action={showLoginModal}></ShortButton>
                     <ShortButton text="회원가입" type="black" action={navigateToJoinPage}></ShortButton>
+                    <ShortButton text="About" type="none" action={navigateToIntroPage}></ShortButton>
                     <ShortButton text="고객센터" type="none" action={showLoginModal}></ShortButton>
                 </HeaderButtonBox>
 
@@ -187,6 +193,7 @@ const Header = () => {
             <HeaderMenu isOpen={isMenuOpen}>
                 <MenuButton onClick={showLoginModal}>로그인</MenuButton>
                 <MenuButton onClick={navigateToJoinPage}>회원가입</MenuButton>
+                <MenuButton onClick={navigateToIntroPage}>About</MenuButton>
                 <MenuButton>고객센터</MenuButton>
             </HeaderMenu>
 

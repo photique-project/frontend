@@ -25,6 +25,8 @@ const Container = styled.div<{ display: 'flex' | 'none' }>`
     position: fixed;
 
     background-color: rgba(0, 0, 0, 0.6);
+
+    z-index: 9999;
 `;
 
 const LoginModalBox = styled.div`
@@ -59,10 +61,10 @@ const CloseIcon = styled.img`
 
     cursor: pointer;
 
-    transition: transform 0.2s ease-in-out; /* 지속시간 0.5초로 설정 */
+    transition: transform 0.2s ease-in-out;
 
     &:hover {
-        transform: scale(1.1); /* 크기를 10% 키움 */
+        transform: scale(1.1);
     }
 `;
 

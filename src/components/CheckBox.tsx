@@ -19,8 +19,8 @@ const Label = styled.label`
     flex-direction: row;
     align-items: center;
 
-    font-size: 12px;
-    line-height: 12px;
+    font-size: 14px;
+    line-height: 14px;
 `;
 
 const Box = styled.input`

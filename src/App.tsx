@@ -1,6 +1,6 @@
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import styled from 'styled-components';
-import Home from './pages/Home';
+import Intro from './pages/Intro';
 import Join from './pages/Join';
 import SNSJoin from './pages/SNSJoin';
 import ResetPassword from './pages/ResetPassword';
@@ -18,7 +18,7 @@ function App() {
     <Router>
       <AppContainer>
         <Routes>
-          <Route path="/" element={<Home />} />
+          <Route path="/" element={<Intro />} />
           <Route path="/join" element={<Join />} />
           <Route path="/sns-join" element={<SNSJoin />} />
           <Route path="/reset-password" element={<ResetPassword />} />

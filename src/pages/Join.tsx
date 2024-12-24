@@ -16,7 +16,6 @@ import ToastMessage from '../components/ToastMessage';
 import useFetch from '../hooks/useFetch';
 import { API_BASE_URL } from '../config/environment';
 import ENDPOINTS from '../api/endpoints';
-import { getHashes } from 'crypto';
 
 const Container = styled.div`
     display: flex;
@@ -122,7 +121,7 @@ const Join = () => {
 
 
     const [emailAuthModalDisplay, setEmailAuthModalDisplay] = useState<'flex' | null>(null);
-    const [toastMessageDisplay, setToastMessageDisplay] = useState<'flex' | null>('flex');
+    const [toastMessageDisplay, setToastMessageDisplay] = useState<'flex' | null>(null);
 
     const [validProfileImage, setValidProfileImage] = useState<boolean | null>(null);
     const [profileImage, setProfileImage] = useState<string | undefined>(undefined);

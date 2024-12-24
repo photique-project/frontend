@@ -21,14 +21,12 @@ const Button = styled.button<{ type: "white" | "black" | "none" }>`
         type === "white" || type === "none" ? "rgba(0, 0, 0, 0.07)" : "rgba(0, 0, 0, 0.7)"};
     }
 
-    /* 태블릿 */
     @media (max-width: 768px) {
         width: 80px;
         height: 40px;
         font-size: 14px;
     }
 
-    /* 휴대폰 */
     @media (max-width: 480px) {
         width: 100%;
         font-size: 14px;

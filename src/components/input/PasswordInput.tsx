@@ -92,7 +92,7 @@ const PasswordInput: React.FC<PasswordInputProps> = (props) => {
     return (
         <Container marginTop={marginTop}>
             <Input placeholder={placeHolder} type={inputType} value={text} onChange={handleChange} disabled={inputDisabled}></Input>
-            <ViewIcon src={isOpen ? eyeIcon : eyeOffIcon} onClick={handleOpen}></ViewIcon>
+            <ViewIcon src={isOpen ? eyeOffIcon : eyeIcon} onClick={handleOpen}></ViewIcon>
 
 
         </Container>
