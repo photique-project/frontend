@@ -3,6 +3,8 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
+    "@redux-devtools/extension": "^3.3.0",
+    "@reduxjs/toolkit": "^2.5.0",
     "@testing-library/jest-dom": "^5.17.0",
     "@testing-library/react": "^13.4.0",
     "@testing-library/user-event": "^13.5.0",
@@ -13,9 +15,13 @@
     "@types/styled-components": "^5.1.34",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
+    "react-redux": "^9.2.0",
     "react-router-dom": "^7.0.2",
+    "redux-persist": "^6.0.0",
+    "redux-saga": "^1.3.0",
     "styled-components": "^6.1.13",
-    "web-vitals": "^2.1.4"
+    "web-vitals": "^2.1.4",
+    "zustand": "^5.0.2"
   },
   "scripts": {
     "start": "react-scripts start",
@@ -47,7 +53,7 @@
     "eslint-plugin-react": "^7.37.2",
     "globals": "^15.14.0",
     "react-scripts": "^5.0.1",
-    "typescript": "^5.7.2",
+    "typescript": "^4.7.3",
     "typescript-eslint": "^8.18.1"
   }
 }

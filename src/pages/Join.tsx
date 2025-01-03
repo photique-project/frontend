@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 import styled from 'styled-components';
@@ -87,7 +87,7 @@ type Method = 'GET' | 'POST' | 'PATCH' | 'DELETE';
 
 interface FetchRequestOptions {
     url: string;
-    method: 'GET' | 'POST' | 'DELETE' | 'PATCH';
+    method: Method
     headers?: Record<string, string>;
     credentials: 'include' | 'same-origin';
     contentType: 'application/json' | 'multipart/form-data';
@@ -173,7 +173,7 @@ const Join = () => {
     }, [validProfileImage])
 
 
-    const showEmailAuthModal = async () => {
+    const showEmailAuthModal = () => {
         if (emailAuthModalDisplay === 'flex') {
             setEmailAuthModalDisplay(null);
             return;
@@ -207,7 +207,7 @@ const Join = () => {
             body: requestBody
         }
 
-        await emailFetchRequest(options);
+        emailFetchRequest(options);
     }
 
     useEffect(function validateEmailFetch() {
@@ -315,7 +315,6 @@ const Join = () => {
         setRepassword(e.target.value);
     };
 
-    // 비밀번호 입력했을 떄의 useEffect
     useEffect(function validatePassword() {
         if (password !== '') {
             if (!/^(?=.*[a-zA-Z])(?=.*[0-9])(?=.*[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>/?]).{8,}$/.test(password)) {

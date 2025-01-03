@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import styled from 'styled-components';
 
 import ShortNormalInput from './input/ShortNormalInput';
@@ -6,18 +6,22 @@ import LongButton from '../components/LongButton';
 import CheckBox from '../components/CheckBox';
 import LoginModalNav from '../components/LoginModalNav';
 import SNSLine from '../components/SNSLine';
+import HelperText from '../components/HelperText';
 
 import logoIcon from '../assets/logo.png';
 import closeIcon from '../assets/close.png';
 import PasswordInput from './input/PasswordInput';
 import OAuthIcons from './OAuthIcons';
+import useFetch from '../hooks/useFetch';
+import { API_BASE_URL } from '../config/environment';
+import ENDPOINTS from '../api/endpoints';
+import useAuthStore from '../zustand/store';
 
-const Container = styled.div<{ display: 'flex' | 'none' }>`
+const Container = styled.div`
     width: 100%;
     height: 100%;
 
     display: flex;
-    display: ${({ display }) => display};
     flex-direction: column;
     align-items: center;
     justify-content: center;
@@ -77,16 +81,42 @@ const LogoIcon = styled.img`
     }
 `;
 
+const HelperTextBox = styled.div`
+    width: 300px;
+    height: 12px;
+`;
+
+type Method = 'GET' | 'POST' | 'PATCH' | 'DELETE';
+
+interface FetchRequestOptions {
+    url: string;
+    method: Method
+    headers?: Record<string, string>;
+    credentials: 'include' | 'same-origin';
+    contentType: 'application/json' | 'multipart/form-data';
+    body?: Record<string, any> | FormData | null;
+}
 
 interface LoginModalProps {
-    display: 'flex' | 'none';
     closeModal: () => void;
 }
 
 const LoginModal: React.FC<LoginModalProps> = (props) => {
-    const { display, closeModal } = props;
+    const { closeModal } = props;
+    const [email, setEmail] = useState<string>('');
+    const [emailDisabled, setEmailDisabled] = useState<boolean>(false);
     const [password, setPassword] = useState<string>('');
     const [passwordDisabled, setPasswordDisalbled] = useState<boolean>(false);
+    const [helperText, setHelperText] = useState<string>('');
+    const [helperTextVisibility, setHelperTextVisibility] = useState<'visible' | 'hidden'>('hidden');
+
+    const {
+        loading: loginLoading,
+        statusCode: loginStatusCode,
+        data: loginData,
+        fetchRequest: loginFetchRequest
+    } = useFetch<void>();
+
 
     const handleContainerClick = (e: React.MouseEvent<HTMLDivElement>) => {
         if (e.target === e.currentTarget) {
@@ -94,16 +124,91 @@ const LoginModal: React.FC<LoginModalProps> = (props) => {
         }
     };
 
+    const handleEmailChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        setEmail(e.target.value);
+    };
+
     const handlePasswordChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         setPassword(e.target.value);
     };
 
     const handleLogin = () => {
+        if (!email) {
+            setHelperText('*이메일을 입력해주세요');
+            setHelperTextVisibility('visible');
+            return;
+        }
 
+        if (!password) {
+            setHelperText('*비밀번호 입력해주세요');
+            setHelperTextVisibility('visible');
+            return;
+        }
+
+        setHelperTextVisibility('hidden');
+
+        const method: Method = 'POST'
+        const headers = {
+            'Content-Type': 'application/json',
+        }
+
+        const requestBody = {
+            email: email,
+            password: password
+        }
+
+        const options: FetchRequestOptions = {
+            url: `${API_BASE_URL}${ENDPOINTS.AUTH.LOGIN}`,
+            method: method,
+            headers: headers,
+            credentials: 'include',
+            contentType: 'application/json',
+            body: requestBody
+        }
+
+        loginFetchRequest(options);
     }
 
+    useEffect(function loadLoginFetchRequest() {
+        if (loginLoading) {
+            setEmailDisabled(true);
+            setPasswordDisalbled(true);
+
+            return;
+        }
+
+        setEmailDisabled(false);
+        setPasswordDisalbled(false);
+
+    }, [loginLoading])
+
+    useEffect(function handleLogin() {
+        const temp = async () => {
+            if (loginStatusCode === 201) {
+                setHelperTextVisibility('hidden');
+                const login = useAuthStore.getState().login;
+                await login();
+                closeModal();
+                return;
+            }
+
+            if (loginStatusCode === 500) {
+                setHelperText('*서버 에러');
+                setHelperTextVisibility('visible');
+                return;
+            }
+
+            if (loginStatusCode === 401) {
+                setHelperText('*이메일과 비밀번호를 확인해주세요');
+                setHelperTextVisibility('visible');
+            }
+        }
+
+        temp();
+    }, [loginStatusCode])
+
     return (
-        <Container display={display} onClick={handleContainerClick}>
+        <Container onClick={handleContainerClick}>
             <LoginModalBox>
 
                 <CloseButtonBox>
@@ -111,11 +216,17 @@ const LoginModal: React.FC<LoginModalProps> = (props) => {
                 </CloseButtonBox>
 
                 <LogoIcon src={logoIcon} />
-                <ShortNormalInput placeHolder='이메일' marginTop={30} />
+                <ShortNormalInput placeHolder='이메일' marginTop={30} text={email} handleChange={handleEmailChange} inputDisabled={emailDisabled} />
                 <PasswordInput placeHolder='비밀번호' marginTop={10} text={password} handleChange={handlePasswordChange} inputDisabled={passwordDisabled} />
                 <CheckBox text='자동 로그인' marginTop={5} />
-                <LongButton text='로그인' type='black' marginTop={20} onClick={handleLogin} />
+                <HelperTextBox>
+                    <HelperText text={helperText} visibility={helperTextVisibility} color={'red'} />
+                </HelperTextBox>
+
+                <LongButton text='로그인' type='black' marginTop={15} onClick={handleLogin} />
+
                 <LoginModalNav />
+
                 <SNSLine text='간편 로그인' marginTop={30} />
                 <OAuthIcons marginTop={12} />
 

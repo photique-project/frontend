@@ -51,6 +51,7 @@ const useFetch = <T = unknown>(): UseFetchReturn<T> => {
             if (response.ok) {
                 const responseData: T | null = response.status === 200 ? await response.json() : null;
                 setData(responseData);
+
             } else {
                 const error = await response.json();
                 console.log(error.message)

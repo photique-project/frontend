@@ -1,9 +1,12 @@
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, useLocation } from 'react-router-dom';
+import { useEffect } from 'react';
+
 import styled from 'styled-components';
 import Intro from './pages/Intro';
 import Join from './pages/Join';
 import SNSJoin from './pages/SNSJoin';
 import ResetPassword from './pages/ResetPassword';
+import Home from './pages/Home';
 
 const AppContainer = styled.div`
   margin: 0;
@@ -14,14 +17,18 @@ const AppContainer = styled.div`
 `;
 
 function App() {
+
+
   return (
     <Router>
       <AppContainer>
         <Routes>
+
           <Route path="/" element={<Intro />} />
           <Route path="/join" element={<Join />} />
           <Route path="/sns-join" element={<SNSJoin />} />
           <Route path="/reset-password" element={<ResetPassword />} />
+          <Route path="/home" element={<Home />} />
 
         </Routes>
       </AppContainer>

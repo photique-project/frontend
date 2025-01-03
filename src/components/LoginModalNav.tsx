@@ -1,3 +1,4 @@
+import { useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
 
 const Container = styled.div`
@@ -23,10 +24,16 @@ const Text = styled.div`
 
 
 const LoginModalNav = () => {
+    const navigate = useNavigate();
+
+    const navigateToJoinPage = () => {
+        navigate('/join');
+    };
+
     return (
         <Container>
             <Text>비밀번호 찾기</Text>
-            <Text>회원가입</Text>
+            <Text onClick={navigateToJoinPage}>회원가입</Text>
         </Container>
     );
 }

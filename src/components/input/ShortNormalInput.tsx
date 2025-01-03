@@ -47,14 +47,22 @@ const Input = styled.input`
 interface ShortNormalInputProps {
     placeHolder: string;
     marginTop: number;
+    text: string;
+    handleChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
+    inputDisabled: boolean;
 }
 
 const ShortNormalInput: React.FC<ShortNormalInputProps> = (props) => {
-    const { placeHolder, marginTop } = props;
+    const { placeHolder, marginTop, text, handleChange, inputDisabled } = props;
 
     return (
         <Container marginTop={marginTop}>
-            <Input placeholder={placeHolder}></Input>
+            <Input
+                placeholder={placeHolder}
+                value={text}
+                onChange={handleChange}
+                disabled={inputDisabled}
+            ></Input>
         </Container>
     )
 }
