@@ -1,0 +1,53 @@
+name: 개발서버 React App 배포
+
+on:
+  pull_request:
+    branches:
+      - develop
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: 소스코드 체크아웃
+      uses: actions/checkout@v3
+
+    - name: Node 설치
+      uses: actions/setup-node@v3
+      with:
+        node-version: 18
+
+    - name: 환경변수 파일 생성
+      run: echo "${{ secrets.ENV_DEV }}" > .env
+
+    - name: 의존성 설치
+        run: npm install
+
+    - name: 앱 빌드
+      run: npm run build
+
+    - name: 빌드 파일 압축
+      run: tar -czf react.tar.gz -C build .
+
+    - name: EC2에 파일 복사
+      uses: appleboy/scp-action@master
+      with:
+        username: ubuntu
+        host: ${{ secrets.HOST_DEV }}
+        key: ${{ secrets.KEY }}
+        source: ./react.tar.gz
+        target: /home/ubuntu
+
+    - name: EC2 연결 압축해제 및 nginx 재시작, 압축파일 삭제
+      uses: appleboy/ssh-action@master
+      with:
+        host: ${{ secrets.HOST_DEV }}
+        username: ubuntu
+        key: ${{ secrets.KEY }}
+        script: |
+            sudo rm -r /home/ubuntu/react
+            tar -xzf /home/ubuntu/react.tar.gz -C /home/ubuntu
+            sudo rm /home/ubuntu/react.tar.gz
+            sudo docker exec nginx-dev nginx -s reload
+            
