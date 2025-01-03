@@ -19,7 +19,7 @@ jobs:
         node-version: 18
 
     - name: 환경변수 파일 생성
-      run: echo "${{ secrets.ENV_DEV }}" > .env
+      run: echo "${{ secrets.ENV_DEV }}" > ./.env
 
     - name: 의존성 설치
       run: npm install
