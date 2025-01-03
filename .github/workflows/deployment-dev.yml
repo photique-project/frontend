@@ -46,8 +46,8 @@ jobs:
         host: ${{ secrets.HOST_DEV }}
         key: ${{ secrets.KEY }}
         script: |
-            sudo rm -r /home/ubuntu/react
-            tar -xzf /home/ubuntu/react.tar.gz -C /home/ubuntu
+            sudo rm -rf /home/ubuntu/react/*
+            tar -xzf /home/ubuntu/react.tar.gz -C /home/ubuntu/react
             sudo rm /home/ubuntu/react.tar.gz
             sudo docker exec nginx-dev nginx -s reload
             
