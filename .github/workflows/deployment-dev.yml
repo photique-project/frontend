@@ -22,7 +22,7 @@ jobs:
       run: echo "${{ secrets.ENV_DEV }}" > .env
 
     - name: 의존성 설치
-        run: npm install
+      run: npm install
 
     - name: 앱 빌드
       run: npm run build
@@ -42,8 +42,8 @@ jobs:
     - name: EC2 연결 압축해제 및 nginx 재시작, 압축파일 삭제
       uses: appleboy/ssh-action@master
       with:
-        host: ${{ secrets.HOST_DEV }}
         username: ubuntu
+        host: ${{ secrets.HOST_DEV }}
         key: ${{ secrets.KEY }}
         script: |
             sudo rm -r /home/ubuntu/react
