@@ -100,7 +100,7 @@ const SNSJoin = () => {
     const [emailAuthModalDisplay, setEmailAuthModalDisplay] = useState<'flex' | null>(null);
 
     const [validProfileImage, setValidProfileImage] = useState<boolean | null>(null);
-    const [profileImage, setProfileImage] = useState<string | undefined>(undefined);
+    const [profileImage, setProfileImage] = useState<File | undefined>(undefined);
     const [profileImageHelperTextVisibility, setProfileImageHelperTextVisibility] = useState<'visible' | 'hidden'>('hidden');
     const [profileImageDisabled, setProfileImageDisalbled] = useState<boolean>(false);
 

@@ -3,18 +3,27 @@ import styled from 'styled-components';
 import ShortButton from './ShortButton';
 
 const Container = styled.div`
-    margin-top: 5px;
     width: 770px;
     padding: 15px;
 
     display: flex;
     flex-direction: column;
 
+    top: 50px;
+
+    position: absolute;
+
     box-shadow: 0 4px 10px -1px rgba(0, 0, 0, 0.25);
 
     border-radius: 10px;
 
     background-color: white;
+    
+    z-index: 1;
+
+    @media (max-width: 900px) {
+        width: calc(100% - 30px);
+    }
 `;
 
 const SearchTargetText = styled.div`
@@ -41,6 +50,7 @@ const CheckboxInputBox = styled.div`
     margin-top: 10px;
     display: flex;
     flex-direction: row;
+    flex-wrap: wrap;
     gap: 10px;
 `;
 
@@ -126,6 +136,12 @@ const FilterPanel: React.FC<FilterPanelProps> = (props) => {
 
     useEffect(function handleClosePanel() {
         const handleClickOutside = (event: MouseEvent) => {
+            const target = event.target as HTMLElement;
+
+            if (target.id === 'sortIcon') {
+                return;
+            }
+
             if (panelRef.current && !panelRef.current.contains(event.target as Node)) {
                 closePanel();
             }

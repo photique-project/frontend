@@ -22,6 +22,7 @@ const Container = styled.div`
 
     @media (max-width: 480px) {
         width: 80%;
+        height: auto;
     }
 `;
 
@@ -37,6 +38,7 @@ const Icon = styled.img`
         width: 40px;
         height: 40px;
     }
+
 `;
 
 const MainText = styled.div`
@@ -49,6 +51,11 @@ const MainText = styled.div`
         margin-top: 10px;
         font-size: 20px;
         line-height: 20px;
+    }
+
+    @media (max-width: 480px) {
+        font-size: 16px;
+        line-height: 17px;
     }
 `;
 
@@ -65,6 +72,11 @@ const SubText = styled.div`
         margin-top: 10px;
         font-size: 16px;
         line-height: 24px;
+    }
+
+    @media (max-width: 480px) {
+        font-size: 12px;
+        line-height: 18px;
     }
 `;
 

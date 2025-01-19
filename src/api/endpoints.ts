@@ -4,6 +4,7 @@ interface Endpoints {
         VALIDATE_CODE: string;
         VALIDATE_NICKNAME: string;
         LOGIN: string;
+        LOGOUT: string;
     };
     USER: {
         DEFAULT: string;
@@ -18,6 +19,7 @@ const ENDPOINTS: Endpoints = {
         VALIDATE_CODE: '/api/v1/auth/code',
         VALIDATE_NICKNAME: '/api/v1/auth/nickname',
         LOGIN: '/api/v1/auth/login',
+        LOGOUT: '/api/v1/auth/logout',
     },
     USER: {
         DEFAULT: '/api/v1/users',

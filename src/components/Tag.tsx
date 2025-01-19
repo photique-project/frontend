@@ -16,6 +16,7 @@ const Container = styled.div`
     justify-content: center;
 
     border: 1px solid rgba(0, 0, 0, 0.2);
+    box-sizing: border-box;
     border-radius: 10px;
 
     gap: 6px;

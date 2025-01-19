@@ -22,7 +22,7 @@ import bellDotIcon from '../assets/bell-dot.png';
 const Container = styled.header`
     width: 100%;
     height: 80px;
-    border-bottom: 2px solid rgba(0, 0, 0, 0.2);
+    box-shadow: 0 2px 4px -1px rgba(0, 0, 0, 0.25);
     background-color: #F9FBFF;
 
     display: flex;
@@ -117,6 +117,11 @@ const HeaderMenu = styled.div<{ isOpen: boolean }>`
 
     @media (max-width: 240px) {
         width: 100%;
+        margin-top: 50px;
+    }
+
+    @media (max-width: 480px) {
+        margin-top: 50px;
     }
 
     @media (min-width: 769px) {
@@ -214,8 +219,6 @@ const NotificationIcon = styled.img`
     }
 `
 
-
-
 type Method = 'GET' | 'POST' | 'PATCH' | 'DELETE';
 
 interface FetchRequestOptions {
@@ -250,6 +253,13 @@ const Header = () => {
         statusCode: userInfoStatusCode,
         data: userInfoData,
         fetchRequest: userInfoFetchRequest
+    } = useFetch<UserInfo>();
+
+    const {
+        loading: logoutLoading,
+        statusCode: logoutStatusCode,
+        data: logoutData,
+        fetchRequest: logoutFetchRequest
     } = useFetch<UserInfo>();
 
     const isLoggedIn = useAuthStore.getState().isLoggedIn;
@@ -318,6 +328,36 @@ const Header = () => {
         setLoginModalDisplay(true);
     }
 
+    const handleLogout = () => {
+        const method: Method = 'POST'
+        const headers = {
+            'Content-Type': 'application/json',
+        }
+
+        const options: FetchRequestOptions = {
+            url: `${API_BASE_URL}${ENDPOINTS.AUTH.LOGOUT}`,
+            method: method,
+            headers: headers,
+            credentials: 'include',
+            contentType: 'application/json',
+        }
+
+        logoutFetchRequest(options);
+    }
+
+    useEffect(function getLogoutResult() {
+        if (logoutStatusCode) {
+            if (logoutStatusCode === 204) {
+                window.location.reload();
+                return;
+            }
+
+            alert("로그아웃 실패\n잠시 후 다시 시도해주세요");
+        }
+
+
+    }, [logoutStatusCode])
+
 
     return (
         <>
@@ -343,7 +383,6 @@ const Header = () => {
                             <NotificationIcon src={bellIcon} alt='알림' />
                         </UserProfileImageBox>
                     }
-
                     <ShortButton text="About" type="none" action={navigateToIntroPage}></ShortButton>
                     <ShortButton text="고객센터" type="none" action={showLoginModal}></ShortButton>
                 </HeaderButtonBox>
@@ -355,8 +394,11 @@ const Header = () => {
             </Container>
 
             <HeaderMenu isOpen={isMenuOpen}>
-                <MenuButton onClick={showLoginModal}>로그인</MenuButton>
-                <MenuButton onClick={navigateToJoinPage}>회원가입</MenuButton>
+                {!userInfo && <MenuButton onClick={showLoginModal}>로그인</MenuButton>}
+                {!userInfo && <MenuButton onClick={navigateToJoinPage}>회원가입</MenuButton>}
+                {userInfo && <MenuButton onClick={showLoginModal}>내 정보</MenuButton>}
+                {userInfo && <MenuButton onClick={handleLogout}>히스토리</MenuButton>}
+                {userInfo && <MenuButton onClick={handleLogout}>로그아웃</MenuButton>}
                 <MenuButton onClick={navigateToIntroPage}>About</MenuButton>
                 <MenuButton>고객센터</MenuButton>
             </HeaderMenu>
