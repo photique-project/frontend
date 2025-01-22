@@ -10,7 +10,7 @@ import ImageInput from '../components/input/ImageInput';
 import CheckInput from '../components/input/CheckInput';
 import EmailAuthModal from '../components/EmailAuthModal';
 import PasswordInput from '../components/input/PasswordInput';
-import LongButton from '../components/LongButton';
+import LongButton from '../components/button/LongButton';
 import HelperText from '../components/HelperText';
 import ToastMessage from '../components/ToastMessage';
 import useFetch from '../hooks/useFetch';
@@ -488,7 +488,7 @@ const Join = () => {
 
                 <JoinFormBox>
                     <ProfileImageInputText>프로필 이미지</ProfileImageInputText>
-                    <ImageInput marginTop={5} image={profileImage} setImage={setProfileImage} setValidImage={setValidProfileImage} inputDisabled={profileImageDisabled} />
+                    <ImageInput width={'100%'} ratio={'1/1'} marginTop={5} image={profileImage} setImage={setProfileImage} setValidImage={setValidProfileImage} inputDisabled={profileImageDisabled} />
                     <HelperText text='*PNG, JPG 파일만 가능하며, 최대 크기는 5MB입니다' visibility={profileImageHelperTextVisibility} color='red' />
 
                     <CheckInput placeHolder='이메일' marginTop={30} action={showEmailAuthModal} text={email} handleChange={handleEmailChange} loading={emailLoading} inputDisabled={emailDisabled} />

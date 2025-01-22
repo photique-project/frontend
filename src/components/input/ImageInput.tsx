@@ -1,13 +1,13 @@
-import { useState, Dispatch, SetStateAction } from 'react';
+import { useState, Dispatch, SetStateAction, useEffect } from 'react';
 
 import imageIcon from '../../assets/add-image.png';
 import cancelIcon from '../../assets/cancel.png';
 import styled from 'styled-components';
 
-const Container = styled.label<{ marginTop: number, isDragging: boolean }>`
+const Container = styled.label<{ width: string, ratio: string, marginTop: number, isDragging: boolean }>`
     margin-top: ${({ marginTop }) => `${marginTop}px`};
-    width:100%;
-    aspect-ratio: 1;
+    width: ${({ width }) => width}; 
+    aspect-ratio: ${({ ratio }) => ratio}; ;
 
     display: flex;
     flex-direction: column;
@@ -55,14 +55,15 @@ const ImageInputSecondText = styled.div<{ textDisplay: 'block' | 'none' }>`
 `;
 
 const ProfileImagePreview = styled.img<{ previewDisplay: 'block' | 'none' }>`
-    width:100%;
-    aspect-ratio: 1;
+    width: 100%;
+    height: 100%;
 
     position: absolute;
     
     border-radius: 15px;
 
     display: ${({ previewDisplay }) => previewDisplay};
+    object-fit: contain; 
 `;
 
 const PreviewRemoveIcon = styled.div<{ cancelDisplay: 'flex' | 'none' }>`
@@ -95,6 +96,8 @@ const CancelIcon = styled.img`
 `
 
 interface ImageInputProps {
+    width: string;
+    ratio: string;
     marginTop: number;
     image: File | undefined;
     setImage: Dispatch<SetStateAction<File | undefined>>;
@@ -103,12 +106,18 @@ interface ImageInputProps {
 }
 
 const ImageInput: React.FC<ImageInputProps> = (props) => {
-    const { marginTop, image, setImage, setValidImage, inputDisabled } = props;
+    const { width, ratio, marginTop, image, setImage, setValidImage, inputDisabled } = props;
     const [previewDisplay, setPreviewDisplay] = useState<'block' | 'none'>('block');
     const [cancelDisplay, setCancelDisplay] = useState<'flex' | 'none'>('none');
     const [textDisplay, setTextDisplay] = useState<'block' | 'none'>('block');
     const [isDragging, setIsDragging] = useState<boolean>(false);
     const [preview, setPreview] = useState<string | undefined>();
+
+    useEffect(function preLoad() {
+        if (image) {
+            isValidImage(image);
+        }
+    }, []);
 
     const isValidImage = (image: File) => {
         const validTypes = ['image/png', 'image/jpg', 'image/jpeg'];
@@ -159,6 +168,8 @@ const ImageInput: React.FC<ImageInputProps> = (props) => {
         if (profileImage) {
             isValidImage(profileImage)
         }
+
+        e.target.value = '';
     };
 
     const removeImage = () => {
@@ -178,6 +189,8 @@ const ImageInput: React.FC<ImageInputProps> = (props) => {
     return (
         <>
             <Container
+                width={width}
+                ratio={ratio}
                 marginTop={marginTop}
                 htmlFor='ImageInput'
                 onClick={preventClickWhenImageExists}

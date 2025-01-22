@@ -1,6 +1,6 @@
 import { useRef, useEffect } from 'react';
 import styled from 'styled-components';
-import ShortButton from './ShortButton';
+import ShortButton from './button/ShortButton';
 
 const Container = styled.div`
     width: 770px;

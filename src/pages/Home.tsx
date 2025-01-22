@@ -1,4 +1,6 @@
-import { useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
+import { useNavigate } from 'react-router-dom';
+
 import styled from 'styled-components';
 import Header from '../components/Header';
 import SingleWorkView from '../components/SingleWorkView';
@@ -355,22 +357,37 @@ const HistoryPanelIcon = styled.img<{ activeSrc?: string }>`
 
 
 const Home = () => {
+    const navigate = useNavigate();
+
+    const scrollBoxRef = useRef<HTMLDivElement | null>(null);
     const [inputValue, setInputValue] = useState<string>('');
+
     const [tags, setTags] = useState<string[]>([]);
     const [isTagMode, setIsTagMode] = useState<boolean>(false);
+    const [isComposing, setIsComposing] = useState(false);
+
     const [searchTarget, setSearchTarget] = useState<'work' | 'photographer' | null>(null);
     const [sortingTarget, setSortingTarget] = useState<'like' | 'last' | 'comment' | 'view' | 'recent' | null>(null);
     const [categories, setCategories] = useState<string[]>([]);
     const [filterPanelDisplay, setFilterPanelDisplay] = useState<'flex' | null>(null);
+
     const [singleWorkView, setSingleWorkView] = useState<boolean>(true);
     const [exhibitionView, setExhibitionView] = useState<boolean>(false);
     const [likeView, setLikeView] = useState<boolean>(false);
+
     const [isScrolled, setIsScrolled] = useState(false);
 
     const handleScroll = (e: React.UIEvent<HTMLDivElement>) => {
         const scrollTop = e.currentTarget.scrollTop;
         setIsScrolled(scrollTop > 0);
     };
+
+    const scrollToTop = () => {
+        if (scrollBoxRef.current) {
+            scrollBoxRef.current.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+    };
+
 
     const handleSearchTarget = (searchTarget: 'work' | 'photographer' | null) => {
         setSearchTarget(searchTarget);
@@ -396,28 +413,37 @@ const Home = () => {
 
 
     const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        const value = e.target.value;
-        setInputValue(value);
+        setInputValue(e.target.value);
+    };
 
-        if (value.startsWith('@') && !value.includes(' ')) {
+    useEffect(function isTagMode() {
+        if (inputValue.startsWith('@') && !inputValue.includes(' ')) {
             setIsTagMode(true);
             return;
         }
 
         setIsTagMode(false);
-    };
+    }, [inputValue])
 
     const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+        if (isComposing) {
+            return; // 한글 입력 중이면 이벤트 무시
+        }
+
         if (e.key === 'Enter' && isTagMode) {
+            e.preventDefault();
             if (tags.length >= 5) {
                 alert('태그는 최대 5개까지만 추가할 수 있습니다.');
                 return;
             }
 
-            const newTag = inputValue.slice(1);
+            const newTag = inputValue.slice(1).trim(); // 골뱅이 제거
 
             if (newTag) {
-                setTags([...tags, newTag]);
+                if (!tags.includes(newTag)) {
+                    setTags([...tags, newTag]);
+                }
+
                 setInputValue('');
                 setIsTagMode(false);
             }
@@ -428,8 +454,16 @@ const Home = () => {
         setTags(tags.filter(tag => tag !== tagToRemove));
     };
 
+    const handleCompositionStart = () => {
+        setIsComposing(true); // 한글 입력 시작
+    };
+
+    const handleCompositionEnd = () => {
+        setIsComposing(false); // 한글 입력 종료
+    };
+
     const showFilterPanel = () => {
-        console.log('필터패널!')
+
         if (filterPanelDisplay === 'flex') {
             setFilterPanelDisplay(null);
 
@@ -463,6 +497,13 @@ const Home = () => {
         setSingleWorkView(false);
     }
 
+    // 페이지 이동
+    const navigateToNewPostPage = () => {
+        if (singleWorkView || likeView) {
+            navigate('/new-singlework');
+        }
+    };
+
 
     return (
         <Container>
@@ -483,6 +524,8 @@ const Home = () => {
                         onKeyDown={handleKeyDown}
                         placeholder="검색어를 입력하세요"
                         isTagMode={isTagMode}
+                        onCompositionStart={handleCompositionStart}
+                        onCompositionEnd={handleCompositionEnd}
                     />
 
                     {filterPanelDisplay && <FilterPanel
@@ -508,7 +551,7 @@ const Home = () => {
             </SearchBox>
 
 
-            <ScrollBox onScroll={handleScroll}>
+            <ScrollBox ref={scrollBoxRef} onScroll={handleScroll}>
 
                 <Tab>
                     <TabIconBox id='single-work' viewMode={singleWorkView} onClick={handleView}>
@@ -532,10 +575,10 @@ const Home = () => {
 
             <ActionBox>
                 <ActionIconBox>
-                    <ActionIcon src={writeNonactiveIcon} activeSrc={writeActiveIcon} />
+                    <ActionIcon src={writeNonactiveIcon} activeSrc={writeActiveIcon} onClick={navigateToNewPostPage} />
                 </ActionIconBox>
                 <ActionIconBox>
-                    <ActionIcon src={upNonactiveIcon} activeSrc={upActiveIcon} />
+                    <ActionIcon src={upNonactiveIcon} activeSrc={upActiveIcon} onClick={scrollToTop} />
                 </ActionIconBox>
                 <ActionIconBox>
                     <ActionIcon src={helpNonactiveIcon} activeSrc={helpActiveIcon} />

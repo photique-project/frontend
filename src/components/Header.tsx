@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 
 import styled from 'styled-components';
 
-import ShortButton from '../components/ShortButton';
+import ShortButton from './button/ShortButton';
 import LoginModal from '../components/LoginModal';
 
 import useFetch from '../hooks/useFetch';
@@ -39,6 +39,8 @@ const Container = styled.header`
     @media (max-width: 480px) {
         height: 50px;
     }
+
+    z-index: 99;
 `;
 
 const Logo = styled.img`

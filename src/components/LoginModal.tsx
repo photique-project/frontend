@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import styled from 'styled-components';
 
 import ShortNormalInput from './input/ShortNormalInput';
-import LongButton from '../components/LongButton';
+import LongButton from './button/LongButton';
 import CheckBox from '../components/CheckBox';
 import LoginModalNav from '../components/LoginModalNav';
 import SNSLine from '../components/SNSLine';
