@@ -120,13 +120,20 @@ const SingleWorkView = styled.div`
 
 interface SingleWorkBoxProps {
     src: string;
+    handleOpenSingleWorkDetail: (singleWorkId: string) => void;
 }
 
 const SingleWorkBox: React.FC<SingleWorkBoxProps> = (props) => {
-    const { src } = props;
+    // 여기서 아이디 가지고 있다가 열기
+    const { src, handleOpenSingleWorkDetail } = props;
+    const id = "1";
+
+    const handleOpenDetail = () => {
+        handleOpenSingleWorkDetail(id);
+    }
 
     return (
-        <Container>
+        <Container onClick={handleOpenDetail}>
             <SingleWorkInfo>
 
                 <BestSingleWorkWriterBox>

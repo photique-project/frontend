@@ -204,7 +204,12 @@ const SingleWorkColumn = styled.div`
     gap: 14px;
 `
 
-const SingleWorkView = () => {
+interface SingleWorkViewProps {
+    handleOpenSingleWorkDetail: (singleWorkId?: string) => void;
+}
+
+const SingleWorkView: React.FC<SingleWorkViewProps> = (props) => {
+    const { handleOpenSingleWorkDetail } = props;
     const [isSmallScreen, setIsSmallScreen] = useState<boolean>(window.innerWidth <= 768);
 
     useEffect(() => {
@@ -254,81 +259,81 @@ const SingleWorkView = () => {
                 {!isSmallScreen &&
                     <>
                         <SingleWorkColumn>
-                            <SingleWorkBox src={ex1}></SingleWorkBox>
-                            <SingleWorkBox src={ex4}></SingleWorkBox>
-                            <SingleWorkBox src={ex7}></SingleWorkBox>
-                            <SingleWorkBox src={ex10}></SingleWorkBox>
-                            <SingleWorkBox src={ex13}></SingleWorkBox>
-                            <SingleWorkBox src={ex16}></SingleWorkBox>
-                            <SingleWorkBox src={ex19}></SingleWorkBox>
-                            <SingleWorkBox src={ex22}></SingleWorkBox>
-                            <SingleWorkBox src={ex25}></SingleWorkBox>
-                            <SingleWorkBox src={ex28}></SingleWorkBox>
-                            <SingleWorkBox src={ex31}></SingleWorkBox>
+                            <SingleWorkBox src={ex1} handleOpenSingleWorkDetail={handleOpenSingleWorkDetail}></SingleWorkBox>
+                            <SingleWorkBox src={ex4} handleOpenSingleWorkDetail={handleOpenSingleWorkDetail}></SingleWorkBox>
+                            <SingleWorkBox src={ex7} handleOpenSingleWorkDetail={handleOpenSingleWorkDetail}></SingleWorkBox>
+                            <SingleWorkBox src={ex10} handleOpenSingleWorkDetail={handleOpenSingleWorkDetail}></SingleWorkBox>
+                            <SingleWorkBox src={ex13} handleOpenSingleWorkDetail={handleOpenSingleWorkDetail}></SingleWorkBox>
+                            <SingleWorkBox src={ex16} handleOpenSingleWorkDetail={handleOpenSingleWorkDetail}></SingleWorkBox>
+                            <SingleWorkBox src={ex19} handleOpenSingleWorkDetail={handleOpenSingleWorkDetail}></SingleWorkBox>
+                            <SingleWorkBox src={ex22} handleOpenSingleWorkDetail={handleOpenSingleWorkDetail}></SingleWorkBox>
+                            <SingleWorkBox src={ex25} handleOpenSingleWorkDetail={handleOpenSingleWorkDetail}></SingleWorkBox>
+                            <SingleWorkBox src={ex28} handleOpenSingleWorkDetail={handleOpenSingleWorkDetail}></SingleWorkBox>
+                            <SingleWorkBox src={ex31} handleOpenSingleWorkDetail={handleOpenSingleWorkDetail}></SingleWorkBox>
                         </SingleWorkColumn>
                         <SingleWorkColumn>
-                            <SingleWorkBox src={ex2}></SingleWorkBox>
-                            <SingleWorkBox src={ex5}></SingleWorkBox>
-                            <SingleWorkBox src={ex8}></SingleWorkBox>
-                            <SingleWorkBox src={ex11}></SingleWorkBox>
-                            <SingleWorkBox src={ex14}></SingleWorkBox>
-                            <SingleWorkBox src={ex17}></SingleWorkBox>
-                            <SingleWorkBox src={ex20}></SingleWorkBox>
-                            <SingleWorkBox src={ex23}></SingleWorkBox>
-                            <SingleWorkBox src={ex26}></SingleWorkBox>
-                            <SingleWorkBox src={ex29}></SingleWorkBox>
-                            <SingleWorkBox src={ex32}></SingleWorkBox>
+                            <SingleWorkBox src={ex2} handleOpenSingleWorkDetail={handleOpenSingleWorkDetail}></SingleWorkBox>
+                            <SingleWorkBox src={ex5} handleOpenSingleWorkDetail={handleOpenSingleWorkDetail}></SingleWorkBox>
+                            <SingleWorkBox src={ex8} handleOpenSingleWorkDetail={handleOpenSingleWorkDetail}></SingleWorkBox>
+                            <SingleWorkBox src={ex11} handleOpenSingleWorkDetail={handleOpenSingleWorkDetail}></SingleWorkBox>
+                            <SingleWorkBox src={ex14} handleOpenSingleWorkDetail={handleOpenSingleWorkDetail}></SingleWorkBox>
+                            <SingleWorkBox src={ex17} handleOpenSingleWorkDetail={handleOpenSingleWorkDetail}></SingleWorkBox>
+                            <SingleWorkBox src={ex20} handleOpenSingleWorkDetail={handleOpenSingleWorkDetail}></SingleWorkBox>
+                            <SingleWorkBox src={ex23} handleOpenSingleWorkDetail={handleOpenSingleWorkDetail}></SingleWorkBox>
+                            <SingleWorkBox src={ex26} handleOpenSingleWorkDetail={handleOpenSingleWorkDetail}></SingleWorkBox>
+                            <SingleWorkBox src={ex29} handleOpenSingleWorkDetail={handleOpenSingleWorkDetail}></SingleWorkBox>
+                            <SingleWorkBox src={ex32} handleOpenSingleWorkDetail={handleOpenSingleWorkDetail}></SingleWorkBox>
                         </SingleWorkColumn>
                         <SingleWorkColumn>
-                            <SingleWorkBox src={ex3}></SingleWorkBox>
-                            <SingleWorkBox src={ex6}></SingleWorkBox>
-                            <SingleWorkBox src={ex9}></SingleWorkBox>
-                            <SingleWorkBox src={ex12}></SingleWorkBox>
-                            <SingleWorkBox src={ex15}></SingleWorkBox>
-                            <SingleWorkBox src={ex18}></SingleWorkBox>
-                            <SingleWorkBox src={ex21}></SingleWorkBox>
-                            <SingleWorkBox src={ex24}></SingleWorkBox>
-                            <SingleWorkBox src={ex27}></SingleWorkBox>
-                            <SingleWorkBox src={ex30}></SingleWorkBox>
-                            <SingleWorkBox src={ex33}></SingleWorkBox>
+                            <SingleWorkBox src={ex3} handleOpenSingleWorkDetail={handleOpenSingleWorkDetail}></SingleWorkBox>
+                            <SingleWorkBox src={ex6} handleOpenSingleWorkDetail={handleOpenSingleWorkDetail}></SingleWorkBox>
+                            <SingleWorkBox src={ex9} handleOpenSingleWorkDetail={handleOpenSingleWorkDetail}></SingleWorkBox>
+                            <SingleWorkBox src={ex12} handleOpenSingleWorkDetail={handleOpenSingleWorkDetail}></SingleWorkBox>
+                            <SingleWorkBox src={ex15} handleOpenSingleWorkDetail={handleOpenSingleWorkDetail}></SingleWorkBox>
+                            <SingleWorkBox src={ex18} handleOpenSingleWorkDetail={handleOpenSingleWorkDetail}></SingleWorkBox>
+                            <SingleWorkBox src={ex21} handleOpenSingleWorkDetail={handleOpenSingleWorkDetail}></SingleWorkBox>
+                            <SingleWorkBox src={ex24} handleOpenSingleWorkDetail={handleOpenSingleWorkDetail}></SingleWorkBox>
+                            <SingleWorkBox src={ex27} handleOpenSingleWorkDetail={handleOpenSingleWorkDetail}></SingleWorkBox>
+                            <SingleWorkBox src={ex30} handleOpenSingleWorkDetail={handleOpenSingleWorkDetail}></SingleWorkBox>
+                            <SingleWorkBox src={ex33} handleOpenSingleWorkDetail={handleOpenSingleWorkDetail}></SingleWorkBox>
                         </SingleWorkColumn>
                     </>
                 }
                 {isSmallScreen &&
                     <SingleWorkColumn>
-                        <SingleWorkBox src={ex1}></SingleWorkBox>
-                        <SingleWorkBox src={ex4}></SingleWorkBox>
-                        <SingleWorkBox src={ex7}></SingleWorkBox>
-                        <SingleWorkBox src={ex10}></SingleWorkBox>
-                        <SingleWorkBox src={ex13}></SingleWorkBox>
-                        <SingleWorkBox src={ex16}></SingleWorkBox>
-                        <SingleWorkBox src={ex19}></SingleWorkBox>
-                        <SingleWorkBox src={ex22}></SingleWorkBox>
-                        <SingleWorkBox src={ex25}></SingleWorkBox>
-                        <SingleWorkBox src={ex28}></SingleWorkBox>
-                        <SingleWorkBox src={ex31}></SingleWorkBox>
-                        <SingleWorkBox src={ex2}></SingleWorkBox>
-                        <SingleWorkBox src={ex5}></SingleWorkBox>
-                        <SingleWorkBox src={ex8}></SingleWorkBox>
-                        <SingleWorkBox src={ex11}></SingleWorkBox>
-                        <SingleWorkBox src={ex14}></SingleWorkBox>
-                        <SingleWorkBox src={ex17}></SingleWorkBox>
-                        <SingleWorkBox src={ex20}></SingleWorkBox>
-                        <SingleWorkBox src={ex23}></SingleWorkBox>
-                        <SingleWorkBox src={ex26}></SingleWorkBox>
-                        <SingleWorkBox src={ex29}></SingleWorkBox>
-                        <SingleWorkBox src={ex32}></SingleWorkBox>
-                        <SingleWorkBox src={ex3}></SingleWorkBox>
-                        <SingleWorkBox src={ex6}></SingleWorkBox>
-                        <SingleWorkBox src={ex9}></SingleWorkBox>
-                        <SingleWorkBox src={ex12}></SingleWorkBox>
-                        <SingleWorkBox src={ex15}></SingleWorkBox>
-                        <SingleWorkBox src={ex18}></SingleWorkBox>
-                        <SingleWorkBox src={ex21}></SingleWorkBox>
-                        <SingleWorkBox src={ex24}></SingleWorkBox>
-                        <SingleWorkBox src={ex27}></SingleWorkBox>
-                        <SingleWorkBox src={ex30}></SingleWorkBox>
-                        <SingleWorkBox src={ex33}></SingleWorkBox>
+                        <SingleWorkBox src={ex1} handleOpenSingleWorkDetail={handleOpenSingleWorkDetail}></SingleWorkBox>
+                        <SingleWorkBox src={ex4} handleOpenSingleWorkDetail={handleOpenSingleWorkDetail}></SingleWorkBox>
+                        <SingleWorkBox src={ex7} handleOpenSingleWorkDetail={handleOpenSingleWorkDetail}></SingleWorkBox>
+                        <SingleWorkBox src={ex10} handleOpenSingleWorkDetail={handleOpenSingleWorkDetail}></SingleWorkBox>
+                        <SingleWorkBox src={ex13} handleOpenSingleWorkDetail={handleOpenSingleWorkDetail}></SingleWorkBox>
+                        <SingleWorkBox src={ex16} handleOpenSingleWorkDetail={handleOpenSingleWorkDetail}></SingleWorkBox>
+                        <SingleWorkBox src={ex19} handleOpenSingleWorkDetail={handleOpenSingleWorkDetail}></SingleWorkBox>
+                        <SingleWorkBox src={ex22} handleOpenSingleWorkDetail={handleOpenSingleWorkDetail}></SingleWorkBox>
+                        <SingleWorkBox src={ex25} handleOpenSingleWorkDetail={handleOpenSingleWorkDetail}></SingleWorkBox>
+                        <SingleWorkBox src={ex28} handleOpenSingleWorkDetail={handleOpenSingleWorkDetail}></SingleWorkBox>
+                        <SingleWorkBox src={ex31} handleOpenSingleWorkDetail={handleOpenSingleWorkDetail}></SingleWorkBox>
+                        <SingleWorkBox src={ex1} handleOpenSingleWorkDetail={handleOpenSingleWorkDetail}></SingleWorkBox>
+                        <SingleWorkBox src={ex4} handleOpenSingleWorkDetail={handleOpenSingleWorkDetail}></SingleWorkBox>
+                        <SingleWorkBox src={ex7} handleOpenSingleWorkDetail={handleOpenSingleWorkDetail}></SingleWorkBox>
+                        <SingleWorkBox src={ex10} handleOpenSingleWorkDetail={handleOpenSingleWorkDetail}></SingleWorkBox>
+                        <SingleWorkBox src={ex13} handleOpenSingleWorkDetail={handleOpenSingleWorkDetail}></SingleWorkBox>
+                        <SingleWorkBox src={ex16} handleOpenSingleWorkDetail={handleOpenSingleWorkDetail}></SingleWorkBox>
+                        <SingleWorkBox src={ex19} handleOpenSingleWorkDetail={handleOpenSingleWorkDetail}></SingleWorkBox>
+                        <SingleWorkBox src={ex22} handleOpenSingleWorkDetail={handleOpenSingleWorkDetail}></SingleWorkBox>
+                        <SingleWorkBox src={ex25} handleOpenSingleWorkDetail={handleOpenSingleWorkDetail}></SingleWorkBox>
+                        <SingleWorkBox src={ex28} handleOpenSingleWorkDetail={handleOpenSingleWorkDetail}></SingleWorkBox>
+                        <SingleWorkBox src={ex31} handleOpenSingleWorkDetail={handleOpenSingleWorkDetail}></SingleWorkBox>
+                        <SingleWorkBox src={ex1} handleOpenSingleWorkDetail={handleOpenSingleWorkDetail}></SingleWorkBox>
+                        <SingleWorkBox src={ex4} handleOpenSingleWorkDetail={handleOpenSingleWorkDetail}></SingleWorkBox>
+                        <SingleWorkBox src={ex7} handleOpenSingleWorkDetail={handleOpenSingleWorkDetail}></SingleWorkBox>
+                        <SingleWorkBox src={ex10} handleOpenSingleWorkDetail={handleOpenSingleWorkDetail}></SingleWorkBox>
+                        <SingleWorkBox src={ex13} handleOpenSingleWorkDetail={handleOpenSingleWorkDetail}></SingleWorkBox>
+                        <SingleWorkBox src={ex16} handleOpenSingleWorkDetail={handleOpenSingleWorkDetail}></SingleWorkBox>
+                        <SingleWorkBox src={ex19} handleOpenSingleWorkDetail={handleOpenSingleWorkDetail}></SingleWorkBox>
+                        <SingleWorkBox src={ex22} handleOpenSingleWorkDetail={handleOpenSingleWorkDetail}></SingleWorkBox>
+                        <SingleWorkBox src={ex25} handleOpenSingleWorkDetail={handleOpenSingleWorkDetail}></SingleWorkBox>
+                        <SingleWorkBox src={ex28} handleOpenSingleWorkDetail={handleOpenSingleWorkDetail}></SingleWorkBox>
+                        <SingleWorkBox src={ex31} handleOpenSingleWorkDetail={handleOpenSingleWorkDetail}></SingleWorkBox>
                     </SingleWorkColumn>
                 }
             </SingleWorkBoxes>

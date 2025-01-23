@@ -7,7 +7,7 @@ import blackHeartIcon from '../assets/black-heart.png';
 
 const Container = styled.div`
     width: 100%;
-
+    
     display: flex;
     flex-direction: row;
     gap: 10px;
@@ -37,43 +37,45 @@ const CommentBodyBox = styled.div`
 `
 
 const CommentBodyHeaderBox = styled.div`
-width: 100%;
+    width: 100%;
 
-display: flex;
-flex-direction: row;
-align-items: center;
-justify-content: space-between;
+    position: relative;
+
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
 `
 
 const CommentNicknameBox = styled.div`
-font-size: 16px;
-font-weight: 700;
+    font-size: 16px;
+    font-weight: 700;
 `
 
 const CommentBodyHeaderRightBox = styled.div`
-display: flex;
-flex-direction: row;
-align-items: center;
-gap: 10px;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 10px;
 `
 
 const CommentTime = styled.div`
-font-size: 14px;
-color: rgba(0, 0, 0, 0.4);
+    font-size: 14px;
+    color: rgba(0, 0, 0, 0.4);
 `;
 
 const CommentMenuIcon = styled.img`
-width: 24px;
-height: 24px;
+    width: 24px;
+    height: 24px;
 `
 
 const CommentText = styled.div`
-font-size: 14px;
-line-height: 20px;
+    font-size: 14px;
+    line-height: 20px;
 
-color: rgba(0, 0, 0, 0.6);
+    color: rgba(0, 0, 0, 0.6);
 
-white-space: pre-wrap;
+    white-space: pre-wrap;
 `
 
 const CommentLikeBox = styled.div`

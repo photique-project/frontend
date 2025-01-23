@@ -1,20 +1,17 @@
+import { API_BASE_URL } from '../config/environment';
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
-import styled from 'styled-components';
-
-import ShortButton from './button/ShortButton';
-import LoginModal from '../components/LoginModal';
-
+import useAuthStore from '../zustand/store';
 import useFetch from '../hooks/useFetch';
+import ENDPOINTS from '../api/endpoints';
+
+import styled from 'styled-components';
+import LoginModal from '../components/LoginModal';
+import ShortButton from './button/ShortButton';
 
 import logo from '../assets/logo.png';
 import menuIcon from '../assets/menu.png';
-
-import useAuthStore from '../zustand/store';
-import { API_BASE_URL } from '../config/environment';
-import ENDPOINTS from '../api/endpoints';
-
 import activeUserIcon from '../assets/active-user.png';
 import bellIcon from '../assets/bell.png';
 import bellDotIcon from '../assets/bell-dot.png';

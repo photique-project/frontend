@@ -6,7 +6,6 @@ import "react-datepicker/dist/react-datepicker.css";
 import styled from 'styled-components';
 
 import Header from '../components/Header';
-import HelperText from '../components/HelperText';
 import ImageInput from '../components/input/ImageInput';
 import ScrollInput from '../components/input/ScrollInput';
 import ShortButton from '../components/button/ShortButton';
@@ -503,7 +502,7 @@ const PreviewContainer = styled.div`
 
 const PreviewImageBox = styled.div`
     width: 100%;
-    aspect-ratio: 4 / 3;
+    aspect-ratio: 3 / 2;
 
     display: flex;
     flex-direction: column;
@@ -1436,7 +1435,7 @@ const NewSingleWork = () => {
                                 <ImageInputTitle color={imageHelperTextColor}>{imageHelperText}</ImageInputTitle>
                             </ImageInputTitleBox>
 
-                            <ImageInput width={'100%'} ratio={'4/3'} marginTop={5} image={image} setImage={setImage} setValidImage={setValidImage} inputDisabled={imageDisabled} />
+                            <ImageInput width={'100%'} ratio={'3/2'} marginTop={5} image={image} setImage={setImage} setValidImage={setValidImage} inputDisabled={imageDisabled} />
 
                             <InputBox>
 

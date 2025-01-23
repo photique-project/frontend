@@ -1,15 +1,16 @@
 import { useEffect, useState, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
-
 import styled from 'styled-components';
+
 import Header from '../components/Header';
 import SingleWorkView from '../components/SingleWorkView';
 import LikeView from '../components/LikeView';
-import sortingIcon from '../assets/sorting.png';
-import mainSearchIcon from '../assets/main-search.png';
 import Tag from '../components/Tag';
 import FilterPanel from '../components/FilterPanel';
 import ExhibitionView from '../components/ExhibitionView';
+
+import sortingIcon from '../assets/sorting.png';
+import mainSearchIcon from '../assets/main-search.png';
 import gridBlackIcon from '../assets/grid-black.png';
 import gridWhiteIcon from '../assets/grid-white.png';
 import exhibitionBlackIcon from '../assets/exhibition-black.png';
@@ -28,6 +29,7 @@ import arrowLeftNonactiveIcon from '../assets/arrow-left-nonactive.png';
 import arrowLeftActiveIcon from '../assets/arrow-left-active.png';
 import arrowRightNonactiveIcon from '../assets/arrow-right-nonactive.png';
 import arrowRightActiveIcon from '../assets/arrow-right-active.png';
+import SingleWork from '../components/SingleWork';
 
 const Container = styled.div`
     display: flex;
@@ -361,6 +363,9 @@ const Home = () => {
 
     const scrollBoxRef = useRef<HTMLDivElement | null>(null);
     const [inputValue, setInputValue] = useState<string>('');
+    const [isScrolled, setIsScrolled] = useState(false);
+    const [openSingleWorkDetail, setOpenSingleWorkDetail] = useState<boolean>(false);
+    const [selectedSingleWorkId, SetSelectedSingleWorkId] = useState<string>(null);
 
     const [tags, setTags] = useState<string[]>([]);
     const [isTagMode, setIsTagMode] = useState<boolean>(false);
@@ -375,7 +380,6 @@ const Home = () => {
     const [exhibitionView, setExhibitionView] = useState<boolean>(false);
     const [likeView, setLikeView] = useState<boolean>(false);
 
-    const [isScrolled, setIsScrolled] = useState(false);
 
     const handleScroll = (e: React.UIEvent<HTMLDivElement>) => {
         const scrollTop = e.currentTarget.scrollTop;
@@ -504,6 +508,19 @@ const Home = () => {
         }
     };
 
+    // single work 상세조회
+    const handleOpenSingleWorkDetail = (singleWorkId?: string) => {
+        // 받은 아이디로 열기
+        if (openSingleWorkDetail) {
+            setOpenSingleWorkDetail(false);
+
+            return;
+        }
+
+        setOpenSingleWorkDetail(true);
+        SetSelectedSingleWorkId(singleWorkId);
+    };
+
 
     return (
         <Container>
@@ -565,10 +582,9 @@ const Home = () => {
                     </TabIconBox>
                 </Tab>
 
-                {singleWorkView && <SingleWorkView />}
+                {singleWorkView && <SingleWorkView handleOpenSingleWorkDetail={handleOpenSingleWorkDetail} />}
                 {exhibitionView && <ExhibitionView />}
-                {likeView && <LikeView />}
-
+                {likeView && <LikeView handleOpenSingleWorkDetail={handleOpenSingleWorkDetail} />}
 
             </ScrollBox>
 
@@ -591,6 +607,8 @@ const Home = () => {
             <HistoryPanelIconBox>
                 <HistoryPanelIcon src={arrowLeftNonactiveIcon} activeSrc={arrowLeftActiveIcon} />
             </HistoryPanelIconBox>
+
+            {openSingleWorkDetail && <SingleWork singleWorkId={selectedSingleWorkId} close={handleOpenSingleWorkDetail}></SingleWork>}
 
         </Container>
     )
