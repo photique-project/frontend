@@ -2,7 +2,8 @@ import styled from 'styled-components';
 
 import commentMenuIcon from '../assets/comment-menu.png';
 import profileImage from '../assets/ex1.jpg';
-import blackHeartIcon from '../assets/black-heart.png';
+import heartIcon from '../assets/heart.png';
+import menuIcon from '../assets/menu-white.png';
 
 
 const Container = styled.div`
@@ -50,6 +51,7 @@ const CommentBodyHeaderBox = styled.div`
 const CommentNicknameBox = styled.div`
     font-size: 16px;
     font-weight: 700;
+    color: white;
 `
 
 const CommentBodyHeaderRightBox = styled.div`
@@ -61,7 +63,7 @@ const CommentBodyHeaderRightBox = styled.div`
 
 const CommentTime = styled.div`
     font-size: 14px;
-    color: rgba(0, 0, 0, 0.4);
+    color: rgba(255, 255, 255, 0.6);
 `;
 
 const CommentMenuIcon = styled.img`
@@ -73,7 +75,7 @@ const CommentText = styled.div`
     font-size: 14px;
     line-height: 20px;
 
-    color: rgba(0, 0, 0, 0.6);
+    color: rgba(255, 255, 255, 0.8);
 
     white-space: pre-wrap;
 `
@@ -92,10 +94,12 @@ const CommentLikeIcon = styled.img`
 
 const CommentLikeValue = styled.div`
     font-size: 14px;
+
+    color: white;
 `
 
 
-const Comment = () => {
+const ExhibitionComment = () => {
     return (
         <Container>
 
@@ -107,12 +111,12 @@ const Comment = () => {
                     <CommentNicknameBox>닉네임</CommentNicknameBox>
                     <CommentBodyHeaderRightBox>
                         <CommentTime>방금 전</CommentTime>
-                        <CommentMenuIcon src={commentMenuIcon} />
+                        <CommentMenuIcon src={menuIcon} />
                     </CommentBodyHeaderRightBox>
                 </CommentBodyHeaderBox>
                 <CommentText>정말 인상적인 작품이네요. 흑백으로 표현된 질감이 너무 아름답습니다. 정말 인상적인 작품이네요. 흑백으로 표현된 질감이 너무 아름답습니다.</CommentText>
                 <CommentLikeBox>
-                    <CommentLikeIcon src={blackHeartIcon} />
+                    <CommentLikeIcon src={heartIcon} />
                     <CommentLikeValue>23</CommentLikeValue>
                 </CommentLikeBox>
 
@@ -122,4 +126,4 @@ const Comment = () => {
     )
 }
 
-export default Comment;
+export default ExhibitionComment;
