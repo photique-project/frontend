@@ -857,6 +857,9 @@ const NewExhibition = () => {
     // 이미지 박스 핸들링
     const handleRemoveImageBox = (index: number) => {
         setImages((prev) => prev.filter((_, i) => i !== index));
+        setPreviewImages((prev) => prev.filter((_, i) => i !== index));
+        setTitleInput((prev) => prev.filter((_, i) => i !== index));
+        setDescriptionInput((prev) => prev.filter((_, i) => i !== index));
     }
 
     const handleMoveUp = (index: number) => {
@@ -907,18 +910,25 @@ const NewExhibition = () => {
         // 리렌더링 발생하면 미리보기와 작성하기 탭을 통해서 강제로 마운트 언마운트가 되도록 해놓았기 때문에 하위에 있는 ImageInput이 리렌더링이 아닌 언마운트 & 마운트 됨
         // 이미지 변경사항은 인덱스가 변경되어도 적용됨 -> 프리뷰배열이 커지고 있음 -> 이미지 사이즈 값 조절하자
         // 삭제도 인덱스 잘 지켜지는 확인
+
         if (images.length > 0 && images.length !== imagesSizeRef.current) {
-            console.log('이미지 추가 || 삭제 이펙트')
-            imagesSizeRef.current += 1;
+            if (images.length > imagesSizeRef.current) {
+                console.log('이미지 추가 이펙트')
+                imagesSizeRef.current += 1;
 
-            const newPreviewImage = URL.createObjectURL(images[0]);
-            setPreviewImages((prev) => [newPreviewImage, ...prev]);
+                const newPreviewImage = URL.createObjectURL(images[0]);
+                setPreviewImages((prev) => [newPreviewImage, ...prev]);
 
-            const newTitleInput = '';
-            setTitleInput((prev) => [newTitleInput, ...prev]);
+                const newTitleInput = '';
+                setTitleInput((prev) => [newTitleInput, ...prev]);
 
-            const newDescriptionInput = '';
-            setDescriptionInput((prev) => [newDescriptionInput, ...prev]);
+                const newDescriptionInput = '';
+                setDescriptionInput((prev) => [newDescriptionInput, ...prev]);
+            } else {
+                console.log('이미지 삭제 이펙트')
+                imagesSizeRef.current -= 1;
+                // 나머지 인덱스 조정은 제거 함수에서 수행
+            }
         }
     }, [images]);
 
