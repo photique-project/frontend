@@ -110,10 +110,11 @@ const ButtonBox = styled.div`
 `;
 
 interface FilterPanelProps {
-    searchTarget: 'work' | 'photographer' | null;
-    handleSearchTarget: (searchTarget: 'work' | 'photographer' | null) => void;
-    sortingTarget: 'like' | 'last' | 'comment' | 'view' | 'recent' | null;
-    handleSortingTarget: (sorting: 'like' | 'last' | 'comment' | 'view' | 'recent' | null) => void;
+    searchTarget: 'work' | 'writer';
+    handleSearchTarget: (searchTarget: 'work' | 'writer') => void;
+    sortingTarget: 'like' | 'last' | 'comment' | 'view' | 'recent';
+    handleSortingTarget: (sorting: 'like' | 'last' | 'comment' | 'view' | 'recent') => void;
+    sortingOrder: 'asc' | 'desc';
     categories: string[];
     handleCategoryTarget: (category: string) => void;
     handleReset: () => void;
@@ -126,6 +127,7 @@ const FilterPanel: React.FC<FilterPanelProps> = (props) => {
         handleSearchTarget,
         sortingTarget,
         handleSortingTarget,
+        sortingOrder,
         categories,
         handleCategoryTarget,
         handleReset,
@@ -163,15 +165,15 @@ const FilterPanel: React.FC<FilterPanelProps> = (props) => {
                         type="checkbox"
                         value="work"
                         checked={searchTarget === 'work'}
-                        onChange={() => handleSearchTarget(searchTarget === 'work' ? null : 'work')}
+                        onChange={() => handleSearchTarget('work')}
                     /> 작품
                 </CheckboxLabel>
                 <CheckboxLabel>
                     <CheckboxInput
                         type="checkbox"
-                        value="photographer"
-                        checked={searchTarget === 'photographer'}
-                        onChange={() => handleSearchTarget(searchTarget === 'photographer' ? null : 'photographer')}
+                        value="writer"
+                        checked={searchTarget === 'writer'}
+                        onChange={() => handleSearchTarget('writer')}
                     /> 작가
                 </CheckboxLabel>
             </CheckboxInputBox>
@@ -181,42 +183,42 @@ const FilterPanel: React.FC<FilterPanelProps> = (props) => {
                 <CheckboxLabel>
                     <CheckboxInput
                         type="checkbox"
-                        value='like'
-                        checked={sortingTarget === 'like'}
-                        onChange={() => handleSortingTarget(sortingTarget === 'like' ? null : 'like')}
-                    /> 좋아요 수
+                        value="recent"
+                        checked={sortingTarget === 'recent'}
+                        onChange={() => handleSortingTarget('recent')}
+                    /> 최신순
                 </CheckboxLabel>
                 <CheckboxLabel>
                     <CheckboxInput
                         type="checkbox"
                         value="last"
                         checked={sortingTarget === 'last'}
-                        onChange={() => handleSortingTarget(sortingTarget === 'last' ? null : 'last')}
+                        onChange={() => handleSortingTarget('last')}
                     /> 과거순
                 </CheckboxLabel>
                 <CheckboxLabel>
                     <CheckboxInput
                         type="checkbox"
-                        value="comment"
-                        checked={sortingTarget === 'comment'}
-                        onChange={() => handleSortingTarget(sortingTarget === 'comment' ? null : 'comment')}
-                    /> 댓글 수
+                        value='like'
+                        checked={sortingTarget === 'like'}
+                        onChange={() => handleSortingTarget('like')}
+                    /> 좋아요 {sortingOrder === 'asc' ? '⬆️' : '⬇️'}
                 </CheckboxLabel>
                 <CheckboxLabel>
                     <CheckboxInput
                         type="checkbox"
                         value="view"
                         checked={sortingTarget === 'view'}
-                        onChange={() => handleSortingTarget(sortingTarget === 'view' ? null : 'view')}
-                    /> 조회수
+                        onChange={() => handleSortingTarget('view')}
+                    /> 조회수 {sortingOrder === 'asc' ? '⬆️' : '⬇️'}
                 </CheckboxLabel>
                 <CheckboxLabel>
                     <CheckboxInput
                         type="checkbox"
-                        value="recent"
-                        checked={sortingTarget === 'recent'}
-                        onChange={() => handleSortingTarget(sortingTarget === 'recent' ? null : 'recent')}
-                    /> 최신순
+                        value="comment"
+                        checked={sortingTarget === 'comment'}
+                        onChange={() => handleSortingTarget('comment')}
+                    /> 댓글수 {sortingOrder === 'asc' ? '⬆️' : '⬇️'}
                 </CheckboxLabel>
             </CheckboxInputBox>
 

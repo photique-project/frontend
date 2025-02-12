@@ -7,6 +7,7 @@ import SNSJoin from './pages/SNSJoin';
 import ResetPassword from './pages/ResetPassword';
 import Home from './pages/Home';
 import NewSingleWork from './pages/NewSingleWork';
+import NewExhibition from './pages/NewExhibition';
 
 const AppContainer = styled.div`
   margin: 0;
@@ -30,6 +31,7 @@ function App() {
           <Route path="/reset-password" element={<ResetPassword />} />
           <Route path="/home" element={<Home />} />
           <Route path="/new-singlework" element={<NewSingleWork />} />
+          <Route path="/new-exhibition" element={<NewExhibition />} />
 
         </Routes>
       </AppContainer>

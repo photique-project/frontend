@@ -99,8 +99,8 @@ interface ImageInputProps {
     width: string;
     ratio: string;
     marginTop: number;
-    image: File | undefined;
-    setImage: Dispatch<SetStateAction<File | undefined>>;
+    image: File | undefined | (File | undefined)[];
+    setImage: any;
     setValidImage: Dispatch<SetStateAction<boolean | null>>;
     inputDisabled: boolean;
 }
@@ -113,23 +113,34 @@ const ImageInput: React.FC<ImageInputProps> = (props) => {
     const [isDragging, setIsDragging] = useState<boolean>(false);
     const [preview, setPreview] = useState<string | undefined>();
 
+    // 방금 막 업로드한 이미지가 아닌 리렌더링 발생했을 때 이미지
     useEffect(function preLoad() {
-        if (image) {
+        if (!image && !Array.isArray(image)) { // 배열일 때는 리렌더링을 고려할 필요가 없음 -> 이 경우 상위에서 관리하기 떄문
             isValidImage(image);
         }
     }, []);
 
-    const isValidImage = (image: File) => {
+    const isValidImage = (file: File) => {
         const validTypes = ['image/png', 'image/jpg', 'image/jpeg'];
         const maxSize = 5 * 1024 * 1024;
 
-        if (validTypes.includes(image.type) && image.size <= maxSize) {
+        if (validTypes.includes(file.type) && file.size <= maxSize) {
             setValidImage(true);
-            setImage(image);
-            setPreview(URL.createObjectURL(image));
-            setPreviewDisplay('block');
-            setCancelDisplay('flex');
-            setTextDisplay('none');
+
+            if (Array.isArray(image)) {
+                if (image.length > 10) {
+                    alert('사진은 최대 10개 까지만 게시할 수 있습니다.');
+                    return;
+                }
+
+                setImage((prev) => [file, ...prev]); // 배열 젤 앞에 추가
+            } else {
+                setImage(file);
+                setPreview(URL.createObjectURL(file));
+                setPreviewDisplay('block');
+                setCancelDisplay('flex');
+                setTextDisplay('none');
+            }
 
             return;
         }
@@ -163,10 +174,10 @@ const ImageInput: React.FC<ImageInputProps> = (props) => {
 
 
     const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        const profileImage = e.target.files?.[0];
+        const image = e.target.files?.[0];
 
-        if (profileImage) {
-            isValidImage(profileImage)
+        if (image) {
+            isValidImage(image)
         }
 
         e.target.value = '';
@@ -180,7 +191,7 @@ const ImageInput: React.FC<ImageInputProps> = (props) => {
     }
 
     const preventClickWhenImageExists = (e: React.MouseEvent<HTMLLabelElement>) => {
-        if (image) {
+        if (!Array.isArray(image) && image) {
             e.preventDefault();
         }
     };

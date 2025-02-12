@@ -4,7 +4,7 @@ import { useState, useRef, useEffect } from 'react';
 
 const Container = styled.div`
     height: 40px;
-    width: calc((100% / 3));
+    width: 100%;
 
     display: flex;
     flex-direction: row;
@@ -22,7 +22,7 @@ const Container = styled.div`
     }
 `
 const ScrollInputTextBox = styled.div`
-    width: 70%;
+    width: calc(100% - 40px);
 
     display: flex;
     flex-direction: column;
@@ -36,7 +36,7 @@ const ScrollInputText = styled.div<{ selectedOption: string | null }>`
 `
 
 const ScrollInputIconBox = styled.div`
-    width: 30%;
+    width: 40px;
     display: flex;
     flex-direction: column;
     justify-content: center;

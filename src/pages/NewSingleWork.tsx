@@ -34,8 +34,8 @@ import settingsGrayIcon from '../assets/settings-gray.png';
 import locationGrayIcon from '../assets/location-gray.png';
 import calendarGrayIcon from '../assets/calendar-gray.png';
 import tagGrayIcon from '../assets/tag-gray.png';
-
-
+import categoryIcon from '../assets/category.png';
+import categoryGrayIcon from '../assets/category-gray.png';
 
 
 
@@ -1182,9 +1182,11 @@ const CommentInputCompleteButtonText = styled.div`
 
 
 const NewSingleWork = () => {
-    const apertureOptions = ["미입력", "f/1.4", "f/2", "f/2.8", "f/4", "f/5.6", "f/8", "f/11", "f/16", "f/22"]
-    const shutterSpeedOptions = ["미입력", "1/1000", "1/500", "1/250", "1/125", "1/60", "1/30", "1/15", "1/8", "1/4", "1/2", "1"]
-    const isoOptions = ["미입력", "100", "200", "400", "800", "1600", "3200", "6400"]
+    const apertureOptions = ["미입력", "f/0.7", "f/0.8", "f/0.85", "f/0.95", "f/1", "f/1.2", "f/1.4", "f/1.8", "f/2", "f/2.8", "f/3.2", "f/3.5", "f/4", "f/4.5", "f/5", "f/5.6", "f/6.3", "f/7.1", "f/8", "f/9", "f/10", "f/11", "f/13", "f/14", "f/16", "f/22", "f/32", "f/40", "f/45", "f/64"];
+    const shutterSpeedOptions = ["미입력", "1/8000", "1/4000", "1/2000", "1/1000", "1/500", "1/250", "1/125", "1/60", "1/30", "1/15", "1/8", "1/4", "1/2", "1", "2", "4", "8", "15", "30"];
+    const isoOptions = ["미입력", "50", "100", "200", "400", "800", "1600", "3200", "6400", "12800", "25600", "51200", "102400", "204800"];
+    const categoryOptions = ["풍경", "인물", "동물", "식물", "건축", "여행", "음식", "스포츠", "흑백", "야경", "길거리", "추상", "이벤트", "패션"];
+
     const navigate = useNavigate();
 
     const [writeView, setWriteView] = useState<boolean>(true);
@@ -1226,6 +1228,13 @@ const NewSingleWork = () => {
     const [validLocationInput, setValidLocationInput] = useState<boolean | null>(null);
     const [locationInput, setLocationInput] = useState<string>('');
     const [locationInputDisabled, setLocationInputDisabled] = useState<boolean>(false);
+
+    // 카테고리 입력값 상태관리 변수
+    const [validCategoryInput, setValidCategoryInput] = useState<boolean | null>(null);
+    const [categoryHelperText, setCategoryHelperText] = useState<string>('카테고리*');
+    const [categoryHelperTextColor, setCategoryHelperTextColor] = useState<'black' | 'red'>('black');
+    const [categoryInput, setCategoryInput] = useState<string>('');
+    const [categoryInputDisabled, setCategoryInputDisabled] = useState<boolean>(false);
 
     // 날짜 입력값 상태관리 변수
     const [validDateInput, setValidDateInput] = useState<boolean | null>(null);
@@ -1313,6 +1322,11 @@ const NewSingleWork = () => {
         setLocationInput(inputValue);
     }
 
+    // 카테고리 입력
+    const handleCategoryInputChange = (option: string) => {
+        setCategoryInput(option);
+    }
+
 
     // 날짜 입력
     const handleDataInputChange = (date: Date) => {
@@ -1351,6 +1365,11 @@ const NewSingleWork = () => {
 
             const trimmedTag = tagInput.trim();
 
+            if (trimmedTag.length > 10) {
+                alert('태그는 10글자 이하만 가능합니다');
+                return;
+            }
+
             if (trimmedTag && !tags.includes(trimmedTag)) {
                 setTags([...tags, trimmedTag]);
                 setTagInput('');
@@ -1382,11 +1401,7 @@ const NewSingleWork = () => {
         setDescriptionInput(inputValue);
     };
 
-
-
-
-
-
+    // 뷰 전환
     const handleView = (event: React.MouseEvent<HTMLDivElement>) => {
         const id = (event.currentTarget as HTMLElement).id;
 
@@ -1505,6 +1520,24 @@ const NewSingleWork = () => {
                                         onChange={handleLocationInputChange}
                                     />
                                 </SmallInputBox>
+
+
+                                <SmallInputBox>
+                                    <SmallInputLabelBox>
+                                        <SmallInputIcon src={categoryIcon} />
+                                        <SmallInputTitle>{categoryHelperText}</SmallInputTitle>
+                                    </SmallInputLabelBox>
+                                    <ScrollInputBox>
+
+                                        <ScrollInput
+                                            title={'카테고리'}
+                                            options={categoryOptions}
+                                            selectedOption={categoryInput}
+                                            handleInputChange={handleCategoryInputChange}
+                                        />
+                                    </ScrollInputBox>
+                                </SmallInputBox>
+
 
                                 <SmallInputBox>
                                     <SmallInputLabelBox>
@@ -1670,6 +1703,20 @@ const NewSingleWork = () => {
                                     <SingleWorkItemValue>
                                         {locationInput ? locationInput : '미입력'}
                                     </SingleWorkItemValue>
+                                </SingleWorkImageInfo>
+
+                                <SingleWorkImageInfo>
+                                    <SingleWorkItem>
+                                        <SingleWorkItemIcon src={categoryGrayIcon} />
+                                        <SingleWorkItemText>카테고리</SingleWorkItemText>
+                                    </SingleWorkItem>
+
+                                    <SingleWorkItemSettingsBox>
+                                        <SingleWorkItemSettings>
+                                            {categoryInput ? `${categoryInput}` : ''}
+                                        </SingleWorkItemSettings>
+
+                                    </SingleWorkItemSettingsBox>
                                 </SingleWorkImageInfo>
 
                                 <SingleWorkImageInfo>

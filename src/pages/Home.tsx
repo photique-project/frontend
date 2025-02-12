@@ -100,13 +100,13 @@ const SearchBoxSubText = styled.div<{ isScrolled: boolean }>`
 
 const SearchInputBox = styled.div`
     margin-top: 15px;
+    margin-bottom: 15px;
     width: 800px;
     height: 40px;
 
     display: flex;
     flex-direction: row;
     
-
     position: relative;
 
     justify-content: center;
@@ -117,19 +117,18 @@ const SearchInputBox = styled.div`
     }
 `
 
-const SearchInput = styled.input<{ isTagMode: boolean }>`
+const SearchInput = styled.input`
     width: 700px;
     height: 40px;
     padding: 0 50px;
-    
     
     background-color: #333333;
     border-radius: 10px;
 
     font-size: 16px;
     line-height: 17px;
-    color: ${({ isTagMode }) => (isTagMode ? '#BCBFD2' : 'white')};
-    font-weight: ${({ isTagMode }) => (isTagMode ? '700' : '400')};
+    color: white;
+    font-weight: 400;
     
     position: absolute;
 
@@ -169,23 +168,6 @@ const MainSearchIcon = styled.img`
         right: 8px;
     }
 `
-
-const TagBox = styled.div`
-    margin-top:10px;
-    margin-bottom: 10px;
-    width: 800px;
-
-    display: flex;
-    flex-direction: row;
-    flex-wrap: wrap;
-    align-items: center;
-
-    gap: 10px;
-    
-    @media (max-width: 900px) {
-        width: 80%;
-    }
-`;
 
 const ScrollBox = styled.div`
     width: 100%;
@@ -367,12 +349,9 @@ const Home = () => {
     const [openSingleWorkDetail, setOpenSingleWorkDetail] = useState<boolean>(false);
     const [selectedSingleWorkId, SetSelectedSingleWorkId] = useState<string>(null);
 
-    const [tags, setTags] = useState<string[]>([]);
-    const [isTagMode, setIsTagMode] = useState<boolean>(false);
-    const [isComposing, setIsComposing] = useState(false);
-
-    const [searchTarget, setSearchTarget] = useState<'work' | 'photographer' | null>(null);
-    const [sortingTarget, setSortingTarget] = useState<'like' | 'last' | 'comment' | 'view' | 'recent' | null>(null);
+    const [searchTarget, setSearchTarget] = useState<'work' | 'writer'>('work');
+    const [sortingTarget, setSortingTarget] = useState<'like' | 'last' | 'comment' | 'view' | 'recent'>('recent');
+    const [sortingOrder, setSortingOrder] = useState<'asc' | 'desc'>('asc');
     const [categories, setCategories] = useState<string[]>([]);
     const [filterPanelDisplay, setFilterPanelDisplay] = useState<'flex' | null>(null);
 
@@ -393,13 +372,35 @@ const Home = () => {
     };
 
 
-    const handleSearchTarget = (searchTarget: 'work' | 'photographer' | null) => {
+    const handleSearchTarget = (searchTarget: 'work' | 'writer') => {
         setSearchTarget(searchTarget);
     };
 
-    const handleSortingTarget = (sorting: 'like' | 'last' | 'comment' | 'view' | 'recent' | null) => {
+    const handleSortingTarget = (sorting: 'like' | 'last' | 'comment' | 'view' | 'recent') => {
         setSortingTarget(sorting);
+
+        if (sorting === 'recent') {
+            setSortingOrder('desc');
+        }
+
+        if (sorting === 'last') {
+            setSortingOrder('asc');
+        }
+
+        if (sortingTarget === sorting) {
+            if (sortingOrder === 'asc') {
+                setSortingOrder('desc');
+
+                return;
+            }
+
+            setSortingOrder('asc');
+        }
     };
+
+
+
+
 
     const handleCategoryTarget = (category: string) => {
         if (!categories.includes(category)) {
@@ -417,53 +418,8 @@ const Home = () => {
 
 
     const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        setInputValue(e.target.value);
-    };
-
-    useEffect(function isTagMode() {
-        if (inputValue.startsWith('@') && !inputValue.includes(' ')) {
-            setIsTagMode(true);
-            return;
-        }
-
-        setIsTagMode(false);
-    }, [inputValue])
-
-    const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
-        if (isComposing) {
-            return; // 한글 입력 중이면 이벤트 무시
-        }
-
-        if (e.key === 'Enter' && isTagMode) {
-            e.preventDefault();
-            if (tags.length >= 5) {
-                alert('태그는 최대 5개까지만 추가할 수 있습니다.');
-                return;
-            }
-
-            const newTag = inputValue.slice(1).trim(); // 골뱅이 제거
-
-            if (newTag) {
-                if (!tags.includes(newTag)) {
-                    setTags([...tags, newTag]);
-                }
-
-                setInputValue('');
-                setIsTagMode(false);
-            }
-        }
-    };
-
-    const handleTagRemove = (tagToRemove: string) => {
-        setTags(tags.filter(tag => tag !== tagToRemove));
-    };
-
-    const handleCompositionStart = () => {
-        setIsComposing(true); // 한글 입력 시작
-    };
-
-    const handleCompositionEnd = () => {
-        setIsComposing(false); // 한글 입력 종료
+        const inputValue = e.target.value.substring(0, 50);
+        setInputValue(inputValue);
     };
 
     const showFilterPanel = () => {
@@ -505,7 +461,10 @@ const Home = () => {
     const navigateToNewPostPage = () => {
         if (singleWorkView || likeView) {
             navigate('/new-singlework');
+            return;
         }
+
+        navigate('/new-exhibition');
     };
 
     // single work 상세조회
@@ -538,11 +497,7 @@ const Home = () => {
                     <SearchInput
                         value={inputValue}
                         onChange={handleInputChange}
-                        onKeyDown={handleKeyDown}
                         placeholder="검색어를 입력하세요"
-                        isTagMode={isTagMode}
-                        onCompositionStart={handleCompositionStart}
-                        onCompositionEnd={handleCompositionEnd}
                     />
 
                     {filterPanelDisplay && <FilterPanel
@@ -550,19 +505,13 @@ const Home = () => {
                         handleSearchTarget={handleSearchTarget}
                         sortingTarget={sortingTarget}
                         handleSortingTarget={handleSortingTarget}
+                        sortingOrder={sortingOrder}
                         categories={categories}
                         handleCategoryTarget={handleCategoryTarget}
                         handleReset={handleReset}
                         closePanel={showFilterPanel}
                     />}
                 </SearchInputBox>
-
-                <TagBox>
-                    {tags.map((tag, index) => (
-                        <Tag key={index} text={tag} handleTagRemove={() => handleTagRemove(tag)}></Tag>
-                    ))}
-
-                </TagBox>
 
 
             </SearchBox>
