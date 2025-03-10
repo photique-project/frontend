@@ -4,18 +4,43 @@ import { API_BASE_URL } from '../config/environment';
 import ENDPOINTS from '../api/endpoints';
 
 type AuthStore = {
-    isLoggedIn: boolean; // 해당값 조회로 로그인 유지
-    login: () => void; // 매 페이지 마다 유저아이디 조회 시도
-    logout: () => void; // 저장된 유저아이디 삭제
+    isLoggedIn: boolean; // 로그인 상태
+    isComplete: boolean; // 로그인 상태 체크 완료 여부
+    login: () => void; // 로그인 함수
+    logout: () => void; // 로그아웃 함수
     userId: number | null;
-    isComplete: boolean;
+    user: {
+        id: number | null;
+        email: string | null;
+        nickname: string | null;
+        profileImage: string | null;
+        introduction: string | null;
+        singleWork: number | null;
+        exhibition: number | null;
+        follower: number | null;
+        following: number | null;
+        createdAt: string | null;
+    };
 };
 
 const useAuthStore = createStore(
     persist<AuthStore>(
-        (set) => ({
+        (set, get) => ({
             isLoggedIn: false,
             isComplete: false,
+            userId: null,
+            user: {
+                id: null,
+                email: null,
+                nickname: null,
+                profileImage: null,
+                introduction: null,
+                singleWork: null,
+                exhibition: null,
+                follower: null,
+                following: null,
+                createdAt: null
+            },
 
             login: async () => {
                 const requestOptions: RequestInit = {
@@ -26,36 +51,118 @@ const useAuthStore = createStore(
                     credentials: 'include',
                 };
 
-                await fetch(`${API_BASE_URL}${ENDPOINTS.USER.GET_USER_ID}`, requestOptions)
-                    .then(async (response) => {
-                        if (response.ok) {
-                            const responseData = await response.json()
+                try {
+                    const response = await fetch(`${API_BASE_URL}${ENDPOINTS.AUTH.GET_USER_ID}`, requestOptions);
 
-                            set({
+                    if (response.ok) {
+                        const responseData = await response.json();
+
+                        set(() => ({
+                            userId: responseData.data.id,
+                        }));
+
+                        const userResponse = await fetch(`${API_BASE_URL}${ENDPOINTS.USER.DEFAULT}/${responseData.data.id}`, requestOptions);
+
+                        if (userResponse.ok) {
+                            const responseData = await userResponse.json();
+
+                            set(() => ({
+                                user: {
+                                    id: responseData.data.id,
+                                    email: responseData.data.email,
+                                    nickname: responseData.data.nickname,
+                                    profileImage: responseData.data.profileImage,
+                                    introduction: responseData.data.introduction,
+                                    singleWork: responseData.data.singleWork,
+                                    exhibition: responseData.data.exhibition,
+                                    follower: responseData.data.follower,
+                                    following: responseData.data.following,
+                                    createdAt: responseData.data.createdAt
+                                },
+                                isComplete: true,
                                 isLoggedIn: true,
-                                userId: responseData.data.id,
-                                isComplete: true
-                            })
+                            }));
 
                             return;
+                        } else {
+                            set(() => ({
+                                user: {
+                                    id: null,
+                                    email: null,
+                                    nickname: null,
+                                    profileImage: null,
+                                    introduction: null,
+                                    singleWork: null,
+                                    exhibition: null,
+                                    follower: null,
+                                    following: null,
+                                    createdAt: null,
+                                },
+                                isComplete: true,
+                                isLoggedIn: false,
+                            }));
                         }
 
-                        set({
-                            isLoggedIn: false,
-                            userId: null,
-                            isComplete: true
-                        })
+                        return;
+                    }
 
-
+                    set({
+                        isLoggedIn: false,
+                        isComplete: true,
+                        userId: null,
+                        user: {
+                            id: null,
+                            email: null,
+                            nickname: null,
+                            profileImage: null,
+                            introduction: null,
+                            singleWork: null,
+                            exhibition: null,
+                            follower: null,
+                            following: null,
+                            createdAt: null
+                        }
                     });
+
+                } catch (error) {
+                    console.error("Login error:", error);
+                    set({
+                        isLoggedIn: false,
+                        isComplete: true,
+                        userId: null,
+                        user: {
+                            id: null,
+                            email: null,
+                            nickname: null,
+                            profileImage: null,
+                            introduction: null,
+                            singleWork: null,
+                            exhibition: null,
+                            follower: null,
+                            following: null,
+                            createdAt: null
+                        }
+                    });
+                }
             },
 
-            logout: () =>
-                set({
-                    isLoggedIn: false,
-                    userId: null,
-                }),
-            userId: null,
+            logout: () => set({
+                isComplete: false,
+                isLoggedIn: false,
+                userId: null,
+                user: {
+                    id: null,
+                    email: null,
+                    nickname: null,
+                    profileImage: null,
+                    introduction: null,
+                    singleWork: null,
+                    exhibition: null,
+                    follower: null,
+                    following: null,
+                    createdAt: null
+                }
+            }),
         }),
         {
             name: "userIdStorage",

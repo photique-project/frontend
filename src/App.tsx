@@ -9,6 +9,7 @@ import Home from './pages/Home';
 import NewSingleWork from './pages/NewSingleWork';
 import NewExhibition from './pages/NewExhibition';
 import Exhibition from './pages/Exhibition';
+import SingleWorkUpdate from './pages/SingleWorkUpdate';
 
 const AppContainer = styled.div`
   margin: 0;
@@ -33,6 +34,7 @@ function App() {
           <Route path="/home" element={<Home />} />
           <Route path="/new-singlework" element={<NewSingleWork />} />
           <Route path="/new-exhibition" element={<NewExhibition />} />
+          <Route path="/singleworks/:singleWorkId/update" element={<SingleWorkUpdate />} />
           <Route path="/exhibitions/:exhibitionId" element={<Exhibition />} />
 
         </Routes>

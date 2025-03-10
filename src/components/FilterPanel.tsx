@@ -109,12 +109,16 @@ const ButtonBox = styled.div`
     gap: 10px;
 `;
 
+type SearchTarget = 'work' | 'writer';
+type SortingTarget = 'createdAt' | 'likeCount' | 'viewCount' | 'commentCount';
+type SortOrder = 'asc' | 'desc'
+
 interface FilterPanelProps {
-    searchTarget: 'work' | 'writer';
-    handleSearchTarget: (searchTarget: 'work' | 'writer') => void;
-    sortingTarget: 'like' | 'last' | 'comment' | 'view' | 'recent';
-    handleSortingTarget: (sorting: 'like' | 'last' | 'comment' | 'view' | 'recent') => void;
-    sortingOrder: 'asc' | 'desc';
+    searchTarget: SearchTarget;
+    handleSearchTarget: (searchTarget: SearchTarget) => void;
+    sortingTarget: SortingTarget;
+    handleSortingTarget: (sortTarget: SortingTarget, sortOrder: SortOrder) => void;
+    sortingOrder: SortOrder;
     categories: string[];
     handleCategoryTarget: (category: string) => void;
     handleReset: () => void;
@@ -183,41 +187,41 @@ const FilterPanel: React.FC<FilterPanelProps> = (props) => {
                 <CheckboxLabel>
                     <CheckboxInput
                         type="checkbox"
-                        value="recent"
-                        checked={sortingTarget === 'recent'}
-                        onChange={() => handleSortingTarget('recent')}
+                        value="createdAt"
+                        checked={sortingTarget === 'createdAt' && sortingOrder === 'desc'}
+                        onChange={() => handleSortingTarget('createdAt', 'desc')}
                     /> 최신순
                 </CheckboxLabel>
                 <CheckboxLabel>
                     <CheckboxInput
                         type="checkbox"
-                        value="last"
-                        checked={sortingTarget === 'last'}
-                        onChange={() => handleSortingTarget('last')}
+                        value="createdAt"
+                        checked={sortingTarget === 'createdAt' && sortingOrder === 'asc'}
+                        onChange={() => handleSortingTarget('createdAt', 'asc')}
                     /> 과거순
                 </CheckboxLabel>
                 <CheckboxLabel>
                     <CheckboxInput
                         type="checkbox"
                         value='like'
-                        checked={sortingTarget === 'like'}
-                        onChange={() => handleSortingTarget('like')}
+                        checked={sortingTarget === 'likeCount'}
+                        onChange={() => handleSortingTarget('likeCount', sortingOrder === 'asc' ? 'desc' : 'asc')}
                     /> 좋아요 {sortingOrder === 'asc' ? '⬆️' : '⬇️'}
                 </CheckboxLabel>
                 <CheckboxLabel>
                     <CheckboxInput
                         type="checkbox"
                         value="view"
-                        checked={sortingTarget === 'view'}
-                        onChange={() => handleSortingTarget('view')}
+                        checked={sortingTarget === 'viewCount'}
+                        onChange={() => handleSortingTarget('viewCount', sortingOrder === 'asc' ? 'desc' : 'asc')}
                     /> 조회수 {sortingOrder === 'asc' ? '⬆️' : '⬇️'}
                 </CheckboxLabel>
                 <CheckboxLabel>
                     <CheckboxInput
                         type="checkbox"
                         value="comment"
-                        checked={sortingTarget === 'comment'}
-                        onChange={() => handleSortingTarget('comment')}
+                        checked={sortingTarget === 'commentCount'}
+                        onChange={() => handleSortingTarget('commentCount', sortingOrder === 'asc' ? 'desc' : 'asc')}
                     /> 댓글수 {sortingOrder === 'asc' ? '⬆️' : '⬇️'}
                 </CheckboxLabel>
             </CheckboxInputBox>

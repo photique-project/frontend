@@ -187,7 +187,8 @@ const LoginModal: React.FC<LoginModalProps> = (props) => {
             if (loginStatusCode === 201) {
                 setHelperTextVisibility('hidden');
                 const login = useAuthStore.getState().login;
-                await login();
+                await login(); // 로그인요청으로 받은 토큰으로 유저아이디 값을 전역 저장소에 세팅
+                // 현재로그인하고 아이디 제대로 받아왔는데 헤더에서 스토어에서 꺼내면 해당 아이디값이 null로찍힘
                 closeModal();
                 return;
             }

@@ -1,5 +1,5 @@
-import { API_BASE_URL } from '../config/environment';
-import { useEffect, useState } from 'react';
+import { API_BASE_URL, API_PREFIX } from '../config/environment';
+import { useEffect, useState, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 import useAuthStore from '../zustand/store';
@@ -8,11 +8,11 @@ import ENDPOINTS from '../api/endpoints';
 
 import styled from 'styled-components';
 import LoginModal from '../components/LoginModal';
+import UserDetailsPanel from './UserDetailsPanel';
 import ShortButton from './button/ShortButton';
 
 import logo from '../assets/logo.png';
 import menuIcon from '../assets/menu.png';
-import activeUserIcon from '../assets/active-user.png';
 import bellIcon from '../assets/bell.png';
 import bellDotIcon from '../assets/bell-dot.png';
 
@@ -152,33 +152,6 @@ const MenuButton = styled.div`
     }
 `;
 
-const ActiveUserBox = styled.div`
-    width: 90px;
-    height: 40px;
-
-    display: flex;
-    flex-direction: row;
-    justify-content: center;
-    align-items: center;
-    gap: 10px;
-
-    border-radius: 5px;
-    font-size: 16px;
-    cursor: pointer;
-`;
-
-const ActiveUserIcon = styled.img`
-    width: 24px;
-    height: 24px;
-`;
-
-const ActiveUserNumber = styled.div`
-    font-size: 14px;
-    font-weight: 700;
-
-    color: rgba(0, 0, 0, 0.5);
-`;
-
 const UserProfileImageBox = styled.div`
     width: 50px;
     height: 40px;
@@ -188,6 +161,7 @@ const UserProfileImageBox = styled.div`
     justify-content: center;
     align-items: center;
 
+    position: relative;
 
     border-radius: 5px;
     font-size: 16px;
@@ -197,6 +171,8 @@ const UserProfileImageBox = styled.div`
 const UserProfileImage = styled.img`
     width: 40px;
     height: 40px;
+
+    border-radius: 5px;
 
     cursor: pointer;
 
@@ -229,76 +205,87 @@ interface FetchRequestOptions {
     body?: Record<string, any> | FormData | null;
 }
 
-interface UserInfo {
-    data: {
-        id: number,
-        email: string,
-        nickname: string,
-        profileImage: string,
-        coin: number,
-        createdAt: string
-    }
+interface HeaderProps {
+    display?: 'none' | 'flex'
 }
 
-const Header = () => {
+const Header: React.FC<HeaderProps> = (props) => {
+    const { display = 'flex' } = props;
     const navigate = useNavigate();
+
+    const userDetailsPanelRef = useRef<HTMLDivElement | null>(null);
+
     const [isMenuOpen, setIsMenuOpen] = useState<boolean>(false);
     const [loginModalDisplay, setLoginModalDisplay] = useState<boolean>(false);
-    const [loginStatus, setLoginStatus] = useState<boolean>(false);
-    const [userInfo, setUserInfo] = useState<UserInfo | null>(null);
-
-    const {
-        loading: userInfoLoading,
-        statusCode: userInfoStatusCode,
-        data: userInfoData,
-        fetchRequest: userInfoFetchRequest
-    } = useFetch<UserInfo>();
+    const [userDetailsPanelDisplay, setUserDetailsPanelDisplay] = useState<boolean>(false);
+    const [eventSource, setEventSource] = useState<EventSource | null>(null);
 
     const {
         loading: logoutLoading,
         statusCode: logoutStatusCode,
-        data: logoutData,
         fetchRequest: logoutFetchRequest
-    } = useFetch<UserInfo>();
+    } = useFetch<void>();
 
     const isLoggedIn = useAuthStore.getState().isLoggedIn;
     const isComplete = useAuthStore.getState().isComplete;
+    const userDetails = useAuthStore.getState().user;
+    const login = useAuthStore.getState().login;
+    const logout = useAuthStore.getState().logout;
+
+    // 유저아이디있다면 유저데이터 요청먼저 보내고 응답에따라서 로그아웃 처리
+    useEffect(function isLoggedIn() {
+        login();
+    }, [])
 
     useEffect(function checkAuth() {
-        if (isLoggedIn) {
-            setLoginStatus(true);
+        if (isLoggedIn) { // 로그인 된 상태라면 로그인 상태관리 변수 업데이트
+
+            if (!userDetails.id) {
+                logout();
+                return;
+            }
+
             return;
         }
 
-        setLoginStatus(false);
-    }, [isComplete])
+        logout();
+    }, [isComplete]) // 인증요청 완료됐을 때 해당 요청 실행
 
-    useEffect(function getUserInfo() {
-        if (loginStatus) {
-            const method: Method = 'GET'
-            const headers = {
-                'Content-Type': 'application/json',
+    useEffect(function requestNotificationService() {
+        function connectSSE() {
+            const eventSource = new EventSource(`${API_BASE_URL}${ENDPOINTS.USER.DEFAULT}/${userDetails.id}${ENDPOINTS.NOTIFICATION.CONNECTION}`);
+
+
+            eventSource.onopen = function () {
+                console.log("notification subscribe is completed");
+            };
+
+            eventSource.onmessage = function (event) {
+                console.log(event.data);
+            };
+
+            eventSource.onerror = function (event) {
+                console.log("❌ SSE connection error...");
+                eventSource.close();  // 기존 연결 닫기
+                setTimeout(connectSSE, 1000); // 1초 후 재연결
             }
 
-            const options: FetchRequestOptions = {
-                url: `${API_BASE_URL}${ENDPOINTS.USER.DEFAULT}/${useAuthStore.getState().userId}`,
-                method: method,
-                headers: headers,
-                credentials: 'include',
-                contentType: 'application/json',
-            }
+            setEventSource(eventSource)
 
-            userInfoFetchRequest(options);
         }
 
-    }, [loginStatus])
-
-    useEffect(function checkUserInfo() {
-        if (userInfoStatusCode == 200 && userInfoData !== null) {
-            setUserInfo(userInfoData);
+        if (isLoggedIn) {
+            connectSSE();
         }
 
-    }, [userInfoData])
+        // 새로고침은 정적파일 자체를 다시 받아오고 전체를 마운트하는 것이므로 언마운트 코드 실행 X
+        return () => {
+
+        }
+    }, [isLoggedIn]); // 로그인이 완료되면 알림 서비스를 위한 SSE 요청
+
+
+
 
     const navigateToJoinPage = () => {
         navigate('/join');
@@ -342,6 +329,7 @@ const Header = () => {
         }
 
         logoutFetchRequest(options);
+        logout();
     }
 
     useEffect(function getLogoutResult() {
@@ -357,33 +345,48 @@ const Header = () => {
 
     }, [logoutStatusCode])
 
+    // 유저상세패널조작
+    const handleUserDetailsPanelDisplay = () => {
+        setUserDetailsPanelDisplay(!userDetailsPanelDisplay);
+    }
+
 
     return (
         <>
-            <Container>
+            <Container style={{ display: display }}>
                 <Logo src={logo} onClick={navigateToHomePage}></Logo>
 
                 <HeaderButtonBox>
-                    {!userInfo && <ShortButton text="로그인" type="white" action={showLoginModal}></ShortButton>}
-                    {!userInfo && <ShortButton text="회원가입" type="black" action={navigateToJoinPage}></ShortButton>}
-                    {userInfo &&
-                        <ActiveUserBox>
-                            <ActiveUserIcon src={activeUserIcon} alt='접속유저' />
-                            <ActiveUserNumber>164</ActiveUserNumber>
-                        </ActiveUserBox>
-                    }
-                    {userInfo &&
+                    {!isLoggedIn && <ShortButton text="로그인" type="white" action={showLoginModal}></ShortButton>}
+                    {!isLoggedIn && <ShortButton text="회원가입" type="black" action={navigateToJoinPage}></ShortButton>}
+                    {isLoggedIn &&
                         <UserProfileImageBox>
-                            <UserProfileImage src={userInfo.data.profileImage} />
+                            <UserProfileImage src={userDetails.profileImage} onClick={handleUserDetailsPanelDisplay} />
+
+                            {userDetailsPanelDisplay && <UserDetailsPanel
+                                id={userDetails.id}
+                                email={userDetails.email}
+                                nickname={userDetails.nickname}
+                                profileImage={userDetails.profileImage}
+                                introduction={userDetails.introduction}
+                                createdAt={userDetails.createdAt}
+                                singleWork={userDetails.singleWork}
+                                exhibition={userDetails.exhibition}
+                                follower={userDetails.follower}
+                                following={userDetails.following}
+                                handleDisplay={handleUserDetailsPanelDisplay}
+                            />}
+
+
+
                         </UserProfileImageBox>
                     }
-                    {userInfo &&
+                    {isLoggedIn &&
                         <UserProfileImageBox>
                             <NotificationIcon src={bellIcon} alt='알림' />
                         </UserProfileImageBox>
                     }
                     <ShortButton text="About" type="none" action={navigateToIntroPage}></ShortButton>
-                    <ShortButton text="고객센터" type="none" action={showLoginModal}></ShortButton>
                 </HeaderButtonBox>
 
                 <HeaderMenuButtonBox onClick={openMenu}>
@@ -393,13 +396,12 @@ const Header = () => {
             </Container>
 
             <HeaderMenu isOpen={isMenuOpen}>
-                {!userInfo && <MenuButton onClick={showLoginModal}>로그인</MenuButton>}
-                {!userInfo && <MenuButton onClick={navigateToJoinPage}>회원가입</MenuButton>}
-                {userInfo && <MenuButton onClick={showLoginModal}>내 정보</MenuButton>}
-                {userInfo && <MenuButton onClick={handleLogout}>히스토리</MenuButton>}
-                {userInfo && <MenuButton onClick={handleLogout}>로그아웃</MenuButton>}
+                {!isLoggedIn && <MenuButton onClick={showLoginModal}>로그인</MenuButton>}
+                {!isLoggedIn && <MenuButton onClick={navigateToJoinPage}>회원가입</MenuButton>}
+                {isLoggedIn && <MenuButton onClick={showLoginModal}>내 정보</MenuButton>}
+                {isLoggedIn && <MenuButton onClick={handleLogout}>히스토리</MenuButton>}
+                {isLoggedIn && <MenuButton onClick={handleLogout}>로그아웃</MenuButton>}
                 <MenuButton onClick={navigateToIntroPage}>About</MenuButton>
-                <MenuButton>고객센터</MenuButton>
             </HeaderMenu>
 
             {loginModalDisplay && <LoginModal closeModal={showLoginModal} />}

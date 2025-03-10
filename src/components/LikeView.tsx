@@ -2,39 +2,7 @@ import { useState, useEffect } from 'react';
 import styled from 'styled-components';
 import SingleWorkBox from '../components/SingleWorkBox';
 import ExhibitionCard from '../components/ExhibitionCard';
-import ex1 from '../assets/ex1.jpg';
-import ex2 from '../assets/ex2.jpg';
-import ex3 from '../assets/ex3.jpg';
-import ex4 from '../assets/ex4.jpg';
-import ex5 from '../assets/ex5.jpg';
-import ex6 from '../assets/ex6.jpg';
-import ex7 from '../assets/ex7.jpg';
-import ex8 from '../assets/ex8.jpg';
-import ex9 from '../assets/ex9.jpeg';
-import ex10 from '../assets/ex10.jpg';
-import ex11 from '../assets/ex11.jpg';
-import ex12 from '../assets/ex12.jpg';
-import ex13 from '../assets/ex13.jpg';
-import ex14 from '../assets/ex14.jpg';
-import ex15 from '../assets/ex15.jpg';
-import ex16 from '../assets/ex16.jpg';
-import ex17 from '../assets/ex17.jpg';
-import ex18 from '../assets/ex18.jpg';
-import ex19 from '../assets/ex19.jpg';
-import ex20 from '../assets/ex20.jpg';
-import ex21 from '../assets/ex21.jpg';
-import ex22 from '../assets/ex22.jpg';
-import ex23 from '../assets/ex23.jpg';
-import ex24 from '../assets/ex24.jpg';
-import ex25 from '../assets/ex25.jpg';
-import ex26 from '../assets/ex26.jpg';
-import ex27 from '../assets/ex27.jpg';
-import ex28 from '../assets/ex28.jpg';
-import ex29 from '../assets/ex29.jpg';
-import ex30 from '../assets/ex30.jpg';
-import ex31 from '../assets/ex31.jpg';
-import ex32 from '../assets/ex32.jpg';
-import ex33 from '../assets/ex33.jpg';
+
 
 const TabBox = styled.div`
     margin-top: 40px;
@@ -147,16 +115,49 @@ const ExhibitionView = styled.div`
     }
 `
 
+interface Writer {
+    id: number;
+    nickname: string;
+    profileImage: string;
+}
+
+interface SingleWorkData {
+    id: number;
+    writer: Writer;
+    image: string;
+    likeCount: number;
+    viewCount: number;
+    isLiked: boolean;
+}
+
+interface SearchSingleWorkData {
+    content: SingleWorkData[];
+    pageable: {
+        pageNumber: number;
+    }
+    last: boolean;
+}
 
 interface LikeViewProps {
-    handleOpenSingleWorkDetail: (singleWorkId?: string) => void;
+    handleOpenSingleWorkDetail: (singleWorkId?: number) => void;
+    searchSingleLoading: boolean;
+    searchSingleWorkData: SearchSingleWorkData
 }
 
 const LikeView: React.FC<LikeViewProps> = (props) => {
-    const { handleOpenSingleWorkDetail } = props;
+    const { handleOpenSingleWorkDetail, searchSingleLoading, searchSingleWorkData } = props;
     const [singleWorkView, setSingleWorkView] = useState<boolean>(true);
     const [exhibitionView, setExhibitionView] = useState<boolean>(false);
     const [isSmallScreen, setIsSmallScreen] = useState<boolean>(window.innerWidth <= 768);
+
+    const [singleWorks, setSingleWorks] = useState<SingleWorkData[]>([]);
+
+    // 검색한 단일작품 배열 할당
+    useEffect(function isCompletedLoading() {
+        if (!searchSingleLoading && searchSingleWorkData) {
+            setSingleWorks((prev) => [...prev, ...searchSingleWorkData.content])
+        }
+    }, [searchSingleLoading])
 
     useEffect(() => {
         const handleResize = () => {
@@ -205,101 +206,61 @@ const LikeView: React.FC<LikeViewProps> = (props) => {
                     {!isSmallScreen &&
                         <>
                             <SingleWorkColumn>
-                                <SingleWorkBox src={ex1} handleOpenSingleWorkDetail={handleOpenSingleWorkDetail}></SingleWorkBox>
-                                <SingleWorkBox src={ex4} handleOpenSingleWorkDetail={handleOpenSingleWorkDetail}></SingleWorkBox>
-                                <SingleWorkBox src={ex7} handleOpenSingleWorkDetail={handleOpenSingleWorkDetail}></SingleWorkBox>
-                                <SingleWorkBox src={ex10} handleOpenSingleWorkDetail={handleOpenSingleWorkDetail}></SingleWorkBox>
-                                <SingleWorkBox src={ex13} handleOpenSingleWorkDetail={handleOpenSingleWorkDetail}></SingleWorkBox>
-                                <SingleWorkBox src={ex16} handleOpenSingleWorkDetail={handleOpenSingleWorkDetail}></SingleWorkBox>
-                                <SingleWorkBox src={ex19} handleOpenSingleWorkDetail={handleOpenSingleWorkDetail}></SingleWorkBox>
-                                <SingleWorkBox src={ex22} handleOpenSingleWorkDetail={handleOpenSingleWorkDetail}></SingleWorkBox>
-                                <SingleWorkBox src={ex25} handleOpenSingleWorkDetail={handleOpenSingleWorkDetail}></SingleWorkBox>
-                                <SingleWorkBox src={ex28} handleOpenSingleWorkDetail={handleOpenSingleWorkDetail}></SingleWorkBox>
-                                <SingleWorkBox src={ex31} handleOpenSingleWorkDetail={handleOpenSingleWorkDetail}></SingleWorkBox>
+                                {singleWorks.map((singleWork, index) => (
+                                    <>
+                                        {index % 3 == 0 &&
+                                            <SingleWorkBox
+                                                key={index}
+                                                singleWorkData={singleWork}
+                                                handleOpenSingleWorkDetail={handleOpenSingleWorkDetail}
+                                            />
+                                        }
+                                    </>
+                                ))}
                             </SingleWorkColumn>
                             <SingleWorkColumn>
-                                <SingleWorkBox src={ex1} handleOpenSingleWorkDetail={handleOpenSingleWorkDetail}></SingleWorkBox>
-                                <SingleWorkBox src={ex4} handleOpenSingleWorkDetail={handleOpenSingleWorkDetail}></SingleWorkBox>
-                                <SingleWorkBox src={ex7} handleOpenSingleWorkDetail={handleOpenSingleWorkDetail}></SingleWorkBox>
-                                <SingleWorkBox src={ex10} handleOpenSingleWorkDetail={handleOpenSingleWorkDetail}></SingleWorkBox>
-                                <SingleWorkBox src={ex13} handleOpenSingleWorkDetail={handleOpenSingleWorkDetail}></SingleWorkBox>
-                                <SingleWorkBox src={ex16} handleOpenSingleWorkDetail={handleOpenSingleWorkDetail}></SingleWorkBox>
-                                <SingleWorkBox src={ex19} handleOpenSingleWorkDetail={handleOpenSingleWorkDetail}></SingleWorkBox>
-                                <SingleWorkBox src={ex22} handleOpenSingleWorkDetail={handleOpenSingleWorkDetail}></SingleWorkBox>
-                                <SingleWorkBox src={ex25} handleOpenSingleWorkDetail={handleOpenSingleWorkDetail}></SingleWorkBox>
-                                <SingleWorkBox src={ex28} handleOpenSingleWorkDetail={handleOpenSingleWorkDetail}></SingleWorkBox>
-                                <SingleWorkBox src={ex31} handleOpenSingleWorkDetail={handleOpenSingleWorkDetail}></SingleWorkBox>
+                                {singleWorks.map((singleWork, index) => (
+                                    <>
+                                        {index % 3 == 1 &&
+                                            <SingleWorkBox
+                                                key={index}
+                                                singleWorkData={singleWork}
+                                                handleOpenSingleWorkDetail={handleOpenSingleWorkDetail}
+                                            />
+                                        }
+                                    </>
+                                ))}
                             </SingleWorkColumn>
                             <SingleWorkColumn>
-                                <SingleWorkBox src={ex1} handleOpenSingleWorkDetail={handleOpenSingleWorkDetail}></SingleWorkBox>
-                                <SingleWorkBox src={ex4} handleOpenSingleWorkDetail={handleOpenSingleWorkDetail}></SingleWorkBox>
-                                <SingleWorkBox src={ex7} handleOpenSingleWorkDetail={handleOpenSingleWorkDetail}></SingleWorkBox>
-                                <SingleWorkBox src={ex10} handleOpenSingleWorkDetail={handleOpenSingleWorkDetail}></SingleWorkBox>
-                                <SingleWorkBox src={ex13} handleOpenSingleWorkDetail={handleOpenSingleWorkDetail}></SingleWorkBox>
-                                <SingleWorkBox src={ex16} handleOpenSingleWorkDetail={handleOpenSingleWorkDetail}></SingleWorkBox>
-                                <SingleWorkBox src={ex19} handleOpenSingleWorkDetail={handleOpenSingleWorkDetail}></SingleWorkBox>
-                                <SingleWorkBox src={ex22} handleOpenSingleWorkDetail={handleOpenSingleWorkDetail}></SingleWorkBox>
-                                <SingleWorkBox src={ex25} handleOpenSingleWorkDetail={handleOpenSingleWorkDetail}></SingleWorkBox>
-                                <SingleWorkBox src={ex28} handleOpenSingleWorkDetail={handleOpenSingleWorkDetail}></SingleWorkBox>
-                                <SingleWorkBox src={ex31} handleOpenSingleWorkDetail={handleOpenSingleWorkDetail}></SingleWorkBox>
+                                {singleWorks.map((singleWork, index) => (
+                                    <>
+                                        {index % 3 == 2 &&
+                                            <SingleWorkBox
+                                                key={index}
+                                                singleWorkData={singleWork}
+                                                handleOpenSingleWorkDetail={handleOpenSingleWorkDetail}
+                                            />
+                                        }
+                                    </>
+                                ))}
                             </SingleWorkColumn>
                         </>
                     }
                     {isSmallScreen &&
                         <SingleWorkColumn>
-                            <SingleWorkBox src={ex1} handleOpenSingleWorkDetail={handleOpenSingleWorkDetail}></SingleWorkBox>
-                            <SingleWorkBox src={ex4} handleOpenSingleWorkDetail={handleOpenSingleWorkDetail}></SingleWorkBox>
-                            <SingleWorkBox src={ex7} handleOpenSingleWorkDetail={handleOpenSingleWorkDetail}></SingleWorkBox>
-                            <SingleWorkBox src={ex10} handleOpenSingleWorkDetail={handleOpenSingleWorkDetail}></SingleWorkBox>
-                            <SingleWorkBox src={ex13} handleOpenSingleWorkDetail={handleOpenSingleWorkDetail}></SingleWorkBox>
-                            <SingleWorkBox src={ex16} handleOpenSingleWorkDetail={handleOpenSingleWorkDetail}></SingleWorkBox>
-                            <SingleWorkBox src={ex19} handleOpenSingleWorkDetail={handleOpenSingleWorkDetail}></SingleWorkBox>
-                            <SingleWorkBox src={ex22} handleOpenSingleWorkDetail={handleOpenSingleWorkDetail}></SingleWorkBox>
-                            <SingleWorkBox src={ex25} handleOpenSingleWorkDetail={handleOpenSingleWorkDetail}></SingleWorkBox>
-                            <SingleWorkBox src={ex28} handleOpenSingleWorkDetail={handleOpenSingleWorkDetail}></SingleWorkBox>
-                            <SingleWorkBox src={ex31} handleOpenSingleWorkDetail={handleOpenSingleWorkDetail}></SingleWorkBox>
-                            <SingleWorkBox src={ex1} handleOpenSingleWorkDetail={handleOpenSingleWorkDetail}></SingleWorkBox>
-                            <SingleWorkBox src={ex4} handleOpenSingleWorkDetail={handleOpenSingleWorkDetail}></SingleWorkBox>
-                            <SingleWorkBox src={ex7} handleOpenSingleWorkDetail={handleOpenSingleWorkDetail}></SingleWorkBox>
-                            <SingleWorkBox src={ex10} handleOpenSingleWorkDetail={handleOpenSingleWorkDetail}></SingleWorkBox>
-                            <SingleWorkBox src={ex13} handleOpenSingleWorkDetail={handleOpenSingleWorkDetail}></SingleWorkBox>
-                            <SingleWorkBox src={ex16} handleOpenSingleWorkDetail={handleOpenSingleWorkDetail}></SingleWorkBox>
-                            <SingleWorkBox src={ex19} handleOpenSingleWorkDetail={handleOpenSingleWorkDetail}></SingleWorkBox>
-                            <SingleWorkBox src={ex22} handleOpenSingleWorkDetail={handleOpenSingleWorkDetail}></SingleWorkBox>
-                            <SingleWorkBox src={ex25} handleOpenSingleWorkDetail={handleOpenSingleWorkDetail}></SingleWorkBox>
-                            <SingleWorkBox src={ex28} handleOpenSingleWorkDetail={handleOpenSingleWorkDetail}></SingleWorkBox>
-                            <SingleWorkBox src={ex31} handleOpenSingleWorkDetail={handleOpenSingleWorkDetail}></SingleWorkBox>
-                            <SingleWorkBox src={ex1} handleOpenSingleWorkDetail={handleOpenSingleWorkDetail}></SingleWorkBox>
-                            <SingleWorkBox src={ex4} handleOpenSingleWorkDetail={handleOpenSingleWorkDetail}></SingleWorkBox>
-                            <SingleWorkBox src={ex7} handleOpenSingleWorkDetail={handleOpenSingleWorkDetail}></SingleWorkBox>
-                            <SingleWorkBox src={ex10} handleOpenSingleWorkDetail={handleOpenSingleWorkDetail}></SingleWorkBox>
-                            <SingleWorkBox src={ex13} handleOpenSingleWorkDetail={handleOpenSingleWorkDetail}></SingleWorkBox>
-                            <SingleWorkBox src={ex16} handleOpenSingleWorkDetail={handleOpenSingleWorkDetail}></SingleWorkBox>
-                            <SingleWorkBox src={ex19} handleOpenSingleWorkDetail={handleOpenSingleWorkDetail}></SingleWorkBox>
-                            <SingleWorkBox src={ex22} handleOpenSingleWorkDetail={handleOpenSingleWorkDetail}></SingleWorkBox>
-                            <SingleWorkBox src={ex25} handleOpenSingleWorkDetail={handleOpenSingleWorkDetail}></SingleWorkBox>
-                            <SingleWorkBox src={ex28} handleOpenSingleWorkDetail={handleOpenSingleWorkDetail}></SingleWorkBox>
-                            <SingleWorkBox src={ex31} handleOpenSingleWorkDetail={handleOpenSingleWorkDetail}></SingleWorkBox>
+                            {singleWorks.map((singleWork, index) => (
+                                <SingleWorkBox
+                                    key={index}
+                                    singleWorkData={singleWork}
+                                    handleOpenSingleWorkDetail={handleOpenSingleWorkDetail}
+                                />
+                            ))}
                         </SingleWorkColumn>
                     }
                 </SingleWorkBoxes>}
             {exhibitionView &&
                 <ExhibitionView>
-                    <ExhibitionCard />
-                    <ExhibitionCard />
-                    <ExhibitionCard />
-                    <ExhibitionCard />
-                    <ExhibitionCard />
-                    <ExhibitionCard />
-                    <ExhibitionCard />
-                    <ExhibitionCard />
-                    <ExhibitionCard />
-                    <ExhibitionCard />
-                    <ExhibitionCard />
-                    <ExhibitionCard />
-                    <ExhibitionCard />
-                    <ExhibitionCard />
-                    <ExhibitionCard />
+
 
 
                 </ExhibitionView>

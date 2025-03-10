@@ -1,3 +1,5 @@
+import { useState, useEffect } from 'react';
+
 import styled from 'styled-components';
 import ExhibitionCard from './ExhibitionCard';
 
@@ -23,32 +25,87 @@ const Container = styled.div`
     }
 `
 
+interface Tag {
+    name: string;
+}
+
+interface ExhibitionData {
+    id: number;
+    writer: {
+        id: number;
+        nickname: string;
+        profileImage: string;
+        introduction: string;
+    }
+    title: string;
+    description: string;
+    cardColor: string;
+    likeCount: number;
+    viewCount: number;
+    tags: Tag[];
+    createdAt: string;
+    isLiked: boolean;
+    isBookmarked: boolean;
+}
+
+interface ExhibitionDataPage {
+    content: ExhibitionData[];
+    pageable: {
+        pageNumber: number;
+    }
+    last: boolean;
+}
+
+interface ExhibitionViewProps {
+    exhibitionDataPageLoading: boolean;
+    exhibitionDataPage: ExhibitionDataPage;
+    exhibitionDataPageStatusCode: number;
+}
+
+const ExhibitionView: React.FC<ExhibitionViewProps> = (props) => {
+    const { exhibitionDataPageLoading, exhibitionDataPage, exhibitionDataPageStatusCode } = props;
+
+    const [exhibitions, setExhibitions] = useState<ExhibitionData[]>([]);
+    const [notFound, setNotFound] = useState<boolean>(false);
+
+    // 검색한 전시회 배열 할당
+    useEffect(function isCompletedLoading() {
+        if (!exhibitionDataPageLoading && exhibitionDataPage) {
+            if (exhibitionDataPage.pageable.pageNumber === 0) {
+                setExhibitions(exhibitionDataPage.content)
+            } else {
+                setExhibitions((prev) => [...prev, ...exhibitionDataPage.content])
+            }
+        }
+    }, [exhibitionDataPageLoading])
+
+    // 404가 나왔다면 검색결과가 아예 없으므로 검색결과 없다는 표시필요
+    useEffect(function isNotFound() {
+        if (exhibitionDataPageStatusCode == 200) {
+            setNotFound(false);
+        }
+
+        if (exhibitionDataPageStatusCode == 404) {
+            setNotFound(true);
+        }
+
+    }, [exhibitionDataPageStatusCode])
 
 
-const ExhibitionView = () => {
     return (
 
         <Container>
-            <ExhibitionCard />
-            <ExhibitionCard />
-            <ExhibitionCard />
-            <ExhibitionCard />
-            <ExhibitionCard />
-            <ExhibitionCard />
-            <ExhibitionCard />
-            <ExhibitionCard />
-            <ExhibitionCard />
-            <ExhibitionCard />
-            <ExhibitionCard />
-            <ExhibitionCard />
-            <ExhibitionCard />
-            <ExhibitionCard />
-            <ExhibitionCard />
+            {notFound &&
+                <>검색결과가 없습니다</>}
+            {!notFound && exhibitions.map((exhibition, index) => (
+                <ExhibitionCard
+                    key={exhibition.id}
+                    exhibitionData={exhibition}
+                />
 
+            ))}
 
         </Container>
-
-
     )
 }
 

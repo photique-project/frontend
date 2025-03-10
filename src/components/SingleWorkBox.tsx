@@ -1,7 +1,8 @@
 import styled from 'styled-components';
 import heartIcon from '../assets/heart.png';
 import viewIcon from '../assets/view.png';
-import ex1 from '../assets/ex1.jpg';
+import heartFillIcon from '../assets/heart-fill.png';
+
 
 const Container = styled.div`
     width: 100%;
@@ -77,6 +78,7 @@ const SingleWorkHitBox = styled.div`
     display: flex;
     flex-direction: row;
     align-items: center;
+    gap: 7px;
 `
 
 const SingleWorkLikeBox = styled.div`
@@ -85,7 +87,7 @@ const SingleWorkLikeBox = styled.div`
     flex-direction: row;
     align-items: center;
 
-    gap: 5px;
+    gap: 7px;
 `
 
 const SingleWorkLikeIcon = styled.img`
@@ -95,6 +97,7 @@ const SingleWorkLikeIcon = styled.img`
 
 const SingleWorkLike = styled.div`
     font-size: 16px;
+    font-weight: 700;
     
     color: white;
 `
@@ -105,7 +108,7 @@ const SingleWorkViewBox = styled.div`
     flex-direction: row;
     align-items: center;
 
-    gap: 5px;
+    gap: 7px;
 `
 
 const SingleWorkViewIcon = styled.img`
@@ -115,18 +118,35 @@ const SingleWorkViewIcon = styled.img`
 
 const SingleWorkView = styled.div`
     font-size: 16px;
+    font-weight: 700;
     color: white;
 `
 
+
+interface Writer {
+    id: number;
+    nickname: string;
+    profileImage: string;
+}
+
+interface SingleWorkData {
+    id: number;
+    writer: Writer;
+    image: string;
+    likeCount: number;
+    viewCount: number;
+    isLiked: boolean;
+}
+
 interface SingleWorkBoxProps {
-    src: string;
-    handleOpenSingleWorkDetail: (singleWorkId: string) => void;
+    singleWorkData: SingleWorkData;
+    handleOpenSingleWorkDetail: (singleWorkId: number) => void;
 }
 
 const SingleWorkBox: React.FC<SingleWorkBoxProps> = (props) => {
     // 여기서 아이디 가지고 있다가 열기
-    const { src, handleOpenSingleWorkDetail } = props;
-    const id = "1";
+    const { singleWorkData, handleOpenSingleWorkDetail } = props;
+    const id = singleWorkData.id;
 
     const handleOpenDetail = () => {
         handleOpenSingleWorkDetail(id);
@@ -137,25 +157,25 @@ const SingleWorkBox: React.FC<SingleWorkBoxProps> = (props) => {
             <SingleWorkInfo>
 
                 <BestSingleWorkWriterBox>
-                    <SingleWorkUserImage src={ex1} alt='Best Single Work'></SingleWorkUserImage>
-                    <SingleWorkUserNickname>닉네임</SingleWorkUserNickname>
+                    <SingleWorkUserImage src={singleWorkData.writer.profileImage} alt='Single Work'></SingleWorkUserImage>
+                    <SingleWorkUserNickname>{singleWorkData.writer.nickname}</SingleWorkUserNickname>
                 </BestSingleWorkWriterBox>
 
                 <SingleWorkHitBox>
                     <SingleWorkLikeBox>
-                        <SingleWorkLikeIcon src={heartIcon} alt='like'></SingleWorkLikeIcon>
-                        <SingleWorkLike>831</SingleWorkLike>
+                        <SingleWorkLikeIcon src={singleWorkData.isLiked ? heartFillIcon : heartIcon} alt='like'></SingleWorkLikeIcon>
+                        <SingleWorkLike>{singleWorkData.likeCount}</SingleWorkLike>
                     </SingleWorkLikeBox>
 
                     <SingleWorkViewBox>
                         <SingleWorkViewIcon src={viewIcon} alt='view'></SingleWorkViewIcon>
-                        <SingleWorkView>1.3k</SingleWorkView>
+                        <SingleWorkView>{singleWorkData.viewCount}</SingleWorkView>
                     </SingleWorkViewBox>
 
                 </SingleWorkHitBox>
 
             </SingleWorkInfo>
-            <SingleWork src={src} />
+            <SingleWork src={singleWorkData.image} />
         </Container>
     );
 }

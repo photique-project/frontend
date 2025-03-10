@@ -1,11 +1,12 @@
 import { useState, useEffect } from 'react';
 import { format } from "date-fns";
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { API_BASE_URL } from '../config/environment';
 import styled, { keyframes } from 'styled-components';
 import DatePicker from "react-datepicker";
 import ENDPOINTS from '../api/endpoints';
 import useAuthStore from '../zustand/store';
+import { parse } from 'date-fns';
 import "react-datepicker/dist/react-datepicker.css";
 
 import useFetch from '../hooks/useFetch';
@@ -518,15 +519,14 @@ const LoadingIcon = styled.img`
     animation: ${rotate} 1.2s ease-in-out infinite;
 `
 
-interface Writer {
-    id: number;
-    nickname: string;
-    introduction: string;
-    profileImage: string;
-}
-
 interface SingleWork {
-    writer: Writer;
+    id: number,
+    writer: {
+        id: number;
+        nickname: string;
+        introduction: string;
+        profileImage: string;
+    };
     image: string;
     createdAt: string;
     camera: string;
@@ -553,7 +553,7 @@ interface FetchRequestOptions {
     body?: Record<string, any> | FormData | null;
 }
 
-const NewSingleWork = () => {
+const SingleWorkUpdate = () => {
     const apertureOptions = ["미입력", "f/0.7", "f/0.8", "f/0.85", "f/0.95", "f/1", "f/1.2", "f/1.4", "f/1.8", "f/2", "f/2.8", "f/3.2", "f/3.5", "f/4", "f/4.5", "f/5", "f/5.6", "f/6.3", "f/7.1", "f/8", "f/9", "f/10", "f/11", "f/13", "f/14", "f/16", "f/22", "f/32", "f/40", "f/45", "f/64"];
     const shutterSpeedOptions = ["미입력", "1/8000", "1/4000", "1/2000", "1/1000", "1/500", "1/250", "1/125", "1/60", "1/30", "1/15", "1/8", "1/4", "1/2", "1", "2", "4", "8", "15", "30"];
     const isoOptions = ["미입력", "50", "100", "200", "400", "800", "1600", "3200", "6400", "12800", "25600", "51200", "102400", "204800"];
@@ -575,80 +575,56 @@ const NewSingleWork = () => {
         "패션": "fashion"
     };
     const user = useAuthStore.getState().user;
+    const location = useLocation();
 
     const navigate = useNavigate();
 
     // 작성뷰, 미리보기 뷰
     const [writeView, setWriteView] = useState<boolean>(true);
     const [preview, setPreview] = useState<boolean>(false);
-    const now = new Date();
-    const createdAt = new Intl.DateTimeFormat('ko-KR', {
-        year: 'numeric',
-        month: '2-digit',
-        day: '2-digit',
-        hour: '2-digit',
-        minute: '2-digit',
-        hour12: false
-    }).format(now).replace(/\. /g, '-').replace('.', '');
 
-    // 단일작품 입력 데이터
+    // 단일작품 입력 데이터 상태관리
     const [singleWork, setSingleWork] = useState<SingleWork>(
-        {
-            writer: {
-                id: user.id,
-                nickname: user.nickname,
-                introduction: user.introduction,
-                profileImage: user.profileImage,
-            },
-            image: undefined,
-            createdAt: createdAt,
-            camera: '',
-            lens: '',
-            aperture: '',
-            shutterSpeed: '',
-            iso: '',
-            location: '',
-            category: '',
-            date: null,
-            tags: [],
-            title: '',
-            description: '',
-        }
+        location.state?.singleWorkUpdateState
     );
 
     // 이미지 입력값 상태관리 변수
-    const [validImage, setValidImage] = useState<boolean | null>(null);
+    const [validImage, setValidImage] = useState<boolean | null>(true);
     const [image, setImage] = useState<File | undefined>(undefined);
     const [imageHelperText, setImageHelperText] = useState<string>('사진*');
     const [imageHelperTextColor, setImageHelperTextColor] = useState<'black' | 'red'>('black');
 
     // 카메라 이름 입력값 상태관리 변수
-    const [validCameraInput, setValidCameraInput] = useState<boolean | null>(null);
+    const [validCameraInput, setValidCameraInput] = useState<boolean | null>(true);
     const [cameraHelperText, setCameraHelperText] = useState<string>('카메라*');
     const [cameraHelperTextColor, setCamareHelperTextColor] = useState<'black' | 'red'>('black');
 
     // 카테고리 입력값 상태관리 변수
-    const [validCategoryInput, setValidCategoryInput] = useState<boolean | null>(null);
+    const [validCategoryInput, setValidCategoryInput] = useState<boolean | null>(true);
     const [categoryHelperText, setCategoryHelperText] = useState<string>('카테고리*');
     const [categoryHelperTextColor, setCategoryHelperTextColor] = useState<'black' | 'red'>('black');
 
     // 날짜 입력값 상태관리 변수
-    const [validDateInput, setValidDateInput] = useState<boolean | null>(null);
+    const parseDate = (dateString: string): Date => {
+        return dateString ? parse(dateString, 'yyyy-MM-dd', new Date()) : new Date();
+    };
+
+    const [validDateInput, setValidDateInput] = useState<boolean | null>(true);
     const [dateHelperText, setDateHelperText] = useState<string>('날짜*');
     const [dateHelperTextColor, setDateHelperTextColor] = useState<'black' | 'red'>('black');
-    const [selectedDate, setSelectedDate] = useState<Date | null>(null);
+    const [selectedDate, setSelectedDate] = useState<Date | null>(parseDate(singleWork.date));
 
     // 태그 입력값 상태관리 변수
     const [tagInput, setTagInput] = useState<string>('');
     const [isComposing, setIsComposing] = useState(false);
 
     // 제목 입력값 상태관리 변수
-    const [validTitleInput, setValidTitleInput] = useState<boolean | null>(null);
+    const [validTitleInput, setValidTitleInput] = useState<boolean | null>(true);
     const [titleHelperText, setTitleHelperText] = useState<string>('제목*');
     const [titleHelperTextColor, setTitleHelperTextColor] = useState<'black' | 'red'>('black');
 
     // 설명 입력값 상태관리 변수
-    const [validDescriptionInput, setValidDescriptionInput] = useState<boolean | null>(null);
+    const [validDescriptionInput, setValidDescriptionInput] = useState<boolean | null>(true);
     const [descriptionHelperText, setDescriptionHelperText] = useState<string>('설명*');
     const [descriptionHelperTextColor, setDescriptionHelperTextColor] = useState<'black' | 'red'>('black');
 
@@ -906,21 +882,20 @@ const NewSingleWork = () => {
 
     // 페이지 이동
     const navigateToHomePage = () => {
-        navigate('/home');
+        navigate('/home', { state: { singleWorkId: singleWork.id } });
     };
 
     // 단일작품 생성 useFetch
     const {
-        loading: singleWorkCreateLoading,
-        statusCode: singleWorkCreateStatusCode,
-        fetchRequest: singleWorkCreateRequest
+        loading: singleWorkUpdateLoading,
+        statusCode: singleWorkUpdateStatusCode,
+        fetchRequest: singleWorkUpdateRequest
     } = useFetch<void>();
 
     // 단일작품 게시하기
-    const handleCreateNewSingleWork = () => {
+    const handleSingleWorkUpdate = () => {
         // 이미지 입력값 확인
         if (!validImage) {
-            // 이미지 헬퍼텍스트는 다른 useEffect에서 진행
             if (validImage == null) {
                 setImageHelperTextColor('red');
                 setImageHelperText('사진* - 필수값입니다')
@@ -993,7 +968,9 @@ const NewSingleWork = () => {
 
         const formData = new FormData();
         formData.append('writerId', user.id.toString());
-        formData.append('image', image);
+        if (image !== undefined) {
+            formData.append('image', image);
+        }
         formData.append('camera', singleWork.camera.trim());
         formData.append('lens', singleWork.lens.trim());
         formData.append('aperture', singleWork.aperture === '' ? '미입력' : singleWork.aperture);
@@ -1007,34 +984,34 @@ const NewSingleWork = () => {
         formData.append('description', singleWork.description.trim());
 
         const options: FetchRequestOptions = {
-            url: `${API_BASE_URL}${ENDPOINTS.SINGLE_WORK.SEARCH}`,
-            method: 'POST',
+            url: `${API_BASE_URL}${ENDPOINTS.SINGLE_WORK.SEARCH}/${singleWork.id}`,
+            method: 'PATCH',
             credentials: 'include',
             contentType: 'multipart/form-data',
             body: formData
         }
 
-        singleWorkCreateRequest(options);
+        singleWorkUpdateRequest(options);
     }
 
     useEffect(function handleSingleWorkCreateResult() {
         setLoadingDisplay(false);
 
-        if (singleWorkCreateStatusCode === 201) {
+        if (singleWorkUpdateStatusCode === 204) {
             setToastMessageDisplay(true);
-            setFirstText('단일작품 게시완료!');
-            setSecondText('홈페이지로 돌아갑니다');
+            setFirstText('단일작품 수정완료!');
+            setSecondText('홈페이지로 돌아갑니다'); // 여기서 useLocation으로 단일작품 값 전달해야함
             setIsSuccess(true);
 
             setTimeout(() => {
-                navigate('/home');
+                navigate('/home', { state: { singleWorkId: singleWork.id } });
             }, 3000);
             return;
         }
 
-        if (singleWorkCreateStatusCode === 400) {
+        if (singleWorkUpdateStatusCode === 400) {
             setToastMessageDisplay(true);
-            setFirstText('단일작품 게시실패!');
+            setFirstText('단일작품 수정실패 !');
             setSecondText('입력값을 확인해주세요');
             setIsSuccess(false);
 
@@ -1045,9 +1022,9 @@ const NewSingleWork = () => {
             return;
         }
 
-        if (singleWorkCreateStatusCode === 401) {
+        if (singleWorkUpdateStatusCode === 401) {
             setToastMessageDisplay(true);
-            setFirstText('단일작품 게시실패 !');
+            setFirstText('단일작품 수정실패 !');
             setSecondText('로그인 상태를 확인해주세요');
             setIsSuccess(false);
 
@@ -1058,9 +1035,9 @@ const NewSingleWork = () => {
             return;
         }
 
-        if (singleWorkCreateStatusCode === 403) {
+        if (singleWorkUpdateStatusCode === 403) {
             setToastMessageDisplay(true);
-            setFirstText('단일작품 게시실패 !');
+            setFirstText('단일작품 수정실패 !');
             setSecondText('인가되지 않은 접근입니다');
             setIsSuccess(false);
 
@@ -1070,9 +1047,9 @@ const NewSingleWork = () => {
             return;
         }
 
-        if (singleWorkCreateStatusCode === 404) {
+        if (singleWorkUpdateStatusCode === 404) {
             setToastMessageDisplay(true);
-            setFirstText('단일작품 게시실패!');
+            setFirstText('단일작품 게시실패 !');
             setSecondText('유저 데이터가 존재하지 않습니다');
             setIsSuccess(false);
 
@@ -1082,7 +1059,7 @@ const NewSingleWork = () => {
             return;
         }
 
-        if (singleWorkCreateStatusCode === 500) {
+        if (singleWorkUpdateStatusCode === 500) {
             setToastMessageDisplay(true);
             setFirstText('서버에러 !');
             setSecondText('잠시 후 다시 시도해주세요');
@@ -1094,7 +1071,7 @@ const NewSingleWork = () => {
             return;
         }
 
-    }, [singleWorkCreateStatusCode])
+    }, [singleWorkUpdateStatusCode])
 
     return (
         <Container>
@@ -1125,7 +1102,7 @@ const NewSingleWork = () => {
                                 <ImageInputTitle color={imageHelperTextColor}>{imageHelperText}</ImageInputTitle>
                             </ImageInputTitleBox>
 
-                            <ImageInput width={'100%'} ratio={'16/9'} marginTop={5} image={image} setImage={setImage} setValidImage={setValidImage} inputDisabled={inputDisabled} />
+                            <ImageInput width={'100%'} ratio={'16/9'} marginTop={5} image={image} setImage={setImage} setValidImage={setValidImage} inputDisabled={inputDisabled} curImage={singleWork.image} />
 
                             <InputBox>
 
@@ -1289,7 +1266,7 @@ const NewSingleWork = () => {
 
                     <ButtonBox>
                         <ShortButton text={'취소'} type={'white'} action={navigateToHomePage}></ShortButton>
-                        <ShortButton text={'작성완료'} type={'black'} action={handleCreateNewSingleWork}></ShortButton>
+                        <ShortButton text={'수정완료'} type={'black'} action={handleSingleWorkUpdate}></ShortButton>
                     </ButtonBox>
 
 
@@ -1312,4 +1289,4 @@ const NewSingleWork = () => {
     )
 }
 
-export default NewSingleWork;
+export default SingleWorkUpdate;

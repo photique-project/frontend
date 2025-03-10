@@ -2,12 +2,12 @@ import styled from 'styled-components';
 
 import ex1 from '../assets/ex1.jpg';
 
-const Container = styled.div`
+const Container = styled.div<{ me: boolean }>`
     width: 100%;
     
     display: flex;
     flex-direction: row;
-
+    justify-content: ${({ me }) => (me ? 'end' : 'start')};
     gap: 10px;
 `
 
@@ -23,10 +23,11 @@ const ProfileImage = styled.img`
     border-radius: 5px;
 `
 
-const CenterBox = styled.div`
+const CenterBox = styled.div<{ me: boolean }>`
     display: flex;
     flex-direction: column;
-
+    align-items: ${({ me }) => (me ? 'flex-end' : 'flex-start')};
+    
     gap: 5px;
 `
 
@@ -45,6 +46,9 @@ const Message = styled.div`
     background-color: white;
     border-radius: 5px;
     font-size: 16px;
+
+    white-space: pre-wrap;
+    word-break: break-word;
 `
 
 
@@ -61,26 +65,89 @@ const Time = styled.div`
     color: rgba(255, 255, 255, 0.6);
 `
 
+const JoinMessage = styled.div`
+    margin-top: 20px;
+    width: 100%;
 
-const ExhibitionChatMessage = () => {
+    font-size: 16px;
+    color: rgba(255, 255, 255, 0.7);
+
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+`
+
+interface Chat {
+    type: 'JOIN' | 'LEAVE' | 'CHAT';
+    me: boolean;
+    userId: number;
+    nickname: string;
+    profileImage: string;
+    content: string;
+    createdAt: string;
+}
+
+interface ExhibitionChatMessageProps {
+    chatData: Chat
+}
+
+const ExhibitionChatMessage: React.FC<ExhibitionChatMessageProps> = (props) => {
+    const { chatData } = props;
+
+
     return (
-        <Container>
-            <LeftBox>
-                <ProfileImage src={ex1} />
-            </LeftBox>
+        <>
+            <Container me={chatData.me}>
+                {chatData.type === 'CHAT' &&
+                    <>
+                        {!chatData.me ?
+                            <>
+                                <LeftBox>
+                                    <ProfileImage src={ex1} />
+                                </LeftBox>
 
-            <CenterBox>
-                <Nickname>닉네임</Nickname>
+                                <CenterBox me={chatData.me}>
+                                    <Nickname>{chatData.nickname}</Nickname>
+                                    <Message>{chatData.content}</Message>
+                                </CenterBox>
 
-                <Message>임시 메시지입니다.
+                                <RightBox>
+                                    <Time>{chatData.createdAt}</Time>
+                                </RightBox>
+                            </>
+                            :
+                            <>
+                                <RightBox>
+                                    <Time>{chatData.createdAt}</Time>
+                                </RightBox>
 
-                </Message>
-            </CenterBox>
+                                <CenterBox me={chatData.me}>
+                                    <Nickname>{chatData.nickname}</Nickname>
+                                    <Message>{chatData.content}</Message>
+                                </CenterBox>
 
-            <RightBox>
-                <Time>오후 1:28</Time>
-            </RightBox>
-        </Container>
+                                <LeftBox>
+                                    <ProfileImage src={ex1} />
+                                </LeftBox>
+                            </>
+                        }
+
+                    </>
+                }
+                {chatData.type === 'JOIN' &&
+
+                    <JoinMessage>{chatData.nickname}님이 입장하셨습니다</JoinMessage>
+
+                }
+
+                {chatData.type === 'LEAVE' &&
+
+                    <JoinMessage>{chatData.nickname}님이 퇴장하셨습니다</JoinMessage>
+
+                }
+            </Container>
+        </>
     )
 }
 

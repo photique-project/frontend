@@ -1,12 +1,18 @@
-import { useState, useEffect } from 'react';
-import styled from 'styled-components';
+import { useState, useEffect, useRef } from 'react';
+import { API_BASE_URL } from '../config/environment';
+import { useNavigate } from 'react-router-dom';
+import ENDPOINTS from '../api/endpoints';
+import useAuthStore from '../zustand/store';
+import styled, { keyframes } from 'styled-components';
 
+import useFetch from '../hooks/useFetch';
+
+import ToastMessage from './ToastMessage';
 import Comment from './Comment';
 
 import closeIcon from '../assets/white-close.png';
 import leftIcon from '../assets/arrow-left.png';
 import rightIcon from '../assets/arrow-right.png';
-import heartIcon from '../assets/heart.png';
 import viewIcon from '../assets/view.png';
 import menuIcon from '../assets/dot-menu.png';
 import clockIcon from '../assets/clock.png';
@@ -17,7 +23,15 @@ import settingsGrayIcon from '../assets/settings-gray.png';
 import locationGrayIcon from '../assets/location-gray.png';
 import calendarGrayIcon from '../assets/calendar-gray.png';
 import tagGrayIcon from '../assets/tag-gray.png';
-import ex1 from '../assets/ex21.jpg';
+import pencilIcon from '../assets/pencil.png'
+import trashIcon from '../assets/trash-red.png';
+import alertIcon from '../assets/alert.png';
+import loadingIcon from '../assets/loading-large.png';
+import heartIcon from '../assets/heart.png';
+import heartFillIcon from '../assets/heart-fill.png';
+import leftBlackIcon from '../assets/left-black.png';
+import rightBlackIcon from '../assets/right-black.png';
+import categoryGrayIcon from '../assets/category-gray.png';
 
 
 const Container = styled.div`
@@ -56,7 +70,7 @@ const CloseIcon = styled.img`
 
 const BodyBox = styled.div`
     margin-top:20px;
-    width: calc(100%- 260px);
+    width: 100%;
     height: calc(100% - 20px);
 
     display: flex;
@@ -105,6 +119,8 @@ const MainBox = styled.div`
     display: flex;
     flex-direction: column;
 
+    position: relative;
+
     border-top-left-radius: 20px;
     border-top-right-radius: 20px;
 
@@ -124,7 +140,7 @@ const MainBox = styled.div`
 
 const ImageBox = styled.div`
     width: 100%;
-    aspect-ratio: 3/2;
+    aspect-ratio: 16/9;
 
     display: flex;
     flex-direction: column;
@@ -196,6 +212,14 @@ const ImageLikeBox = styled.div`
     }
 `;
 
+const swing = keyframes`
+  0% { transform: rotate(0deg) scale(1.2); }
+  25% { transform: rotate(-15deg) scale(1.2); }
+  50% { transform: rotate(15deg) scale(1.2); }
+  75% { transform: rotate(-10deg) scale(1.2); }
+  100% { transform: rotate(0deg) scale(1.2); }
+`;
+
 const ImageLikeIcon = styled.img`
     width: 30px;
     height: 30px;
@@ -204,10 +228,21 @@ const ImageLikeIcon = styled.img`
         width: 20px;
         height: 20px;
     }
+
+    cursor: pointer;
+
+    
+
+    &:hover {
+    transform: scale(1.2);
+    animation: ${swing} 0.5s ease-in-out infinite;
+  }
 `;
+
 
 const ImageLikeValue = styled.div`
     font-size: 16px;
+    font-weight: 700;
     color: white;
 
     @media (max-width: 768px) {
@@ -244,6 +279,7 @@ const ImageViewIcon = styled.img`
 const ImageViewValue = styled.div`
     font-size: 16px;    
     color: white;
+    font-weight: 700;
 
     @media (max-width: 768px) {
         font-size: 14px;
@@ -262,9 +298,11 @@ const ImageMenuBox = styled.div`
     justify-content: center;
     align-items: center;
 
+    position: relative;
+
     border-radius: 25px;
     background-color: black;
-    opacity: 0.6;
+    background-color: rgba(0, 0, 0, 0.6);
 
     @media (max-width: 768px) {
         margin-right: 10px;
@@ -285,6 +323,50 @@ const ImageMenuIcon = styled.img`
         width: 20px;
         height: 20px;
     }
+`
+
+const SingleWorkOptionBox = styled.div`
+    padding: 5px;
+    top: 60px;
+    right: 0;
+
+    display: flex;
+    flex-direction: column;
+
+    border-radius: 5px;
+
+    box-shadow: 0 2px 4px -1px rgba(0, 0, 0, 0.25);
+    
+
+    position: absolute;
+    background-color: white;
+`
+
+const SingleWorkOption = styled.div`
+    padding: 10px;
+
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+
+    gap: 10px;
+
+    border-radius: 5px;
+    cursor: pointer;
+
+    &:hover {
+        background-color: rgba(0, 0, 0, 0.1);
+    }
+`
+
+const SingleWorkOptionIcon = styled.img`   
+    width: 20px;
+    height: 20px;
+`
+
+const SingleWorkOptionText = styled.div`
+    font-size: 16px;
+    white-space: nowrap;
 `
 
 const Image = styled.img`
@@ -388,18 +470,22 @@ const PhotographerIntro = styled.div`
     }
 `
 
-const FollowButton = styled.button`
-    width: 80px;
+const FollowButton = styled.button<{ isFollowing: boolean }>`
+    padding-left: 10px;
+    padding-right: 10px;
     height: 45px;
 
     font-size: 16px;
 
-    background-color: white;
+    position: relative;
+
+    background-color: ${({ isFollowing }) => isFollowing ? "black" : "white"};
+    color: ${({ isFollowing }) => isFollowing ? "white" : "black"};
     border: none;
     border-radius: 5px;
 
     &:hover {
-        background-color: rgba(0, 0, 0, 0.1);
+        background-color: ${({ isFollowing }) => isFollowing ? "rgba(0, 0, 0, 0.7)" : "rgba(0, 0, 0, 0.1)"};
     }
 
     @media (max-width: 768px) {
@@ -410,6 +496,32 @@ const FollowButton = styled.button`
 
     @media (max-width: 550px) {
         width: 100%;
+    }
+`
+
+const FollowMessageBox = styled.div`
+    padding: 10px;
+
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    white-space: nowrap;
+
+    border-radius: 10px;
+    color: white;
+
+    position: absolute;
+    bottom: 100%;
+    left: 100%;
+
+    background-color: rgba(0, 0, 0, 0.3);
+
+    opacity: 0;
+    transition: opacity 0.3s ease-in-out;
+
+    ${FollowButton}:hover & {
+        opacity: 1;
     }
 `
 
@@ -449,6 +561,7 @@ const ImageInfoBodyBox = styled.div`
     display: flex;
     flex-direction: row;
     justify-content: space-between;
+    position: relative;
     flex-wrap: wrap;
     row-gap: 30px;
 
@@ -514,6 +627,10 @@ const ImageInfoItemText = styled.div`
 const ImageInfoItemValue = styled.div`
     font-size: 18px;
     font-weight: 700;
+
+    word-wrap: break-word;   
+    overflow-wrap: break-word;
+    white-space: normal;  
 
     @media (max-width: 768px) {
         font-size: 16px;
@@ -587,6 +704,7 @@ const ImageInfoFooter = styled.div`
     width: 100%;
 
     display: flex;
+    position: relative;
     flex-direction: row;
     justify-content: space-between;
     flex-wrap: wrap;
@@ -654,9 +772,9 @@ const CommentBox = styled.div`
     padding: 40px;
     width: calc((100% - 15px) / 2 - 80px);
     
-
     display: flex;
     flex-direction: column;
+    position: relative;
 
     border: 1px solid rgba(0, 0, 0, 0.2);
     border-radius: 10px;
@@ -673,16 +791,23 @@ const CommentBox = styled.div`
     }
 `
 
+const CommentTitle = styled.div`
+    font-size: 20px;
+    font-weight: 700;
+
+    @media (max-width: 768px) {
+        font-size: 16px;
+    }
+`
+
 const CommentListBox = styled.div`
     margin-top: 20px;
     width: 100%;
-    max-height: 400px;
 
     display: flex;
     flex-direction: column;
+    position: relative;
     gap: 15px;
-
-    overflow-y: scroll;
 
     &::-webkit-scrollbar {
         width: 0px;
@@ -709,6 +834,103 @@ const CommentListBox = styled.div`
     }
 `
 
+const CommentPageNavBox = styled.div`
+    margin-top: 10px;
+    width: 100%;
+
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 10px;
+
+    border-radius: 1px solid #000000;
+`
+
+const CommentPageBox = styled.div`
+    width: 100%;
+
+    display: flex;
+    flex-direction: row;
+
+    gap: 10px;
+
+    justify-content: center;
+`
+
+const CommentPrevPageIcon = styled.img`
+    width: 20px;
+    height: 20px;
+
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+`
+
+const CommentNextPageIcon = styled.img`
+    width: 20px;
+    height: 20px;
+
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+
+    font-weight: 700;
+`
+
+const CommentPage = styled.div<{ isSelected?: boolean }>`
+    width: 40px;
+    height: 40px;
+
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+
+    border-radius: 10px;
+    font-weight: 700;
+    border: 1px solid rgba(0, 0, 0, 0.2);
+    cursor: pointer;
+
+    background-color: ${({ isSelected }) => (isSelected ? "black" : "white")};
+    color: ${({ isSelected }) => (isSelected ? "white" : "black")};
+
+    &:hover {
+        background-color: ${({ isSelected }) => (isSelected ? "black" : "rgba(0, 0, 0, 0.07)")};
+    }
+`
+
+const CommentQuickPageBox = styled.div`
+    width: 100%;
+    display: flex;
+    flex-direction: row;   
+    gap: 15px;
+
+    justify-content: center;
+`
+
+const CommentFirstPage = styled.div`
+    font-size: 14px;
+    color: rgba(0, 0, 0, 0.5);
+
+    cursor: pointer;
+    &:hover {
+        color: black;
+    }
+`
+
+const CommentLastPage = styled.div`
+    font-size: 14px;
+    color: rgba(0, 0, 0, 0.5);
+
+    cursor: pointer;
+    &:hover {
+        color: black;
+    }
+`
+
+
 const CommentWriterProfileImage = styled.img`
     width: 40px;
     height: 40px;
@@ -722,7 +944,7 @@ const CommentWriterProfileImage = styled.img`
 `
 
 const CommentInputBox = styled.div`
-    margin-top:30px;
+    margin-top:10px;
     width: 100%;
 
     display: flex;
@@ -730,7 +952,7 @@ const CommentInputBox = styled.div`
     gap: 10px;
 `
 
-const CommentInput = styled.textarea`
+const CommentInput = styled.textarea<{ commentUpdateMode: boolean }>`
     width: calc(100% - 20px - 10px - 20px);
     height: 80px;
     padding: 10px;
@@ -746,7 +968,8 @@ const CommentInput = styled.textarea`
     
     &:focus {
         outline: none; 
-        box-shadow: 0 0 5px rgba(0, 0, 0, 0.6);
+        box-shadow: ${({ commentUpdateMode }) =>
+        commentUpdateMode ? "0 0 5px #a574c2" : "0 0 5px rgba(0, 0, 0, 0.6)"};
     }
 
     @media (max-width: 480px) {
@@ -760,8 +983,12 @@ const CommentInputCompleteButtonBox = styled.div`
     width: 100%;
     
     display: flex;
-    flex-direction: column;
-    align-items: flex-end;
+    flex-direction: row;
+    justify-content: right;
+
+    gap: 5px;
+
+    cursor: pointer;
 
     @media (max-width: 480px) {
         align-items: center;
@@ -812,20 +1039,1015 @@ const CommentInputCompleteButtonText = styled.div`
     }
 `
 
+const CommentInputUpdateButtonBox = styled.div`
+    padding: 8px 10px;
 
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+
+    gap: 10px;
+
+    border: 1px solid rgba(0, 0, 0, 0.2);
+    border-radius: 5px;
+
+    background-color: #a574c2;
+    
+    &:hover {
+        background-color: #8836b7;
+    }
+
+    @media (max-width: 768px) {
+        width: calc(100% - 16px);
+    }
+`
+
+const CommentInputUpdateButtonText = styled.div`
+    font-size: 16px;
+    color: white;
+
+    @media (max-width: 768px) {
+        font-size: 14px;
+    }
+`
+
+const CommentInputUpdateCancelButtonBox = styled.div`
+    padding: 8px 10px;
+
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+
+    gap: 10px;
+
+    border: 1px solid rgba(0, 0, 0, 0.2);
+    border-radius: 5px;
+
+    background-color: white;
+
+    &:hover {
+        background-color: rgba(0, 0, 0, 0.07);
+    }
+
+    @media (max-width: 768px) {
+        width: calc(100% - 16px);
+    }
+`
+
+const CommentInputUpdateCancelButtonText = styled.div`
+    font-size: 16px;
+    color:black;
+
+    @media (max-width: 768px) {
+        font-size: 14px;
+    }
+`
+
+
+const DeleteBackground = styled.div`
+    width: 100%;
+    height: 100%;
+
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+
+    background-color: rgba(0, 0, 0, 0.7);
+    position: absolute;
+`
+
+const DeleteBox = styled.div`
+    padding: 25px;
+
+    display: flex;
+    flex-direction: column;
+
+    border-radius: 10px;
+    background-color: white;
+`
+
+const DeleteBoxTitleBox = styled.div`
+    display: flex;
+    margin-bottom: 20px;
+    flex-direction: row;
+    align-items: center;
+    
+    gap: 10px;
+`
+
+const AlertIcon = styled.img`
+    width: 30px;
+    height:30px;
+`
+
+const DeleteBoxTitle = styled.div`
+    font-size: 20px;
+    font-weight: 700;
+
+
+    color: #f50000;
+`
+
+const DeleteBoxContent = styled.div`
+    font-size:16px;
+    color: rgba(0, 0, 0, 0.6);
+`
+
+const DeleteBoxInput = styled.input`
+    padding-left: 12px;
+    padding-right: 12px;
+    margin-top: 10px;
+    width: calc(100%-24px);
+    height: 40px;
+
+
+    font-size: 16px;
+    line-height: 17px;
+    
+    border: 1.5px solid rgba(0, 0, 0, 0.2);
+    border-radius: 6px;
+    
+    &::placeholder {
+        color: rgba(0, 0, 0, 0.3);
+    }
+    
+    &:focus {
+        outline: none; 
+        box-shadow: 0 0 5px rgba(0, 0, 0, 0.6);
+    }
+
+`
+
+const DeleteBoxButtonBox = styled.div`
+    margin-top: 20px;
+    width: 100%;
+    display: flex;
+    flex-direction: row;
+    justify-content: end;
+
+    gap: 5px;
+
+    cursor: pointer;
+`
+
+const DeleteBoxCancelButton = styled.button`
+    width: 50px;
+    height: 30px;
+
+    font-size: 16px;
+    background-color: rgba(0, 0, 0, 0.01);
+
+    border: 1px solid rgba(0, 0, 0, 0.2);
+    border-radius: 5px;
+
+    cursor: pointer;
+
+    &:hover {
+        background-color: rgba(0, 0, 0, 0.1);
+    }
+`
+
+const DeleteBoxDeleteButton = styled.button`
+    width: 50px;
+    height: 30px;
+
+    font-size: 16px;
+    color: white;
+    background-color: rgba(255, 0, 0, 0.4);
+
+    border: 1px solid rgba(0, 0, 0, 0.2);
+    border-radius: 5px;
+
+    &:hover {
+        background-color: rgba(255, 0, 0, 1);
+    }
+`
+
+const rotate = keyframes`
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+`;
+
+const LoadingIcon = styled.img`
+    width: 50px;
+    height: 50px;
+
+    animation: ${rotate} 1.2s ease-in-out infinite;
+`
+
+type Method = 'GET' | 'POST' | 'PATCH' | 'DELETE';
+
+interface FetchRequestOptions {
+    url: string;
+    method: Method
+    headers?: Record<string, string>;
+    credentials: 'include' | 'same-origin';
+    contentType: 'application/json' | 'multipart/form-data';
+    body?: Record<string, any> | FormData | null;
+}
+
+interface SingleWorkUpdateState {
+    writer: {
+        id: number;
+        nickname: string;
+        introduction: string;
+        profileImage: string;
+    };
+    image: string;
+    createdAt: string;
+    camera: string;
+    lens: string;
+    aperture: string;
+    shutterSpeed: string;
+    iso: string;
+    location: string;
+    category: string;
+    date: string;
+    tags: string[];
+    title: string;
+    description: string;
+}
+
+interface Tag {
+    name: string;
+}
+
+interface SingleWork {
+    id: number;
+    writer: {
+        id: number,
+        nickname: string;
+        profileImage: string;
+        introduction: string;
+    };
+    image: string;
+    camera: string;
+    lens: string;
+    aperture: string;
+    shutterSpeed: string;
+    iso: string;
+    location: string;
+    category: string;
+    date: string;
+    tags: Tag[];
+    title: string;
+    description: string;
+    likeCount: number;
+    viewCount: number;
+    createdAt: string;
+    isLiked: boolean;
+    isFollowing: boolean;
+}
+
+interface Writer {
+    id: number;
+    nickname: string;
+    profileImage: string;
+}
+
+interface CommentData {
+    id: number;
+    writer: Writer;
+    content: string;
+    createdAt: string;
+}
+
+interface CommentPageData {
+    content: CommentData[];
+    pageable: {
+        pageNumber: number;
+    }
+    totalPages: number;
+}
 
 
 interface SingleWorkProps {
-    singleWorkId: string;
-    close: (singleWorkId?: string) => void;
+    singleWorkId: number;
+    close: (singleWorkId?: number) => void;
 }
 
 const SingleWork: React.FC<SingleWorkProps> = (props) => {
     const { singleWorkId, close } = props;
+    const categoryMap: { [key: string]: string } = {
+        "landscape": "풍경",
+        "portrait": "인물",
+        "animal": "동물",
+        "plant": "식물",
+        "architecture": "건축",
+        "travel": "여행",
+        "food": "음식",
+        "sports": "스포츠",
+        "blackAndWhite": "흑백",
+        "nightscape": "야경",
+        "street": "길거리",
+        "abstract": "추상",
+        "event": "이벤트",
+        "fashion": "패션",
+    };
 
+    const navigate = useNavigate();
+
+    // 단일작품 옵션모달
+    const optionModalRef = useRef<HTMLDivElement>(null);
+    const [optionModalDisplay, setOptionModalDisplay] = useState<boolean>(false);
+    const [deleteModalDisplay, setDeleteModalDisplay] = useState<boolean>(false);
+    const [deleteModalInput, setDeleteModalInput] = useState<string>('');
+
+
+    useEffect(() => {
+        function handleClickOutside(event: MouseEvent) {
+            if (optionModalRef.current && !optionModalRef.current.contains(event.target as Node)) {
+                setOptionModalDisplay(false);
+            }
+        }
+
+        if (optionModalDisplay) {
+            document.addEventListener('mousedown', handleClickOutside);
+        }
+
+        return () => {
+            document.removeEventListener('mousedown', handleClickOutside);
+        };
+    }, [optionModalDisplay]);
+
+    // 토스트 메시지 상태관리 변수
+    const [toastMessageDisplay, setToastMessageDisplay] = useState<boolean>(false);
+    const [firstText, setFirstText] = useState<string>('');
+    const [secondText, setSecondText] = useState<string>('');
+    const [isSucess, setIsSucess] = useState<boolean>(null);
+
+    // 단일작품 조회 상태관리
+    const [singleWork, setSingleWork] = useState<SingleWork>(null);
+
+    // 댓글 상태관리변수
+    const [commentCurrentPage, setCommentCurrentPage] = useState<number>(0);
+    const [commentTotalPage, setCommentTotalPage] = useState<number>(0);
+    const [commentPageGroup, setCommentPageGroup] = useState<number>(0);
+    const [comments, setComments] = useState<CommentData[]>([]);
+    const [commentInput, setCommentInput] = useState<string>('');
+    const [commentUpdateMode, setCommentUpdateMode] = useState<boolean>(false);
+    const [commentUpdateTargetId, setCommentUpdateTargetId] = useState<number | null>(null);
+
+    const {
+        loading: commentUpdateLoading,
+        statusCode: commentUpdateStatusCode,
+        fetchRequest: commentUpdateRequest
+    } = useFetch<void>();
+
+    const handleCommentUpdateRequest = () => {
+        if (commentInput.trim().length < 1) {
+            return;
+        }
+
+        const requestBody = {
+            writerId: useAuthStore.getState().userId,
+            content: commentInput.trim()
+        }
+
+        const options: FetchRequestOptions = {
+            url: `${API_BASE_URL}${ENDPOINTS.SINGLE_WORK.SEARCH}/${singleWorkId}${ENDPOINTS.SINGLE_WORK.COMMENT}/${commentUpdateTargetId}`,
+            method: 'PATCH',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            credentials: 'include',
+            contentType: 'application/json',
+            body: requestBody
+        }
+
+        commentUpdateRequest(options);
+    }
+
+    useEffect(function handleCommentUpdateResponse() {
+        if (commentUpdateStatusCode === 204) {
+            setToastMessageDisplay(true);
+            setFirstText('댓글 수정완료 !');
+            setSecondText('댓글을 다시 불러옵니다');
+            setIsSucess(true);
+            setDeleteModalDisplay(false);
+
+            setTimeout(() => {
+                setToastMessageDisplay(false);
+                handleCommentupdateMode()
+                handleCommentPageRequest();
+            }, 3000);
+
+            return;
+        }
+
+        if (commentUpdateStatusCode === 400) {
+            setToastMessageDisplay(true);
+            setFirstText('댓글수정 실패 !');
+            setSecondText('입력값을 확인해주세요');
+            setIsSucess(false);
+
+            setTimeout(() => {
+                setToastMessageDisplay(false);
+            }, 3000);
+
+            return;
+        }
+
+        if (commentUpdateStatusCode === 401) {
+            setToastMessageDisplay(true);
+            setFirstText('댓글수정 실패 !');
+            setSecondText('로그인 상태를 확인해주세요');
+            setIsSucess(false);
+
+            setTimeout(() => {
+                useAuthStore.getState().logout();
+                window.location.reload();
+            }, 3000);
+
+            return;
+        }
+
+        if (commentUpdateStatusCode === 403) {
+            return;
+        }
+
+        if (commentUpdateStatusCode === 404) {
+            return;
+        }
+
+        if (commentUpdateStatusCode === 500) {
+            return;
+        }
+
+    }, [commentUpdateStatusCode]);
+
+    const handleCommentupdateMode = (input?: string, commentId?: number) => {
+        if (input) {
+            setCommentInput(input);
+            setCommentUpdateTargetId(commentId);
+        } else {
+            setCommentInput('');
+        }
+        setCommentUpdateMode(!commentUpdateMode);
+    }
+
+    const handleCommentInputChange = (e?: React.ChangeEvent<HTMLTextAreaElement>, value?: string) => {
+        const input = e.target.value.substring(0, 300);
+        setCommentInput(input);
+    }
+
+    const {
+        loading: commentPageLoading,
+        statusCode: commentPageStatusCode,
+        data: commentPageData,
+        fetchRequest: commentPageRequest
+    } = useFetch<CommentPageData>();
+
+    const handleCommentPageRequest = (page = 0) => {
+        const options: FetchRequestOptions = {
+            url: `${API_BASE_URL}${ENDPOINTS.SINGLE_WORK.SEARCH}/${singleWorkId}${ENDPOINTS.SINGLE_WORK.COMMENT}?page=${page}&size=5&sort=createdAt,desc`,
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            credentials: 'include',
+            contentType: 'application/json',
+        }
+
+        commentPageRequest(options);
+    }
+
+    useEffect(function handleInitCommentPageRequest() {
+        handleCommentPageRequest();
+    }, []);
+
+    useEffect(function handleCommentPageResponse() {
+        if (commentPageData) {
+            setCommentCurrentPage(commentPageData.pageable.pageNumber);
+            setCommentPageGroup(Math.floor(commentPageData.pageable.pageNumber / 5)); // 5로 나눴을 때 몫이 해당 그룹
+            setCommentTotalPage(commentPageData.totalPages);
+            setComments(commentPageData.content)
+        }
+
+    }, [commentPageData]);
+
+    const {
+        loading: commentCreateLoading,
+        statusCode: commentCreateStatusCode,
+        fetchRequest: commentCreateRequest
+    } = useFetch<CommentPageData>();
+
+    const handleCommentCreateRequest = () => {
+        // 앞뒤 공백 제거했을 때 댓글 길이가 0일경우
+        if (commentInput.trim().length < 1) {
+            return;
+        }
+
+        const body = {
+            writerId: useAuthStore.getState().userId,
+            content: commentInput.trim(),
+        }
+
+        const options: FetchRequestOptions = {
+            url: `${API_BASE_URL}${ENDPOINTS.SINGLE_WORK.SEARCH}/${singleWorkId}${ENDPOINTS.SINGLE_WORK.COMMENT}`,
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            credentials: 'include',
+            contentType: 'application/json',
+            body: body,
+        }
+
+        commentCreateRequest(options);
+    }
+
+    useEffect(function commentCreateResponse() {
+        if (commentCreateStatusCode) {
+            if (commentCreateStatusCode == 201) {
+                handleCommentPageRequest();
+                setCommentInput('')
+                return;
+            }
+
+            if (commentCreateStatusCode == 400) {
+                setToastMessageDisplay(true);
+                setFirstText('댓글작성 실패 !');
+                setSecondText('입력값을 확인해주세요');
+                setIsSucess(false);
+
+                setTimeout(() => {
+                    setToastMessageDisplay(false);
+                }, 3000);
+
+                return;
+            }
+
+            if (commentCreateStatusCode == 401) {
+                setToastMessageDisplay(true);
+                setFirstText('댓글작성 실패 !');
+                setSecondText('로그인 상태를 확인해주세요');
+                setIsSucess(false);
+
+                setTimeout(() => {
+                    useAuthStore.getState().logout();
+                    window.location.reload();
+                }, 3000);
+                return;
+            }
+
+            if (commentCreateStatusCode == 403) {
+                return;
+            }
+
+            if (commentCreateStatusCode == 404) {
+                return;
+            }
+
+            if (commentCreateStatusCode == 500) {
+                return;
+            }
+
+        }
+    }, [commentCreateStatusCode])
+
+
+
+
+
+
+
+    // 삭제모달 입력값 함수
+    const handleDeleteModalInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        setDeleteModalInput(e.target.value);
+    }
+
+    // 삭제 모달 함수
+    const handleDeleteModalDisplay = () => {
+        setDeleteModalDisplay(!deleteModalDisplay);
+    }
+
+    // 옵션 모달 함수
+    const handleOptionModalDisplay = () => {
+        setOptionModalDisplay(!optionModalDisplay);
+    }
+
+    // 단일작품 닫는 함수
     const handleClose = () => {
         close();
     }
+
+    // 단일작품 데이터 조회 useFetch
+    const {
+        loading: singleWorkLoading,
+        statusCode: singleWorkStatusCode,
+        data: singleWorkData,
+        fetchRequest: singleWorkRequest
+    } = useFetch<SingleWork>();
+
+    useEffect(function requestSingleWorkDetail() {
+        const options: FetchRequestOptions = {
+            url: `${API_BASE_URL}${ENDPOINTS.SINGLE_WORK.SEARCH}/${singleWorkId}?userId=${useAuthStore.getState().userId !== null ? useAuthStore.getState().userId : ''}`,
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            credentials: 'include',
+            contentType: 'application/json',
+        }
+
+        singleWorkRequest(options);
+    }, []);
+
+    useEffect(function handleSingleWorkDetailResponse() {
+        if (singleWorkStatusCode) {
+            if (singleWorkStatusCode === 200) {
+
+                return;
+            }
+        }
+
+    }, [singleWorkStatusCode]);
+
+    useEffect(function handleSingleWorkDetailResponse() {
+        if (singleWorkData) {
+            singleWorkData.category = categoryMap[singleWorkData.category];
+            setSingleWork(singleWorkData);
+        }
+
+    }, [singleWorkData]);
+
+
+    // 삭제 요청
+    const {
+        loading: singleWorkDeleteLoading,
+        statusCode: singleWorkDeleteStatusCode,
+        fetchRequest: singleWorkDeleteRequest
+    } = useFetch<void>();
+
+    const handleDeleteSingleWork = () => {
+        if (deleteModalInput !== '삭제') {
+            return;
+        }
+
+        const options: FetchRequestOptions = {
+            url: `${API_BASE_URL}${ENDPOINTS.SINGLE_WORK.SEARCH}/${singleWorkId}`,
+            method: 'DELETE',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            credentials: 'include',
+            contentType: 'application/json',
+        }
+
+        singleWorkDeleteRequest(options);
+    }
+
+    useEffect(function singleWorkDeleteResponse() {
+        if (singleWorkDeleteStatusCode === 204) {
+            setToastMessageDisplay(true);
+            setFirstText('단일작품 삭제완료 !');
+            setSecondText('현재 창이 닫힙니다');
+            setIsSucess(true);
+            setDeleteModalDisplay(false);
+
+            setTimeout(() => {
+                window.location.reload();
+            }, 3000);
+            return;
+        }
+        // 나머지 에러처리
+        if (singleWorkDeleteStatusCode === 401) {
+            setToastMessageDisplay(true);
+            setFirstText('단일작품 삭제실패 !');
+            setSecondText('로그인 상태를 확인해주세요');
+            setIsSucess(false);
+            setDeleteModalDisplay(false);
+
+            setTimeout(() => {
+                useAuthStore.getState().logout();
+                window.location.reload();
+            }, 3000);
+            return;
+        }
+
+        if (singleWorkDeleteStatusCode === 403) {
+            setToastMessageDisplay(true);
+            setFirstText('단일작품 삭제실패 !');
+            setSecondText('인가되지 않은 접근입니다');
+            setIsSucess(false);
+            setDeleteModalDisplay(false);
+
+            setTimeout(() => {
+                setToastMessageDisplay(false);
+            }, 3000);
+            return;
+        }
+
+        if (singleWorkDeleteStatusCode === 404) {
+            setToastMessageDisplay(true);
+            setFirstText('단일작품 삭제실패 !');
+            setSecondText('해당 단일작품 또는 작성자 데이터를 찾을 수 없습니다');
+            setIsSucess(false);
+            setDeleteModalDisplay(false);
+
+            setTimeout(() => {
+                setToastMessageDisplay(false);
+            }, 3000);
+            return;
+        }
+
+
+        if (singleWorkDeleteStatusCode === 500) {
+            setToastMessageDisplay(true);
+            setFirstText('서버에러 !');
+            setSecondText('잠시 후 다시 시도해주세요');
+            setIsSucess(false);
+            setDeleteModalDisplay(false);
+
+            setTimeout(() => {
+                setToastMessageDisplay(false);
+            }, 3000);
+            return;
+        }
+
+    }, [singleWorkDeleteStatusCode]);
+
+
+    // 단일작품 좋아요 추가 요청 
+    const {
+        loading: likeLoading,
+        statusCode: likeStatusCode,
+        fetchRequest: likeRequest
+    } = useFetch<void>();
+
+    // 단일작품 좋아요 삭제 요청 
+    const {
+        loading: dislikeLoading,
+        statusCode: dislikeStatusCode,
+        fetchRequest: dislikeRequest
+    } = useFetch<void>();
+
+    const handleLikeRequest = () => {
+        const method = singleWork.isLiked ? 'DELETE' : 'POST';
+        const request = singleWork.isLiked ? dislikeRequest : likeRequest;
+
+        const requestBody = {
+            userId: useAuthStore.getState().userId,
+        }
+
+        const options: FetchRequestOptions = {
+            url: `${API_BASE_URL}${ENDPOINTS.SINGLE_WORK.SEARCH}/${singleWorkId}${ENDPOINTS.SINGLE_WORK.LIKE}`,
+            method: method,
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            credentials: 'include',
+            contentType: 'application/json',
+            body: requestBody
+        }
+
+        request(options);
+    }
+
+    useEffect(function handleLikeResponse() {
+        if (likeStatusCode) {
+            if (likeStatusCode == 201) {
+                setSingleWork(prevState => ({
+                    ...prevState,
+                    isLiked: true,
+                    likeCount: prevState.likeCount + 1
+                }));
+                return;
+            }
+
+            if (likeStatusCode == 401) {
+                setToastMessageDisplay(true);
+                setFirstText('좋아요 추가실패 !');
+                setSecondText('로그인 상태를 확인해주세요');
+                setIsSucess(false);
+                setDeleteModalDisplay(false);
+
+                setTimeout(() => {
+                    useAuthStore.getState().logout();
+                    window.location.reload();
+                }, 3000);
+                return;
+
+            }
+
+            if (likeStatusCode == 403) {
+                return;
+            }
+
+            if (likeStatusCode == 404) {
+                return;
+            }
+
+            if (likeStatusCode == 409) {
+                return;
+            }
+
+            if (likeStatusCode == 500) {
+                return;
+            }
+        }
+    }, [likeStatusCode])
+
+
+    useEffect(function handleDislikeResponse() {
+        if (dislikeStatusCode) {
+            if (dislikeStatusCode == 204) {
+                setSingleWork(prevState => ({
+                    ...prevState,
+                    isLiked: false,
+                    likeCount: prevState.likeCount - 1
+                }));
+                return;
+            }
+
+            if (dislikeStatusCode == 401) {
+                // 모달 띄우고 홈페이지로 리다이렉트
+                setToastMessageDisplay(true);
+                setFirstText('좋아요 삭제 실패 !');
+                setSecondText('로그인 상태를 확인해주세요');
+                setIsSucess(false);
+
+                setTimeout(() => {
+                    useAuthStore.getState().logout();
+                    window.location.reload();
+                }, 3000);
+                return;
+            }
+
+            if (dislikeStatusCode == 403) {
+                return;
+            }
+
+            if (dislikeStatusCode == 404) {
+                return;
+            }
+
+            if (dislikeStatusCode == 500) {
+                return;
+            }
+        }
+    }, [dislikeStatusCode])
+
+
+    // 작가 팔로우 & 언팔요청
+    const {
+        loading: followLoading,
+        statusCode: followStatusCode,
+        fetchRequest: followRequest
+    } = useFetch<void>();
+
+    const {
+        loading: unfollowLoading,
+        statusCode: unfollowStatusCode,
+        fetchRequest: unfollowRequest
+    } = useFetch<void>();
+
+    const handleFollowRequest = () => {
+        const method = singleWork.isFollowing ? 'DELETE' : 'POST';
+        const request = singleWork.isFollowing ? unfollowRequest : followRequest;
+
+        const requestBody = {
+            followingId: singleWork.writer.id,
+        }
+
+        const options: FetchRequestOptions = {
+            url: `${API_BASE_URL}${ENDPOINTS.USER.DEFAULT}/${useAuthStore.getState().userId}${ENDPOINTS.USER.FOLLOW}`,
+            method: method,
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            credentials: 'include',
+            contentType: 'application/json',
+            body: requestBody
+        }
+
+        request(options);
+    }
+
+    useEffect(function handleFollowResponse() {
+        if (followStatusCode) {
+            if (followStatusCode == 201) {
+                setSingleWork(prevState => ({
+                    ...prevState,
+                    isFollowing: true,
+                }));
+                return;
+            }
+
+            if (followStatusCode == 401) {
+                setToastMessageDisplay(true);
+                setFirstText('팔로우 요청 실패 !');
+                setSecondText('로그인 상태를 확인해주세요');
+                setIsSucess(false);
+                setDeleteModalDisplay(false);
+
+                setTimeout(() => {
+                    useAuthStore.getState().logout();
+                    window.location.reload();
+                }, 3000);
+                return;
+
+            }
+
+            if (followStatusCode == 403) {
+                return;
+            }
+
+            if (followStatusCode == 404) {
+                return;
+            }
+
+            if (followStatusCode == 409) {
+                return;
+            }
+
+            if (followStatusCode == 500) {
+                return;
+            }
+        }
+    }, [followStatusCode])
+
+
+    useEffect(function handleUnfollowResponse() {
+        if (unfollowStatusCode) {
+            if (unfollowStatusCode == 204) {
+                setSingleWork(prevState => ({
+                    ...prevState,
+                    isFollowing: false,
+                }));
+                return;
+            }
+
+            if (unfollowStatusCode == 401) {
+                // 모달 띄우고 홈페이지로 리다이렉트
+                setToastMessageDisplay(true);
+                setFirstText('언팔로우 요청 실패 !');
+                setSecondText('로그인 상태를 확인해주세요');
+                setIsSucess(false);
+
+                setTimeout(() => {
+                    useAuthStore.getState().logout();
+                    window.location.reload();
+                }, 3000);
+                return;
+            }
+
+            if (unfollowStatusCode == 403) {
+                return;
+            }
+
+            if (unfollowStatusCode == 404) {
+                return;
+            }
+
+            if (unfollowStatusCode == 500) {
+                return;
+            }
+        }
+    }, [unfollowStatusCode])
+
+
+    // 태그 객체배열을 문자열 배열로 변환
+    const transformTagsToStrings = (tags: Tag[]): string[] => {
+        return tags.map(tag => tag.name);
+    };
+
+    // 수정페이지로 이동
+    const navigateToUpdateSingleWorkPage = () => {
+        const singleWorkUpdateState = {
+            id: singleWork.id,
+            writer: {
+                id: singleWork.writer.id,
+                nickname: singleWork.writer.nickname,
+                introduction: singleWork.writer.introduction,
+                profileImage: singleWork.writer.profileImage,
+            },
+            image: singleWork.image,
+            createdAt: singleWork.createdAt,
+            camera: singleWork.camera,
+            lens: singleWork.lens,
+            aperture: singleWork.aperture,
+            shutterSpeed: singleWork.shutterSpeed,
+            iso: singleWork.iso,
+            location: singleWork.location,
+            category: singleWork.category,
+            date: singleWork.date,
+            tags: transformTagsToStrings(singleWork.tags),
+            title: singleWork.title,
+            description: singleWork.description,
+        }
+
+        navigate(`/singleworks/${singleWorkId}/update`, { state: { singleWorkUpdateState } });
+    }
+
 
     return (
         <Container>
@@ -837,168 +2059,336 @@ const SingleWork: React.FC<SingleWorkProps> = (props) => {
                     <MoveIcon src={leftIcon} />
                 </SideBarBox>
 
-                <MainBox>
-                    <ImageBox>
-                        <ImageHeader>
-                            <ImageHitBox>
-                                <ImageLikeBox>
-                                    <ImageLikeIcon src={heartIcon} />
-                                    <ImageLikeValue>605.7K</ImageLikeValue>
-                                </ImageLikeBox>
+                {!singleWorkLoading && singleWork && <>
+                    <MainBox>
+                        <ImageBox>
+                            <ImageHeader>
+                                <ImageHitBox>
+                                    <ImageLikeBox>
+                                        <ImageLikeIcon src={singleWork.isLiked ? heartFillIcon : heartIcon} onClick={handleLikeRequest} />
+                                        <ImageLikeValue>{singleWork.likeCount}</ImageLikeValue>
+                                    </ImageLikeBox>
 
-                                <ImageViewBox>
-                                    <ImageViewIcon src={viewIcon} />
-                                    <ImageViewValue>23K</ImageViewValue>
-                                </ImageViewBox>
+                                    <ImageViewBox>
+                                        <ImageViewIcon src={viewIcon} />
+                                        <ImageViewValue>{singleWork.viewCount}</ImageViewValue>
+                                    </ImageViewBox>
 
-                            </ImageHitBox>
+                                </ImageHitBox>
 
-                            <ImageMenuBox>
-                                <ImageMenuIcon src={menuIcon}></ImageMenuIcon>
-                            </ImageMenuBox>
-                        </ImageHeader>
+                                {useAuthStore.getState().user.id === singleWork.writer.id &&
+                                    <ImageMenuBox
+                                        onClick={handleOptionModalDisplay}
+                                        ref={optionModalRef}
+                                    >
+                                        <ImageMenuIcon src={menuIcon}></ImageMenuIcon>
 
-                        <Image src={ex1} />
+                                        {optionModalDisplay &&
+                                            <SingleWorkOptionBox>
+                                                <SingleWorkOption onClick={navigateToUpdateSingleWorkPage}>
+                                                    <SingleWorkOptionIcon src={pencilIcon} />
+                                                    <SingleWorkOptionText>수정하기</SingleWorkOptionText>
+                                                </SingleWorkOption>
+                                                <SingleWorkOption
+                                                    onClick={handleDeleteModalDisplay}
+                                                >
+                                                    <SingleWorkOptionIcon src={trashIcon} />
+                                                    <SingleWorkOptionText style={{ color: '#f50000' }}>삭제하기</SingleWorkOptionText>
+                                                </SingleWorkOption>
+                                            </SingleWorkOptionBox>
+                                        }
 
-                    </ImageBox>
+                                    </ImageMenuBox>
+                                }
+                            </ImageHeader>
 
+                            <Image src={singleWork.image} />
 
-                    <InfoHeaderBox>
-
-                        <PhotographerInfoBox>
-                            <PhotographerProfileImage src={ex1} />
-
-                            <PhotographerProfile>
-                                <PhotographerNickname>뚱이</PhotographerNickname>
-                                <PhotographerIntro>Professional Photographer</PhotographerIntro>
-                            </PhotographerProfile>
-
-                            <FollowButton>팔로우</FollowButton>
-                        </PhotographerInfoBox>
-
-                        <PostDateBox>
-                            <PostDateIcon src={clockIcon} />
-                            <PostDate>게시일: 2024-01-15 13:45</PostDate>
-                        </PostDateBox>
-
-                    </InfoHeaderBox>
+                        </ImageBox>
 
 
+                        <InfoHeaderBox>
 
-                    <ImageInfoBodyBox>
-                        <ImageInfo>
+                            <PhotographerInfoBox>
+                                <PhotographerProfileImage src={singleWork.writer.profileImage} />
+
+                                <PhotographerProfile>
+                                    <PhotographerNickname>{singleWork.writer.nickname}</PhotographerNickname>
+                                    {singleWork.writer.introduction && <PhotographerIntro>{singleWork.writer.introduction}</PhotographerIntro>}
+                                </PhotographerProfile>
+
+                                <FollowButton
+                                    onClick={handleFollowRequest}
+                                    isFollowing={singleWork.isFollowing}
+                                >
+                                    {singleWork.isFollowing ? '팔로잉' : '팔로우'}
+
+                                    <FollowMessageBox>
+                                        {singleWork.isFollowing ? '현재 팔로우하고 있는 작가입니다' : '팔로우 요청하고 작가의 소식을 받아보세요 !'}
+                                    </FollowMessageBox>
+                                </FollowButton>
+                            </PhotographerInfoBox>
+
+                            <PostDateBox>
+                                <PostDateIcon src={clockIcon} />
+                                <PostDate>게시일: {singleWork.createdAt}</PostDate>
+                            </PostDateBox>
+
+                        </InfoHeaderBox>
+
+
+
+                        <ImageInfoBodyBox>
+                            <ImageInfo>
+                                <ImageInfoItem>
+                                    <ImageInfoItemIcon src={cameraGrayIcon} />
+                                    <ImageInfoItemText>카메라</ImageInfoItemText>
+                                </ImageInfoItem>
+
+                                <ImageInfoItemValue>{singleWork.camera}</ImageInfoItemValue>
+                            </ImageInfo>
+
+                            <ImageInfo>
+                                <ImageInfoItem>
+                                    <ImageInfoItemIcon src={lensGrayIcon} />
+                                    <ImageInfoItemText>렌즈</ImageInfoItemText>
+                                </ImageInfoItem>
+
+                                <ImageInfoItemValue>{singleWork.lens ? singleWork.lens : '미입력'}</ImageInfoItemValue>
+                            </ImageInfo>
+
+                            <ImageInfo>
+                                <ImageInfoItem>
+                                    <ImageInfoItemIcon src={settingsGrayIcon} />
+                                    <ImageInfoItemText>설정값</ImageInfoItemText>
+                                </ImageInfoItem>
+
+                                <ImageInfoItemTagBox>
+                                    <ImageInfoItemTag>{singleWork.aperture}</ImageInfoItemTag>
+                                    <ImageInfoItemTag>{singleWork.shutterSpeed}</ImageInfoItemTag>
+                                    <ImageInfoItemTag>{singleWork.iso === '미입력' ? '미입력' : `ISO ${singleWork.iso}`}</ImageInfoItemTag>
+                                </ImageInfoItemTagBox>
+                            </ImageInfo>
+
+                            <ImageInfo>
+                                <ImageInfoItem>
+                                    <ImageInfoItemIcon src={locationGrayIcon} />
+                                    <ImageInfoItemText>위치</ImageInfoItemText>
+                                </ImageInfoItem>
+
+                                <ImageInfoItemValue>{singleWork.location ? singleWork.location : '미입력'}</ImageInfoItemValue>
+                            </ImageInfo>
+
+
+                            <ImageInfo>
+                                <ImageInfoItem>
+                                    <ImageInfoItemIcon src={categoryGrayIcon} />
+                                    <ImageInfoItemText>카테고리</ImageInfoItemText>
+                                </ImageInfoItem>
+
+                                <ImageInfoItemTagBox>
+                                    <ImageInfoItemTag>{singleWork.category}</ImageInfoItemTag>
+                                </ImageInfoItemTagBox>
+                            </ImageInfo>
+
+
+                            <ImageInfo>
+                                <ImageInfoItem>
+                                    <ImageInfoItemIcon src={calendarGrayIcon} />
+                                    <ImageInfoItemText>날짜</ImageInfoItemText>
+                                </ImageInfoItem>
+
+                                <ImageInfoItemValue>{singleWork.date}</ImageInfoItemValue>
+                            </ImageInfo>
+
+                        </ImageInfoBodyBox>
+
+
+                        <ImageInfoTagBox>
                             <ImageInfoItem>
-                                <ImageInfoItemIcon src={cameraGrayIcon} />
-                                <ImageInfoItemText>카메라</ImageInfoItemText>
-                            </ImageInfoItem>
-
-                            <ImageInfoItemValue>Sony A7C</ImageInfoItemValue>
-                        </ImageInfo>
-
-                        <ImageInfo>
-                            <ImageInfoItem>
-                                <ImageInfoItemIcon src={lensGrayIcon} />
-                                <ImageInfoItemText>렌즈</ImageInfoItemText>
-                            </ImageInfoItem>
-
-                            <ImageInfoItemValue>Sony FE 24-70mm f/2.8 GM</ImageInfoItemValue>
-                        </ImageInfo>
-
-                        <ImageInfo>
-                            <ImageInfoItem>
-                                <ImageInfoItemIcon src={settingsGrayIcon} />
-                                <ImageInfoItemText>설정값</ImageInfoItemText>
+                                <ImageInfoItemIcon src={tagGrayIcon} />
+                                <ImageInfoItemText>태그</ImageInfoItemText>
                             </ImageInfoItem>
 
                             <ImageInfoItemTagBox>
-                                <ImageInfoItemTag>f/2.8</ImageInfoItemTag>
-                                <ImageInfoItemTag>1/1000s</ImageInfoItemTag>
-                                <ImageInfoItemTag>ISO 100</ImageInfoItemTag>
+                                {singleWork.tags.map((tag, index) => (
+                                    <ImageInfoItemTag key={index}>{tag.name}</ImageInfoItemTag>
+                                ))}
                             </ImageInfoItemTagBox>
-                        </ImageInfo>
 
-                        <ImageInfo>
-                            <ImageInfoItem>
-                                <ImageInfoItemIcon src={locationGrayIcon} />
-                                <ImageInfoItemText>위치</ImageInfoItemText>
-                            </ImageInfoItem>
-
-                            <ImageInfoItemValue>Seoul, South Korea</ImageInfoItemValue>
-                        </ImageInfo>
+                        </ImageInfoTagBox>
 
 
-                        <ImageInfo>
-                            <ImageInfoItem>
-                                <ImageInfoItemIcon src={calendarGrayIcon} />
-                                <ImageInfoItemText>날짜</ImageInfoItemText>
-                            </ImageInfoItem>
+                        <ImageInfoFooter>
+                            <DescriptionBox>
+                                <Title>{singleWork.title}</Title>
+                                <Description>
+                                    {singleWork.description}
+                                </Description>
+                            </DescriptionBox>
 
-                            <ImageInfoItemValue>2024-01-15</ImageInfoItemValue>
-                        </ImageInfo>
+                            <CommentBox>
+                                <CommentTitle>댓글</CommentTitle>
 
-                    </ImageInfoBodyBox>
-
-
-                    <ImageInfoTagBox>
-                        <ImageInfoItem>
-                            <ImageInfoItemIcon src={tagGrayIcon} />
-                            <ImageInfoItemText>태그</ImageInfoItemText>
-                        </ImageInfoItem>
-
-                        <ImageInfoItemTagBox>
-                            <ImageInfoItemTag>흑백</ImageInfoItemTag>
-                            <ImageInfoItemTag>바퀴</ImageInfoItemTag>
-                            <ImageInfoItemTag>을지로</ImageInfoItemTag>
-                        </ImageInfoItemTagBox>
-
-                    </ImageInfoTagBox>
+                                <CommentInputBox>
+                                    <CommentWriterProfileImage src={useAuthStore.getState().user.profileImage} />
+                                    <CommentInput
+                                        placeholder='댓글을 입력해주세요 (300자 이내)'
+                                        value={commentInput}
+                                        onChange={handleCommentInputChange}
+                                        commentUpdateMode={commentUpdateMode}
+                                    />
+                                </CommentInputBox>
 
 
-                    <ImageInfoFooter>
-                        <DescriptionBox>
-                            <Title>도시의 흔적</Title>
-                            <Description>
-                                오래된 자전거 타이어에 새겨진 도시의 흔적들을 담아보았습니다.
-                                매일 같은 길을 달리며 쌓인 시간의 흔적이 타이어의 패턴 속에 고스란히 남아있는 모습이 인상적이었습니다. 도시의 일상적인 풍경 속에서 발견한 특별한 순간입니다.
-                            </Description>
-                        </DescriptionBox>
+                                <CommentInputCompleteButtonBox>
+                                    {commentUpdateMode &&
+                                        <>
+                                            <CommentInputUpdateCancelButtonBox onClick={() => handleCommentupdateMode()}>
+                                                <CommentInputUpdateCancelButtonText>취소</CommentInputUpdateCancelButtonText>
+                                            </CommentInputUpdateCancelButtonBox>
+                                            <CommentInputUpdateButtonBox onClick={handleCommentUpdateRequest}>
+                                                <CommentInputUpdateButtonText>수정하기</CommentInputUpdateButtonText>
+                                            </CommentInputUpdateButtonBox>
+                                        </>
+                                    }
+                                    {!commentUpdateMode &&
+                                        <CommentInputCompleteButton
+                                            onClick={handleCommentCreateRequest}
+                                        >
+                                            <CommentInputCompleteButtonIcon src={sendIcon} />
+                                            <CommentInputCompleteButtonText>댓글작성</CommentInputCompleteButtonText>
+                                        </CommentInputCompleteButton>
+                                    }
+                                </CommentInputCompleteButtonBox>
 
-                        <CommentBox>
-                            <CommentListBox>
-                                <Comment />
-                                <Comment />
-                                <Comment />
-                                <Comment />
-                                <Comment />
-                            </CommentListBox>
+                                <CommentListBox>
+                                    {comments.map((comment, index) => (
+                                        <Comment
+                                            key={comment.id}
+                                            data={comment}
+                                            singleWorkId={singleWorkId}
+                                            handleCommentPageRequest={handleCommentPageRequest}
+                                            handleCommentupdateMode={handleCommentupdateMode}
+                                        />
+                                    ))}
 
-                            <CommentInputBox>
-                                <CommentWriterProfileImage src={ex1} />
-                                <CommentInput />
-                            </CommentInputBox>
+                                    {commentTotalPage > 0 &&
+                                        <CommentPageNavBox>
 
-                            <CommentInputCompleteButtonBox>
-                                <CommentInputCompleteButton>
-                                    <CommentInputCompleteButtonIcon src={sendIcon} />
-                                    <CommentInputCompleteButtonText>댓글작성</CommentInputCompleteButtonText>
-                                </CommentInputCompleteButton>
-                            </CommentInputCompleteButtonBox>
+                                            <CommentPageBox>
+                                                <CommentPage
+                                                    onClick={
+                                                        () => {
+                                                            // 현재 페이지가 첫번째 페이지 이후 페이지라면
+                                                            if (commentCurrentPage > 0) {
+                                                                handleCommentPageRequest(commentCurrentPage - 1)
+                                                            }
+                                                        }
+                                                    }
+                                                >
+                                                    <CommentPrevPageIcon src={leftBlackIcon} />
+                                                </CommentPage>
 
-                        </CommentBox>
-                    </ImageInfoFooter>
+                                                {Array.from({ length: commentTotalPage }, (_, index) => (
+                                                    <>
+                                                        {commentPageGroup === Math.floor(index / 5) &&
+                                                            <CommentPage
+                                                                key={index + 1}
+                                                                isSelected={index + 1 == commentCurrentPage + 1}
+                                                                onClick={() => handleCommentPageRequest(index)}
+                                                            >
+                                                                {index + 1}
+                                                            </CommentPage>
+                                                        }
+                                                    </>
+                                                ))}
+
+                                                <CommentPage
+                                                    onClick={
+                                                        () => {
+                                                            // 현재 페이지가 마지막 페이지보다 이전 페이지라면
+                                                            if (commentCurrentPage < commentTotalPage - 1) {
+                                                                handleCommentPageRequest(commentCurrentPage + 1)
+                                                            }
+                                                        }
+                                                    }>
+                                                    <CommentNextPageIcon src={rightBlackIcon} />
+                                                </CommentPage>
+
+                                            </CommentPageBox>
+
+                                            <CommentQuickPageBox>
+                                                <CommentFirstPage
+                                                    onClick={() => { handleCommentPageRequest(0) }}
+                                                >
+                                                    시작 페이지
+                                                </CommentFirstPage>
+                                                <CommentLastPage
+                                                    onClick={() => { handleCommentPageRequest(commentTotalPage - 1) }}
+                                                >
+
+                                                    마지막 페이지
+                                                </CommentLastPage>
+                                            </CommentQuickPageBox>
+                                        </CommentPageNavBox>}
+
+                                </CommentListBox>
+
+                            </CommentBox>
+                        </ImageInfoFooter>
 
 
 
 
 
-
-                </MainBox>
+                    </MainBox>
+                </>
+                }
 
                 <SideBarBox>
                     <MoveIcon src={rightIcon} />
                 </SideBarBox>
             </BodyBox>
 
+
+            {deleteModalDisplay &&
+                <DeleteBackground>
+                    {singleWorkDeleteLoading &&
+                        <LoadingIcon src={loadingIcon} />
+                    }
+                    {!singleWorkDeleteLoading &&
+                        <DeleteBox>
+                            <DeleteBoxTitleBox>
+                                <AlertIcon src={alertIcon} />
+                                <DeleteBoxTitle>게시글 삭제 확인</DeleteBoxTitle>
+                            </DeleteBoxTitleBox>
+
+                            <DeleteBoxContent>이 작업은 되돌릴 수 없습니다.</DeleteBoxContent>
+                            <DeleteBoxContent>게시글과 관련된 모든 데이터가 영구적으로 삭제됩니다.</DeleteBoxContent>
+
+                            <DeleteBoxInput
+                                placeholder='"삭제"를 입력하세요'
+                                value={deleteModalInput}
+                                onChange={handleDeleteModalInputChange}
+                            />
+
+                            <DeleteBoxButtonBox>
+                                <DeleteBoxCancelButton onClick={handleDeleteModalDisplay}>취소</DeleteBoxCancelButton>
+                                <DeleteBoxDeleteButton onClick={handleDeleteSingleWork}>삭제</DeleteBoxDeleteButton>
+                            </DeleteBoxButtonBox>
+
+                        </DeleteBox>
+                    }
+                </DeleteBackground>
+            }
+
+            {toastMessageDisplay &&
+                <ToastMessage
+                    firstText={firstText}
+                    secondText={secondText}
+                    isSuccess={isSucess}
+                />}
         </Container>
     )
 }

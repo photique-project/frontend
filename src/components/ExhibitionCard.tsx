@@ -1,10 +1,14 @@
+import { useNavigate } from 'react-router-dom';
+
 import styled from 'styled-components';
-import ex3 from '../assets/ex3.jpg';
+
 import bookmarkIcon from '../assets/bookmark.png';
 import calendarIcon from '../assets/calendar.png';
-import usersIcon from '../assets/users.png';
 import heartIcon from '../assets/heart.png';
 import viewIcon from '../assets/view.png';
+import heartFillIcon from '../assets/heart-fill.png';
+import bookmarkFillIcon from '../assets/bookmark-fill.png';
+import ExhibitionChatMessage from './ExhibitionChatMessage';
 
 const Container = styled.div`
     width: 380px;
@@ -29,7 +33,6 @@ const Container = styled.div`
 const ExhibitionCardColor = styled.div`
     width: 100%;
     height: 235px;
-    background-color: #AF3D3D;
     border-top-left-radius: 10px;
     border-top-right-radius: 10px;
     
@@ -203,26 +206,6 @@ font-size: 16px;
 color: rgba(0, 0, 0, 0.6);
 `;
 
-const ParticipantBox = styled.div`
-margin-top: 10px;
-
-display: flex;
-flex-direction: row;
-align-items: center;
-`;
-
-const ParticipantIcon = styled.img`
-width: 20px;
-height: 20px;
-`;
-
-const Participant = styled.div`
-margin-left: 5px;
-
-font-size: 16px;
-color: rgba(0, 0, 0, 0.6);
-`;
-
 const TagBox = styled.div`
     margin-top: 20px;
 
@@ -247,22 +230,56 @@ font-weight: 600;
 background-color: rgba(0, 0, 0, 0.07);
 `
 
+interface Tag {
+    name: string;
+}
+
+interface ExhibitionData {
+    id: number;
+    writer: {
+        id: number;
+        nickname: string;
+        profileImage: string;
+        introduction: string;
+    }
+    title: string;
+    description: string;
+    cardColor: string;
+    likeCount: number;
+    viewCount: number;
+    tags: Tag[];
+    createdAt: string;
+    isLiked: boolean;
+    isBookmarked: boolean;
+}
+
+interface ExhibitionCardProps {
+    exhibitionData: ExhibitionData;
+}
 
 
-const ExhibitionCard = () => {
+const ExhibitionCard: React.FC<ExhibitionCardProps> = (props) => {
+    const { exhibitionData } = props
+
+    const navigate = useNavigate();
+
+    const handleNavigateToExhibitionDetail = () => {
+        window.open(`/exhibitions/${exhibitionData.id}`, "_blank");
+    }
+
     return (
-        <Container>
-            <ExhibitionCardColor>
+        <Container onClick={handleNavigateToExhibitionDetail}>
+            <ExhibitionCardColor style={{ backgroundColor: exhibitionData.cardColor }}>
                 <HitBox>
 
                     <LikeBox>
-                        <LikeIcon src={heartIcon} />
-                        <Like>605.7K</Like>
+                        <LikeIcon src={exhibitionData.isLiked ? heartFillIcon : heartIcon} alt='like' />
+                        <Like>{exhibitionData.likeCount}</Like>
                     </LikeBox>
 
                     <ViewBox>
-                        <ViewIcon src={viewIcon} />
-                        <View>23K</View>
+                        <ViewIcon src={viewIcon} alt='view' />
+                        <View>{exhibitionData.viewCount}</View>
                     </ViewBox>
 
                 </HitBox>
@@ -271,32 +288,31 @@ const ExhibitionCard = () => {
             <ExhibitionCardInfo>
                 <InfoHeader>
                     <PhotographerProfile>
-                        <PhotographerProfileImage src={ex3} alt='profile image'></PhotographerProfileImage>
+                        <PhotographerProfileImage src={exhibitionData.writer.profileImage} alt='profile image'></PhotographerProfileImage>
                         <PhotographerInfo>
-                            <PhotographerNickname>뚱이</PhotographerNickname>
-                            <PhotographerIntro>아마추어 사진작가</PhotographerIntro>
+                            <PhotographerNickname>{exhibitionData.writer.nickname}</PhotographerNickname>
+                            <PhotographerIntro>{exhibitionData.writer.introduction}</PhotographerIntro>
                         </PhotographerInfo>
                     </PhotographerProfile>
-                    <BookmarkIcon src={bookmarkIcon} />
+                    <BookmarkIcon src={exhibitionData.isBookmarked ? bookmarkFillIcon : bookmarkIcon} alt='bookmark' />
                 </InfoHeader>
 
-                <Title>도시의 빛과 그림자</Title>
-                <Description>현대 도시의 일상적 순간들을 포착한 흑백 사진전</Description>
+                <Title>{exhibitionData.title}</Title>
+                <Description>{exhibitionData.description}</Description>
 
                 <DateBox>
                     <DataIcon src={calendarIcon} />
-                    <Data>2024-01-25</Data>
+                    <Data>{exhibitionData.createdAt}</Data>
                 </DateBox>
 
-                <ParticipantBox>
-                    <ParticipantIcon src={usersIcon} />
-                    <Participant>참여작가 10명</Participant>
-                </ParticipantBox>
-
                 <TagBox>
-                    <Tag>고양이</Tag>
-                    <Tag>살쾡이</Tag>
-                    <Tag>바다코끼리</Tag>
+                    {exhibitionData.tags.map((tag, index) => (
+                        <Tag
+                            key={index}
+                        >
+                            {tag.name}
+                        </Tag>
+                    ))}
                 </TagBox>
 
             </ExhibitionCardInfo>

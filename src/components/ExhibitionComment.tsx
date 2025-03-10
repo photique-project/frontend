@@ -1,16 +1,29 @@
-import styled from 'styled-components';
 
-import commentMenuIcon from '../assets/comment-menu.png';
-import profileImage from '../assets/ex1.jpg';
-import heartIcon from '../assets/heart.png';
-import menuIcon from '../assets/menu-white.png';
+import { useState, useEffect, useRef } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { API_BASE_URL } from '../config/environment';
+import ENDPOINTS from '../api/endpoints';
+import useFetch from '../hooks/useFetch';
 
+import styled, { keyframes } from 'styled-components';
+
+import useAuthStore from '../zustand/store';
+
+import ToastMessage from './ToastMessage';
+
+import commentMenuIcon from '../assets/menu-white.png';
+import pencilIcon from '../assets/pencil.png'
+import trashIcon from '../assets/trash-red.png';
+import alertIcon from '../assets/alert.png';
+import loadingIcon from '../assets/loading-large.png';
+import { Navigate } from 'react-router-dom';
 
 const Container = styled.div`
     width: 100%;
     
     display: flex;
     flex-direction: row;
+    position: relative;
     gap: 10px;
 `;
 
@@ -78,50 +91,406 @@ const CommentText = styled.div`
     color: rgba(255, 255, 255, 0.8);
 
     white-space: pre-wrap;
+    word-break: break-word;
 `
 
-const CommentLikeBox = styled.div`
+const CommentMenuIconBox = styled.div`
+    width: 30px;
+    height: 30px;
+
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+
+    position: relative;
+
+    border-radius: 5px;
+    cursor: pointer;
+
+    &:hover {
+        background-color: rgba(255, 255, 255, 0.2);
+    }
+`
+
+const CommentOptionBox = styled.div`
+    padding: 5px;
+    top: 35px;
+    right: 0;
+
+    display: flex;
+    flex-direction: column;
+
+    border-radius: 5px;
+
+    box-shadow: 0 2px 4px -1px rgba(0, 0, 0, 0.25);
+    
+    position: absolute;
+    background-color: white;
+
+    z-index: 1;
+`
+
+const CommentOption = styled.div`
+    padding: 10px;
+
     display: flex;
     flex-direction: row;
     align-items: center;
+
+    gap: 10px;
+
+    border-radius: 5px;
+    cursor: pointer;
+
+    &:hover {
+        background-color: rgba(0, 0, 0, 0.1);
+    }
+`
+
+const CommentOptionIcon = styled.img`   
+    width: 20px;
+    height: 20px;
+`
+
+const CommentOptionText = styled.div`
+    font-size: 16px;
+    white-space: nowrap;
+`
+
+const DeleteBackground = styled.div`
+    width: 100vw;
+    height: 100vh;
+
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+
+    position: fixed;
+    top:0px;
+    right: 0px;
+    z-index: 999;
+
+    background-color: rgba(0, 0, 0, 0.7);
+`
+
+const DeleteBox = styled.div`
+    padding: 25px;
+
+    display: flex;
+    flex-direction: column;
+
+    border-radius: 10px;
+    background-color: white;
+`
+
+const DeleteBoxTitleBox = styled.div`
+    display: flex;
+    margin-bottom: 20px;
+    flex-direction: row;
+    align-items: center;
+    
+    gap: 10px;
+`
+
+const AlertIcon = styled.img`
+    width: 30px;
+    height:30px;
+`
+
+const DeleteBoxTitle = styled.div`
+    font-size: 20px;
+    font-weight: 700;
+
+
+    color: #f50000;
+`
+
+const DeleteBoxContent = styled.div`
+    font-size:16px;
+    color: rgba(0, 0, 0, 0.6);
+`
+
+const DeleteBoxButtonBox = styled.div`
+    margin-top: 20px;
+    width: 100%;
+    display: flex;
+    flex-direction: row;
+    justify-content: end;
+
     gap: 5px;
+
+    cursor: pointer;
 `
 
-const CommentLikeIcon = styled.img`
-    width: 16px;
-    height: 16px;
+const DeleteBoxCancelButton = styled.button`
+    width: 50px;
+    height: 30px;
+
+    font-size: 16px;
+    background-color: rgba(0, 0, 0, 0.01);
+
+    border: 1px solid rgba(0, 0, 0, 0.2);
+    border-radius: 5px;
+
+    cursor: pointer;
+
+    &:hover {
+        background-color: rgba(0, 0, 0, 0.1);
+    }
 `
 
-const CommentLikeValue = styled.div`
-    font-size: 14px;
+const DeleteBoxDeleteButton = styled.button`
+    width: 50px;
+    height: 30px;
 
+    font-size: 16px;
     color: white;
+    background-color: rgba(255, 0, 0, 0.4);
+
+    border: 1px solid rgba(0, 0, 0, 0.2);
+    border-radius: 5px;
+
+    &:hover {
+        background-color: rgba(255, 0, 0, 1);
+    }
+`
+const rotate = keyframes`
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+`;
+
+const LoadingIcon = styled.img`
+    width: 50px;
+    height: 50px;
+
+    animation: ${rotate} 1.2s ease-in-out infinite;
 `
 
 
-const ExhibitionComment = () => {
+type Method = 'GET' | 'POST' | 'PATCH' | 'DELETE';
+
+interface FetchRequestOptions {
+    url: string;
+    method: Method
+    headers?: Record<string, string>;
+    credentials: 'include' | 'same-origin';
+    contentType: 'application/json' | 'multipart/form-data';
+    body?: Record<string, any> | FormData | null;
+}
+
+interface Writer {
+    id: number;
+    nickname: string;
+    profileImage: string;
+}
+
+interface CommentData {
+    id: number;
+    writer: Writer;
+    content: string;
+    createdAt: string;
+}
+
+interface CommentProps {
+    data: CommentData;
+    exhibitionId: number;
+    handleCommentPageRequest: (page?: number) => void;
+    handleCommentupdateMode: (input?: string, commentId?: number) => void;
+}
+
+
+const ExhibitionComment: React.FC<CommentProps> = (props) => {
+    const { data, exhibitionId, handleCommentPageRequest, handleCommentupdateMode } = props;
+
+    const user = useAuthStore.getState().user;
+    const navigate = useNavigate();
+
+    // 토스트 메시지 
+    const [toastMessageDisplay, setToastMessageDisplay] = useState<boolean>(false);
+    const [firstText, setFirstText] = useState<string>('');
+    const [secondText, setSecondText] = useState<string>('');
+    const [isSucess, setIsSucess] = useState<boolean>(null);
+
+    // 옵션 모달
+    const optionModalRef = useRef<HTMLDivElement>(null);
+    const [optionModalDisplay, setOptionModalDisplay] = useState<boolean>(false);
+    const [deleteModalDisplay, setDeleteModalDisplay] = useState<boolean>(false);
+
+    const handleOptionModalDisplay = () => {
+        setOptionModalDisplay(!optionModalDisplay);
+    }
+
+    const handleDeleteModalDisplay = () => {
+        setDeleteModalDisplay(!deleteModalDisplay);
+    }
+
+    useEffect(() => {
+        function handleClickOutside(event: MouseEvent) {
+            if (optionModalRef.current && !optionModalRef.current.contains(event.target as Node)) {
+                setOptionModalDisplay(false);
+            }
+        }
+
+        if (optionModalDisplay) {
+            document.addEventListener('mousedown', handleClickOutside);
+        }
+
+        return () => {
+            document.removeEventListener('mousedown', handleClickOutside);
+        };
+    }, [optionModalDisplay]);
+
+    // 감상평 삭제
+    // 댓글삭제
+    const {
+        loading: commentDeleteLoading,
+        statusCode: commentDeleteStatusCode,
+        fetchRequest: commentDeleteRequest
+    } = useFetch<void>();
+
+    const handleDeleteComment = () => {
+        const body = {
+            writerId: user.id,
+        }
+
+        const options: FetchRequestOptions = {
+            url: `${API_BASE_URL}${ENDPOINTS.PRERIX}${ENDPOINTS.EXHIBITION.DOMAIN}/${exhibitionId}${ENDPOINTS.COMMENT}/${data.id}`,
+            method: 'DELETE',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            credentials: 'include',
+            contentType: 'application/json',
+            body: body,
+        }
+
+        commentDeleteRequest(options);
+    }
+
+    useEffect(function handleCommentDeleteRequest() {
+        if (commentDeleteStatusCode == 204) {
+            setToastMessageDisplay(true);
+            setFirstText('감상평 삭제완료 !');
+            setSecondText('감상평을 다시 불러옵니다');
+            setIsSucess(true);
+            setDeleteModalDisplay(false);
+
+            setTimeout(() => {
+                setToastMessageDisplay(false);
+                handleCommentPageRequest();
+            }, 3000);
+            return
+        }
+
+        if (commentDeleteStatusCode == 400) {
+
+            return
+        }
+
+        if (commentDeleteStatusCode == 401) {
+            // 삭제완료 모달 띄우고 홈페이지로 리다이렉트
+            setToastMessageDisplay(true);
+            setFirstText('감상평 삭제실패 !');
+            setSecondText('로그인 상태를 확인해주세요');
+            setIsSucess(false);
+            setDeleteModalDisplay(false);
+
+            setTimeout(() => {
+                useAuthStore.getState().logout();
+                navigate('/home');
+            }, 3000);
+            return
+        }
+
+        if (commentDeleteStatusCode == 403) {
+            return
+        }
+
+        if (commentDeleteStatusCode == 404) {
+            return
+        }
+
+        if (commentDeleteStatusCode == 405) {
+            return
+        }
+
+    }, [commentDeleteStatusCode])
+
     return (
         <Container>
 
-            <CommentWriterProfileImage src={profileImage} />
+            <CommentWriterProfileImage src={data.writer.profileImage} />
 
             <CommentBodyBox>
 
                 <CommentBodyHeaderBox>
-                    <CommentNicknameBox>닉네임</CommentNicknameBox>
+                    <CommentNicknameBox>{data.writer.nickname}</CommentNicknameBox>
                     <CommentBodyHeaderRightBox>
-                        <CommentTime>방금 전</CommentTime>
-                        <CommentMenuIcon src={menuIcon} />
+                        <CommentTime>{data.createdAt}</CommentTime>
+                        {user.id === data.writer.id &&
+                            <CommentMenuIconBox
+                                ref={optionModalRef}
+                                onClick={handleOptionModalDisplay}
+                            >
+                                <CommentMenuIcon src={commentMenuIcon} />
+                                {optionModalDisplay &&
+                                    <CommentOptionBox>
+                                        <CommentOption onClick={() => handleCommentupdateMode(data.content, data.id)}>
+                                            <CommentOptionIcon src={pencilIcon} />
+                                            <CommentOptionText>수정하기</CommentOptionText>
+                                        </CommentOption>
+                                        <CommentOption
+                                            onClick={handleDeleteModalDisplay}
+                                        >
+                                            <CommentOptionIcon src={trashIcon} />
+                                            <CommentOptionText style={{ color: '#f50000' }}>삭제하기</CommentOptionText>
+                                        </CommentOption>
+                                    </CommentOptionBox>
+                                }
+                            </CommentMenuIconBox>}
                     </CommentBodyHeaderRightBox>
                 </CommentBodyHeaderBox>
-                <CommentText>정말 인상적인 작품이네요. 흑백으로 표현된 질감이 너무 아름답습니다. 정말 인상적인 작품이네요. 흑백으로 표현된 질감이 너무 아름답습니다.</CommentText>
-                <CommentLikeBox>
-                    <CommentLikeIcon src={heartIcon} />
-                    <CommentLikeValue>23</CommentLikeValue>
-                </CommentLikeBox>
+                <CommentText>{data.content}</CommentText>
 
             </CommentBodyBox>
 
+            {deleteModalDisplay &&
+                <DeleteBackground>
+                    {commentDeleteLoading &&
+                        <LoadingIcon src={loadingIcon} />
+                    }
+                    {!commentDeleteLoading &&
+                        <DeleteBox>
+                            <DeleteBoxTitleBox>
+                                <AlertIcon src={alertIcon} />
+                                <DeleteBoxTitle>댓글 삭제 확인</DeleteBoxTitle>
+                            </DeleteBoxTitleBox>
+
+                            <DeleteBoxContent>이 작업은 되돌릴 수 없습니다.</DeleteBoxContent>
+                            <DeleteBoxContent>해당 댓글은 영구적으로 삭제됩니다.</DeleteBoxContent>
+
+                            <DeleteBoxButtonBox>
+                                <DeleteBoxCancelButton onClick={handleDeleteModalDisplay}>취소</DeleteBoxCancelButton>
+                                <DeleteBoxDeleteButton onClick={handleDeleteComment}>삭제</DeleteBoxDeleteButton>
+                            </DeleteBoxButtonBox>
+
+                        </DeleteBox>
+                    }
+                </DeleteBackground>
+            }
+
+            {toastMessageDisplay &&
+                <ToastMessage
+                    firstText={firstText}
+                    secondText={secondText}
+                    isSuccess={isSucess}
+                />}
         </Container>
     )
 }

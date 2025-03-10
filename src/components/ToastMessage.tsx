@@ -4,25 +4,28 @@ import failIcon from "../assets/fail.png";
 
 
 const Container = styled.div<{ isSuccess: boolean }>`
-  width: 320px;
-  height: 92px;
-  
-  background-color: ${({ isSuccess }) => (isSuccess ? '#78db6f' : '#fc4949')};
-  box-shadow: 0 2px 5px -1px rgba(0, 0, 0, 0.25);
-  
-  display: flex;
-  flex-direction: column;
-  
-  top: 20px;
-  right: 20px;
-  position: fixed;
+    width: 320px;
+    height: 92px;
+    
+    background-color: ${({ isSuccess }) => (isSuccess ? '#78db6f' : '#fc4949')};
+    box-shadow: 0 2px 5px -1px rgba(0, 0, 0, 0.25);
+    
+    display: flex;
+    flex-direction: column;
+    
+    top: 20px;
+    right: 20px;
+    position: fixed;
 
-  border-radius: 7px;
+    border-radius: 7px;
 
-  @media (max-width: 450px) {
-        width: 70%;
-        height: 70px;
+    z-index: 999;
+
+    @media (max-width: 450px) {
+            width: 70%;
+            height: 70px;
     }
+
 `;
 
 const slideAnimation = keyframes`

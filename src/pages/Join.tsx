@@ -1,7 +1,11 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { API_BASE_URL } from '../config/environment';
+import ENDPOINTS from '../api/endpoints';
 
 import styled from 'styled-components';
+
+import useFetch from '../hooks/useFetch';
 
 import Header from '../components/Header';
 import OAuthIcons from '../components/OAuthIcons';
@@ -13,9 +17,6 @@ import PasswordInput from '../components/input/PasswordInput';
 import LongButton from '../components/button/LongButton';
 import HelperText from '../components/HelperText';
 import ToastMessage from '../components/ToastMessage';
-import useFetch from '../hooks/useFetch';
-import { API_BASE_URL } from '../config/environment';
-import ENDPOINTS from '../api/endpoints';
 
 const Container = styled.div`
     display: flex;
@@ -121,7 +122,6 @@ const Join = () => {
 
 
     const [emailAuthModalDisplay, setEmailAuthModalDisplay] = useState<'flex' | null>(null);
-    const [toastMessageDisplay, setToastMessageDisplay] = useState<'flex' | null>(null);
 
     const [validProfileImage, setValidProfileImage] = useState<boolean | null>(null);
     const [profileImage, setProfileImage] = useState<File | undefined>(undefined);
@@ -156,6 +156,7 @@ const Join = () => {
     const [repasswordHelperTextVisibility, setRepasswordHelperTextVisibility] = useState<'visible' | 'hidden'>('hidden');
     const [repasswordDisabled, setRepasswordDisalbled] = useState<boolean>(false);
 
+    const [toastMessageDisplay, setToastMessageDisplay] = useState<'flex' | null>(null);
     const [toastMessageFirstText, setToastMessageFirstText] = useState<string>('');
     const [toastMessageSecondText, setToastMessageSecondText] = useState<string>('');
     const [joinSuccess, setJoinSuccess] = useState<boolean>(true);
@@ -255,7 +256,7 @@ const Join = () => {
         }
 
         const options: FetchRequestOptions = {
-            url: `${API_BASE_URL}${ENDPOINTS.AUTH.VALIDATE_NICKNAME}?nickname=${nickname}`,
+            url: `${API_BASE_URL}${ENDPOINTS.USER.VALIDATE_NICKNAME}?nickname=${nickname}`,
             method: method,
             headers: headers,
             credentials: 'include',

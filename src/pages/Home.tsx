@@ -1,6 +1,10 @@
+import { API_BASE_URL, API_PREFIX } from '../config/environment';
+import ENDPOINTS from '../api/endpoints';
 import { useEffect, useState, useRef } from 'react';
-import { useNavigate } from 'react-router-dom';
-import styled from 'styled-components';
+import { useNavigate, useLocation } from 'react-router-dom';
+import styled, { keyframes } from "styled-components";
+
+import useFetch from '../hooks/useFetch';
 
 import Header from '../components/Header';
 import SingleWorkView from '../components/SingleWorkView';
@@ -8,6 +12,7 @@ import LikeView from '../components/LikeView';
 import Tag from '../components/Tag';
 import FilterPanel from '../components/FilterPanel';
 import ExhibitionView from '../components/ExhibitionView';
+import SingleWork from '../components/SingleWork';
 
 import sortingIcon from '../assets/sorting.png';
 import mainSearchIcon from '../assets/main-search.png';
@@ -29,7 +34,9 @@ import arrowLeftNonactiveIcon from '../assets/arrow-left-nonactive.png';
 import arrowLeftActiveIcon from '../assets/arrow-left-active.png';
 import arrowRightNonactiveIcon from '../assets/arrow-right-nonactive.png';
 import arrowRightActiveIcon from '../assets/arrow-right-active.png';
-import SingleWork from '../components/SingleWork';
+import singleWorkIcon from '../assets/singlework-new.png';
+import exhibitionIcon from '../assets/exhibition-new.png';
+import useAuthStore from '../zustand/store';
 
 const Container = styled.div`
     display: flex;
@@ -188,13 +195,18 @@ const ScrollBox = styled.div`
 const Tab = styled.div`
     flex-shrink: 0;
     margin-top: 80px;
-    width: 220px;
+    padding-left:10px;
+    padding-right:10px;
+    padding-top:5px;
+    padding-bottom:5px;
     height: 65px;
+    
 
     display: flex;
     flex-direction: row;
-    justify-content: space-around;
+    justify-content: space-between;
     align-items: center;
+    gap: 15px;
 
     border-radius: 35px;
     box-shadow: 0 2px 4px -1px rgba(0, 0, 0, 0.2);
@@ -275,6 +287,8 @@ const ActionIconBox = styled.div`
     justify-content: center;
     align-items: center;
 
+    position: relative;
+
     box-shadow: 0 2px 4px -1px rgba(0, 0, 0, 0.25);
 
     background-color: white;
@@ -291,6 +305,83 @@ const ActionIconBox = styled.div`
         border-radius: 17.5px;
     }
 `
+
+const fadeIn = keyframes`
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+`;
+
+const MessageBox = styled.div`
+    padding: 10px;
+
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    white-space: nowrap;
+
+    border-radius: 10px;
+    color: white;
+
+    position: absolute;
+    bottom: 100%;
+    right: 100%;
+
+    background-color: rgba(0, 0, 0, 0.3);
+
+    opacity: 0;
+    animation: ${fadeIn} 0.3s ease-in-out forwards;
+`
+
+const NewPostItemBox = styled.div`
+    padding: 5px;
+    right: 60px;
+    bottom: 0;
+
+    display: flex;
+    flex-direction: column;
+
+    border-radius: 5px;
+
+    box-shadow: 0 2px 4px -1px rgba(0, 0, 0, 0.25);
+    
+    position: absolute;
+    background-color: white;
+
+    position: absolute;
+`
+
+const NewPostItem = styled.div`
+    padding: 10px;
+
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+
+    gap: 10px;
+
+    border-radius: 5px;
+    cursor: pointer;
+
+    &:hover {
+        background-color: rgba(0, 0, 0, 0.1);
+    }
+`
+
+const NewPostItemIcon = styled.img`   
+    width: 20px;
+    height: 20px;
+`
+
+const NewPostItemText = styled.div`
+    font-size: 16px;
+    white-space: nowrap;
+`
+
 
 const ActionIcon = styled.img<{ activeSrc?: string }>`
     width: 36px;
@@ -340,68 +431,278 @@ const HistoryPanelIcon = styled.img<{ activeSrc?: string }>`
 `
 
 
+
+type Method = 'GET' | 'POST' | 'PATCH' | 'DELETE';
+
+interface FetchRequestOptions {
+    url: string;
+    method: Method
+    headers?: Record<string, string>;
+    credentials: 'include' | 'same-origin';
+    contentType: 'application/json' | 'multipart/form-data';
+    body?: Record<string, any> | FormData | null;
+}
+
+type SearchTarget = 'work' | 'writer';
+type SortingTarget = 'createdAt' | 'likeCount' | 'viewCount' | 'commentCount';
+type SortOrder = 'asc' | 'desc'
+
+interface Writer {
+    id: number;
+    nickname: string;
+    profileImage: string;
+}
+
+interface SingleWorkData {
+    id: number;
+    writer: Writer;
+    image: string;
+    likeCount: number;
+    viewCount: number;
+    isLiked: boolean;
+}
+
+interface SingleWorkDataPage {
+    content: SingleWorkData[];
+    pageable: {
+        pageNumber: number;
+    }
+    last: boolean;
+}
+interface Tag {
+    name: string;
+}
+
+interface ExhibitionData {
+    id: number;
+    writer: {
+        id: number;
+        nickname: string;
+        profileImage: string;
+        introduction: string;
+    }
+    title: string;
+    description: string;
+    cardColor: string;
+    likeCount: number;
+    viewCount: number;
+    tags: Tag[];
+    createdAt: string;
+    isLiked: boolean;
+    isBookmarked: boolean;
+}
+
+interface ExhibitionDataPage {
+    content: ExhibitionData[];
+    pageable: {
+        pageNumber: number;
+    }
+    last: boolean;
+}
+
 const Home = () => {
+    const categoryMap: { [key: string]: string } = {
+        "풍경": "landscape",
+        "인물": "portrait",
+        "동물": "animal",
+        "식물": "plant",
+        "건축": "architecture",
+        "여행": "travel",
+        "음식": "food",
+        "스포츠": "sports",
+        "흑백": "blackAndWhite",
+        "야경": "nightscape",
+        "길거리": "street",
+        "추상": "abstract",
+        "이벤트": "event",
+        "패션": "fashion"
+    };
+
+    useEffect(function clearLocationState() {
+        // 업데이트 페이지에서 홈으로 넘어왔을 떄 useLocation을 활용해서 state를 넘기는데
+        // 새로고침하면 해당 state가 유지되는 문제가 발생하여 추가한 useEffect
+        if (location.state) {
+            navigate(location.pathname, { replace: true, state: null });
+        }
+    }, []);
+
     const navigate = useNavigate();
+    const location = useLocation();
+    const isLoggedIn = useAuthStore.getState().isLoggedIn;
 
+    const [authMessageDisplay, setAuthMessageDisplay] = useState<boolean>(false);
+
+    // 새 게시글 옵션 모달 display
+    const [newPostOptionDisplay, setNewPostOptionDisplay] = useState<boolean>(false);
+    const newPostOptionRef = useRef<HTMLDivElement>(null);
+
+    // 스크롤 조작을 위한 ref
     const scrollBoxRef = useRef<HTMLDivElement | null>(null);
-    const [inputValue, setInputValue] = useState<string>('');
-    const [isScrolled, setIsScrolled] = useState(false);
-    const [openSingleWorkDetail, setOpenSingleWorkDetail] = useState<boolean>(false);
-    const [selectedSingleWorkId, SetSelectedSingleWorkId] = useState<string>(null);
 
-    const [searchTarget, setSearchTarget] = useState<'work' | 'writer'>('work');
-    const [sortingTarget, setSortingTarget] = useState<'like' | 'last' | 'comment' | 'view' | 'recent'>('recent');
-    const [sortingOrder, setSortingOrder] = useState<'asc' | 'desc'>('asc');
+    // 검색창 입력 상태관리 변수
+    const [inputValue, setInputValue] = useState<string>('');
+
+    // 스크롤 하면 검색창 변화를 위한 상태관리변수
+    const [isScrolled, setIsScrolled] = useState(false);
+
+    // 단일작품 상세패널 
+    const [openSingleWorkDetail, setOpenSingleWorkDetail] = useState<boolean>(location.state?.singleWorkId !== undefined ? true : false);
+    // 선택한 단일작품 상세 패널 아이디
+    const [selectedSingleWorkId, setSelectedSingleWorkId] = useState<number | null>(location.state?.singleWorkId !== undefined ? location.state?.singleWorkId : null);
+
+    // 입력 조건 상태관리 변수
+    const [searchTarget, setSearchTarget] = useState<SearchTarget>('work');
+    const [sortingTarget, setSortingTarget] = useState<SortingTarget>('createdAt');
+    const [sortingOrder, setSortingOrder] = useState<SortOrder>('desc');
     const [categories, setCategories] = useState<string[]>([]);
+    const [categoryQueryParam, setCategoryQueryParam] = useState<string>('');
+
+    // 입력 조건 설정 패널 display
     const [filterPanelDisplay, setFilterPanelDisplay] = useState<'flex' | null>(null);
 
+    // 세 가지 뷰
     const [singleWorkView, setSingleWorkView] = useState<boolean>(true);
     const [exhibitionView, setExhibitionView] = useState<boolean>(false);
     const [likeView, setLikeView] = useState<boolean>(false);
 
+    // 현재 검색페이지
+    const [page, setPage] = useState<number>(0);
 
-    const handleScroll = (e: React.UIEvent<HTMLDivElement>) => {
-        const scrollTop = e.currentTarget.scrollTop;
-        setIsScrolled(scrollTop > 0);
-    };
+    // 단일작품 페이지 useFetch
+    const {
+        loading: singleWorkDataPageLoading,
+        statusCode: singleWorkDataPageStatusCode,
+        data: singleWorkDataPage,
+        fetchRequest: singleWorkDataPageRequest
+    } = useFetch<SingleWorkDataPage>();
 
+    const handleSingleWorkDataPageRequest = (page: number) => {
+        const options: FetchRequestOptions = {
+            url: `${API_BASE_URL}${ENDPOINTS.SINGLE_WORK.SEARCH}?target=${searchTarget}&keywords=${inputValue}&categories=${categoryQueryParam}&sort=${sortingTarget},${sortingOrder}&page=${page}&size=30&userId=${useAuthStore.getState().userId !== null ? useAuthStore.getState().userId : ''}`,
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            credentials: 'include',
+            contentType: 'application/json',
+        }
+
+        singleWorkDataPageRequest(options);
+    }
+
+    // 홈페이지 마운트하면 단일작품 첫 페이지 요청
+    useEffect(function requestSearchSingleWork() {
+        handleSingleWorkDataPageRequest(0);
+    }, []);
+
+
+
+    // 인기 단일작품 가져오는 useFetch
+    const {
+        loading: popularSingleWorkLoading,
+        statusCode: popularSingleWorkStatusCode,
+        data: popularSingleWorkData,
+        fetchRequest: popularSingleWorkRequest
+    } = useFetch<SingleWorkData>();
+
+    // 홈페이지 마운트하면 인기 단일작품 요청
+    useEffect(function requestPopularSingleWorkRequest() {
+        const options: FetchRequestOptions = {
+            url: `${API_BASE_URL}${ENDPOINTS.SINGLE_WORK.POPULAR}?userId=${useAuthStore.getState().userId !== null ? useAuthStore.getState().userId : ''}`,
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            credentials: 'include',
+            contentType: 'application/json',
+        }
+
+        popularSingleWorkRequest(options);
+    }, []);
+
+
+
+    // 스크롤 상단으로 이동 함수
     const scrollToTop = () => {
         if (scrollBoxRef.current) {
             scrollBoxRef.current.scrollTo({ top: 0, behavior: 'smooth' });
         }
     };
 
+    // 전시회 페이지 useFetch
+    const {
+        loading: exhibitionDataPageLoading,
+        statusCode: exhibitionDataPageStatusCode,
+        data: exhibitionDataPage,
+        fetchRequest: exhibitionDataPageRequest
+    } = useFetch<ExhibitionDataPage>();
 
-    const handleSearchTarget = (searchTarget: 'work' | 'writer') => {
+    const handleExhibitionDataPageRequest = (page: number) => {
+        const options: FetchRequestOptions = {
+            url: `${API_BASE_URL}${API_PREFIX}${ENDPOINTS.EXHIBITION.DOMAIN}?target=${searchTarget}&keywords=${inputValue}&sort=${sortingTarget},${sortingOrder}&page=${page}&size=30&userId=${useAuthStore.getState().userId !== null ? useAuthStore.getState().userId : ''}`,
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            credentials: 'include',
+            contentType: 'application/json',
+        }
+
+        exhibitionDataPageRequest(options);
+    }
+
+    // 정상응답이 왔다면 현재 페이지 값으로 할당
+    useEffect(function incrementSingleWorkPage() {
+        if (singleWorkDataPage) {
+            setPage(singleWorkDataPage.pageable.pageNumber);
+        }
+
+        if (exhibitionDataPage) {
+            setPage(exhibitionDataPage.pageable.pageNumber);
+        }
+
+    }, [singleWorkDataPage, exhibitionDataPage]);
+
+    // 스크롤 상태감지 함수
+    const handleScroll = (e: React.UIEvent<HTMLDivElement>) => {
+        const scrollBox = e.currentTarget;
+        const { scrollTop, scrollHeight, clientHeight } = scrollBox;
+        const threshold = (scrollHeight - clientHeight) * (4 / 5);
+
+        // 스크롤 페이지를 2/3 이상 넘었고 마지막페이지가 아니라면 다음 페이지 요청
+        if (singleWorkView) {
+            if (scrollTop >= threshold && !singleWorkDataPageLoading && singleWorkDataPage && !singleWorkDataPage.last) {
+                handleSingleWorkDataPageRequest(page + 1);
+            }
+
+            setIsScrolled(scrollTop > 0);
+        } else {
+            if (scrollTop >= threshold && !exhibitionDataPageLoading && exhibitionDataPage && !exhibitionDataPage.last) {
+                handleExhibitionDataPageRequest(page + 1);
+            }
+
+            setIsScrolled(scrollTop > 0);
+        }
+    };
+
+
+
+
+
+
+
+    // 검색 타겟 설정 함수
+    const handleSearchTarget = (searchTarget: SearchTarget) => {
         setSearchTarget(searchTarget);
     };
 
-    const handleSortingTarget = (sorting: 'like' | 'last' | 'comment' | 'view' | 'recent') => {
-        setSortingTarget(sorting);
-
-        if (sorting === 'recent') {
-            setSortingOrder('desc');
-        }
-
-        if (sorting === 'last') {
-            setSortingOrder('asc');
-        }
-
-        if (sortingTarget === sorting) {
-            if (sortingOrder === 'asc') {
-                setSortingOrder('desc');
-
-                return;
-            }
-
-            setSortingOrder('asc');
-        }
+    // 검색 정렬 설정 함수
+    const handleSortingTarget = (sortTarget: SortingTarget, sortOrder: SortOrder) => {
+        setSortingTarget(sortTarget);
+        setSortingOrder(sortOrder);
     };
 
-
-
-
-
+    // 검색 카테고리 설정 함수
     const handleCategoryTarget = (category: string) => {
         if (!categories.includes(category)) {
             setCategories((prevCategories) => [...prevCategories, category]);
@@ -409,21 +710,29 @@ const Home = () => {
             setCategories((prevCategories) => prevCategories.filter((cat) => cat !== category));
         }
     };
+    // 선택한 카테고리를 쿼리파라미터형태로 변환 useEffect
+    useEffect(function convertToQueryParam() {
+        const array = categories.map((category) => categoryMap[category]);
+        setCategoryQueryParam(array.join(','));
+    }, [categories]);
 
+    // 검색 조건 초기화 함수
     const handleReset = () => {
-        setSearchTarget(null);
-        setSortingTarget(null);
+        setSearchTarget('work');
+        setSortingTarget('createdAt');
+        setSortingOrder('desc');
         setCategories([]);
     };
 
 
+    // 검색 입력값 관리 함수
     const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const inputValue = e.target.value.substring(0, 50);
         setInputValue(inputValue);
     };
 
+    // 필터패널 display관리 함수
     const showFilterPanel = () => {
-
         if (filterPanelDisplay === 'flex') {
             setFilterPanelDisplay(null);
 
@@ -433,6 +742,7 @@ const Home = () => {
         setFilterPanelDisplay('flex');
     }
 
+    // 뷰 조작 함수
     const handleView = (event: React.MouseEvent<HTMLDivElement>) => {
         const id = (event.currentTarget as HTMLElement).id;
 
@@ -440,6 +750,7 @@ const Home = () => {
             setSingleWorkView(true);
             setExhibitionView(false);
             setLikeView(false);
+            handleSingleWorkDataPageRequest(0);
 
             return;
         }
@@ -448,6 +759,7 @@ const Home = () => {
             setExhibitionView(true);
             setSingleWorkView(false);
             setLikeView(false);
+            handleExhibitionDataPageRequest(0);
 
             return;
         }
@@ -457,18 +769,31 @@ const Home = () => {
         setSingleWorkView(false);
     }
 
-    // 페이지 이동
-    const navigateToNewPostPage = () => {
-        if (singleWorkView || likeView) {
-            navigate('/new-singlework');
-            return;
-        }
+    // 새 게시글 옵션 모달
+    const handleNewPostOption = () => {
+        if (isLoggedIn) {
+            setNewPostOptionDisplay(!newPostOptionDisplay)
+        } else {
+            setAuthMessageDisplay(true);
 
-        navigate('/new-exhibition');
+            setTimeout(() => {
+                setAuthMessageDisplay(false);
+            }, 3000);
+        }
     };
 
+    // 새 단일작품 작성 페이지로 이동
+    const navigateNewSingleWorkPage = () => {
+        navigate('/new-singlework');
+    }
+
+    // 새 전시회 작성 페이지로 이동
+    const navigateNewExhibitionPage = () => {
+        navigate('/new-exhibition');
+    }
+
     // single work 상세조회
-    const handleOpenSingleWorkDetail = (singleWorkId?: string) => {
+    const handleOpenSingleWorkDetail = (singleWorkId?: number) => {
         // 받은 아이디로 열기
         if (openSingleWorkDetail) {
             setOpenSingleWorkDetail(false);
@@ -477,8 +802,31 @@ const Home = () => {
         }
 
         setOpenSingleWorkDetail(true);
-        SetSelectedSingleWorkId(singleWorkId);
+        setSelectedSingleWorkId(singleWorkId);
     };
+
+    // 새 게시글 작성 옵션 모달 리스너 등록 effect
+    useEffect(function addNewPostOptionCloseListner() {
+        const handleClickOutside = (event: MouseEvent) => {
+            if (newPostOptionRef.current && !newPostOptionRef.current.contains(event.target as Node)) {
+                setNewPostOptionDisplay(false);
+            }
+        };
+
+        document.addEventListener('mousedown', handleClickOutside);
+
+        return () => {
+            document.removeEventListener('mousedown', handleClickOutside);
+        };
+    }, []);
+
+    const handleSearch = () => {
+        if (singleWorkView) {
+            handleSingleWorkDataPageRequest(0);
+        } else {
+            handleExhibitionDataPageRequest(0);
+        }
+    }
 
 
     return (
@@ -493,7 +841,7 @@ const Home = () => {
 
                 <SearchInputBox>
                     <SortingIcon id='sortIcon' src={sortingIcon} alt='분류' onClick={showFilterPanel}></SortingIcon>
-                    <MainSearchIcon src={mainSearchIcon} alt='검색'></MainSearchIcon>
+                    <MainSearchIcon src={mainSearchIcon} alt='검색' onClick={handleSearch}></MainSearchIcon>
                     <SearchInput
                         value={inputValue}
                         onChange={handleInputChange}
@@ -526,22 +874,54 @@ const Home = () => {
                     <TabIconBox id='exhibition' viewMode={exhibitionView} onClick={handleView}>
                         <GridIcon src={exhibitionView ? exhibitionWhiteIcon : exhibitionBlackIcon} alt='전시회' />
                     </TabIconBox>
-                    <TabIconBox id='like' viewMode={likeView} onClick={handleView}>
-                        <GridIcon src={likeView ? likeWhiteIcon : likeBlackIcon} alt='좋아요 작품' />
-                    </TabIconBox>
                 </Tab>
 
-                {singleWorkView && <SingleWorkView handleOpenSingleWorkDetail={handleOpenSingleWorkDetail} />}
-                {exhibitionView && <ExhibitionView />}
-                {likeView && <LikeView handleOpenSingleWorkDetail={handleOpenSingleWorkDetail} />}
+                {singleWorkView &&
+                    <SingleWorkView
+                        handleOpenSingleWorkDetail={handleOpenSingleWorkDetail}
+                        popularSingleWorkLoading={popularSingleWorkLoading}
+                        popularSingleWorkData={popularSingleWorkData}
+                        singleWorkDataPageLoading={singleWorkDataPageLoading}
+                        singleWorkDataPage={singleWorkDataPage}
+                        singleWorkDataStatusCode={singleWorkDataPageStatusCode}
+                    />
+                }
+
+                {exhibitionView && <ExhibitionView
+                    exhibitionDataPageLoading={exhibitionDataPageLoading}
+                    exhibitionDataPage={exhibitionDataPage}
+                    exhibitionDataPageStatusCode={exhibitionDataPageStatusCode}
+                />}
 
             </ScrollBox>
 
 
             <ActionBox>
-                <ActionIconBox>
-                    <ActionIcon src={writeNonactiveIcon} activeSrc={writeActiveIcon} onClick={navigateToNewPostPage} />
+                <ActionIconBox
+                    onClick={handleNewPostOption}
+                    ref={newPostOptionRef}
+                >
+                    {authMessageDisplay && <MessageBox>로그인이 필요합니다</MessageBox>}
+                    <ActionIcon src={writeNonactiveIcon} activeSrc={writeActiveIcon} />
+
+
+                    {newPostOptionDisplay &&
+                        <NewPostItemBox>
+                            <NewPostItem onClick={navigateNewSingleWorkPage}>
+                                <NewPostItemIcon src={singleWorkIcon} />
+                                <NewPostItemText>단일작품 올리기</NewPostItemText>
+                            </NewPostItem>
+
+                            <NewPostItem onClick={navigateNewExhibitionPage}>
+                                <NewPostItemIcon src={exhibitionIcon} />
+                                <NewPostItemText>전시회 개최하기</NewPostItemText>
+                            </NewPostItem>
+
+                        </NewPostItemBox>
+                    }
                 </ActionIconBox>
+
+
                 <ActionIconBox>
                     <ActionIcon src={upNonactiveIcon} activeSrc={upActiveIcon} onClick={scrollToTop} />
                 </ActionIconBox>

@@ -49,8 +49,8 @@ const useFetch = <T = unknown>(): UseFetchReturn<T> => {
             setStatusCode(response.status);
 
             if (response.ok) {
-                const responseData: T | null = response.status === 200 ? await response.json() : null;
-                setData(responseData);
+                const responseData: { data: T } | null = response.status === 200 ? await response.json() : null;
+                setData(responseData.data);
 
             } else {
                 const error = await response.json();

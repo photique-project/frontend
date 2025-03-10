@@ -103,19 +103,20 @@ interface ImageInputProps {
     setImage: any;
     setValidImage: Dispatch<SetStateAction<boolean | null>>;
     inputDisabled: boolean;
+    curImage?: string;
 }
 
 const ImageInput: React.FC<ImageInputProps> = (props) => {
-    const { width, ratio, marginTop, image, setImage, setValidImage, inputDisabled } = props;
+    const { width, ratio, marginTop, image, setImage, setValidImage, inputDisabled, curImage } = props;
     const [previewDisplay, setPreviewDisplay] = useState<'block' | 'none'>('block');
     const [cancelDisplay, setCancelDisplay] = useState<'flex' | 'none'>('none');
     const [textDisplay, setTextDisplay] = useState<'block' | 'none'>('block');
     const [isDragging, setIsDragging] = useState<boolean>(false);
-    const [preview, setPreview] = useState<string | undefined>();
+    const [preview, setPreview] = useState<string | undefined>(curImage);
 
     // 방금 막 업로드한 이미지가 아닌 리렌더링 발생했을 때 이미지
     useEffect(function preLoad() {
-        if (!image && !Array.isArray(image)) { // 배열일 때는 리렌더링을 고려할 필요가 없음 -> 이 경우 상위에서 관리하기 떄문
+        if (image && !Array.isArray(image)) { // 배열일 때는 리렌더링을 고려할 필요가 없음 -> 이 경우 상위에서 관리하기 떄문
             isValidImage(image);
         }
     }, []);
