@@ -14,6 +14,7 @@ import tagGrayIcon from '../assets/tag-gray.png';
 import categoryGrayIcon from '../assets/category-gray.png';
 
 
+
 const Container = styled.div`
     margin-top: 40px;
     width: 100%;
@@ -164,8 +165,6 @@ const ImageViewValue = styled.div`
         font-size: 14px;
     }
 `
-
-
 
 const ImageMenuBox = styled.div`
     margin-right: 20px;
@@ -346,8 +345,6 @@ const PostDate = styled.div`
     }
 `
 
-
-
 const SingleWorkImageInfoBox = styled.div`
     margin-top: 15px;
     padding: 25px;
@@ -489,7 +486,6 @@ const SingleWorkTagBox = styled.div`
         padding: 15px;
     }
 `
-
 
 const SingleWorkFooterBox = styled.div`
     margin-top: 15px;
@@ -711,6 +707,8 @@ const CommentInputCompleteButtonText = styled.div`
         font-size: 14px;
     }
 `
+
+
 interface Writer {
     id: number;
     nickname: string;
@@ -738,6 +736,8 @@ interface SingleWork {
 interface SingleWorkCreatePreviewProps {
     singleWork: SingleWork;
 }
+
+
 
 const SingleWorkCreatePreview: React.FC<SingleWorkCreatePreviewProps> = (props) => {
     const { singleWork } = props;

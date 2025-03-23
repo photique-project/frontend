@@ -1,6 +1,7 @@
-import { useNavigate } from 'react-router-dom';
+import { useState } from 'react';
+import { styled, keyframes } from 'styled-components';
 
-import styled from 'styled-components';
+import useAuthStore from '../zustand/store';
 
 import bookmarkIcon from '../assets/bookmark.png';
 import calendarIcon from '../assets/calendar.png';
@@ -8,13 +9,16 @@ import heartIcon from '../assets/heart.png';
 import viewIcon from '../assets/view.png';
 import heartFillIcon from '../assets/heart-fill.png';
 import bookmarkFillIcon from '../assets/bookmark-fill.png';
-import ExhibitionChatMessage from './ExhibitionChatMessage';
+
+
 
 const Container = styled.div`
     width: 380px;
 
     display: flex;
     flex-direction: column;
+
+    position: relative;
 
     border: 0.5px solid rgba(0, 0, 0, 0.2);
     border-radius: 10px;
@@ -102,8 +106,6 @@ const ViewBox = styled.div`
     gap: 7px;
 `
 
-
-
 const ViewIcon = styled.img`
     width: 24px;
     height: 24px;
@@ -127,25 +129,24 @@ const ExhibitionCardInfo = styled.div`
 `;
 
 const InfoHeader = styled.div`
-width: 100%;
+    width: 100%;
 
-display: flex;
-flex-direction: row;
-align-items: center;
-justify-content: space-between;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
 `;
 
-
 const PhotographerProfile = styled.div`
-display: flex;
-flex-direction: row;
+    display: flex;
+    flex-direction: row;
 `
 
 const PhotographerProfileImage = styled.img`
-width: 40px;
-height: 40px;
+    width: 40px;
+    height: 40px;
 
-border-radius: 10px;
+    border-radius: 10px;
 `
 
 const PhotographerInfo = styled.div`
@@ -180,23 +181,23 @@ font-weight: 700;
 `;
 
 const Description = styled.div`
-margin-top: 10px;
+    margin-top: 10px;
 
-font-size: 16px;
-color: rgba(0, 0, 0, 0.7);
+    font-size: 16px;
+    color: rgba(0, 0, 0, 0.7);
 `;
 
 const DateBox = styled.div`
-margin-top: 20px;
+    margin-top: 20px;
 
-display: flex;
-flex-direction: row;
-align-items: center;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
 `;
 
 const DataIcon = styled.img`
-width: 20px;
-height: 20px;
+    width: 20px;
+    height: 20px;
 `;
 
 const Data = styled.div`
@@ -216,19 +217,52 @@ const TagBox = styled.div`
 `
 
 const Tag = styled.div`
-padding: 5px 10px;
+    padding: 5px 10px;
 
-border-radius: 8px;
+    border-radius: 8px;
 
-display: flex;
-flex-direction: column;
-justify-content: center;
-align-items: center;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
 
-font-size: 14px;
-font-weight: 600;
-background-color: rgba(0, 0, 0, 0.07);
+    font-size: 14px;
+    font-weight: 600;
+    background-color: rgba(0, 0, 0, 0.07);
 `
+
+const fadeIn = keyframes`
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+`;
+
+const MessageBox = styled.div`
+    padding: 10px;
+
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    white-space: nowrap;
+
+    border-radius: 10px;
+    color: white;
+
+    position: absolute;
+    bottom: 100%;
+    right: 100%;
+
+    background-color: rgba(0, 0, 0, 0.3);
+
+    opacity: 0;
+    animation: ${fadeIn} 0.3s ease-in-out forwards;
+`
+
+
 
 interface Tag {
     name: string;
@@ -258,17 +292,30 @@ interface ExhibitionCardProps {
 }
 
 
-const ExhibitionCard: React.FC<ExhibitionCardProps> = (props) => {
-    const { exhibitionData } = props
 
-    const navigate = useNavigate();
+const ExhibitionCard: React.FC<ExhibitionCardProps> = (props) => {
+    const user = useAuthStore.getState().user;
+    const { exhibitionData } = props
+    const [authModalDisplay, setAuthModalDisplay] = useState<boolean>(false);
+
+
 
     const handleNavigateToExhibitionDetail = () => {
-        window.open(`/exhibitions/${exhibitionData.id}`, "_blank");
+        if (!user.id) {
+            setAuthModalDisplay(true);
+
+            setTimeout(() => {
+                setAuthModalDisplay(false);
+            }, 3000);
+        } else {
+            window.open(`/exhibitions/${exhibitionData.id}`, "_blank");
+        }
     }
 
     return (
         <Container onClick={handleNavigateToExhibitionDetail}>
+            {authModalDisplay && <MessageBox>로그인이 필요합니다</MessageBox>}
+
             <ExhibitionCardColor style={{ backgroundColor: exhibitionData.cardColor }}>
                 <HitBox>
 

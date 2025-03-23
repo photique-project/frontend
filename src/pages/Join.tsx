@@ -1,10 +1,9 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { API_BASE_URL } from '../config/environment';
-import ENDPOINTS from '../api/endpoints';
-
 import styled from 'styled-components';
 
+import { FetchRequestOptions } from '../types/http';
+import ENDPOINTS from '../api/endpoints';
 import useFetch from '../hooks/useFetch';
 
 import Header from '../components/Header';
@@ -17,6 +16,8 @@ import PasswordInput from '../components/input/PasswordInput';
 import LongButton from '../components/button/LongButton';
 import HelperText from '../components/HelperText';
 import ToastMessage from '../components/ToastMessage';
+import userEvent from '@testing-library/user-event';
+
 
 const Container = styled.div`
     display: flex;
@@ -84,17 +85,6 @@ const ProfileImageInputText = styled.div`
     color: rgba(0, 0, 0, 0.6);
 `;
 
-type Method = 'GET' | 'POST' | 'PATCH' | 'DELETE';
-
-interface FetchRequestOptions {
-    url: string;
-    method: Method
-    headers?: Record<string, string>;
-    credentials: 'include' | 'same-origin';
-    contentType: 'application/json' | 'multipart/form-data';
-    body?: Record<string, any> | FormData | null;
-}
-
 
 const Join = () => {
     const navigate = useNavigate();
@@ -102,21 +92,18 @@ const Join = () => {
     const {
         loading: emailLoading,
         statusCode: emailStatusCode,
-        data: emailData,
         fetchRequest: emailFetchRequest
     } = useFetch<void>();
 
     const {
         loading: nicknameLoading,
         statusCode: nicknameStatusCode,
-        data: nicknameData,
         fetchRequest: nicknameFetchRequest
     } = useFetch<void>();
 
     const {
         loading: joinLoading,
         statusCode: joinStatusCode,
-        data: joinData,
         fetchRequest: joinFetchRequest
     } = useFetch<void>();
 
@@ -173,6 +160,29 @@ const Join = () => {
         }
     }, [validProfileImage])
 
+    const handleJoinMainRequest = () => {
+        const method = ENDPOINTS.AUTH.SEND_JOIN_MAIL.METHOD;
+        const url = ENDPOINTS.AUTH.SEND_JOIN_MAIL.URL;
+
+        const requestBody = {
+            email: email,
+            type: "JOIN"
+        }
+
+        const options: FetchRequestOptions = {
+            url: url,
+            method: method,
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            credentials: 'include',
+            contentType: 'application/json',
+            body: requestBody
+        }
+
+        emailFetchRequest(options);
+    }
+
 
     const showEmailAuthModal = () => {
         if (emailAuthModalDisplay === 'flex') {
@@ -188,27 +198,7 @@ const Join = () => {
         }
 
         setEmailHelperTextVisibility('hidden');
-
-        const method: Method = 'POST'
-        const headers = {
-            'Content-Type': 'application/json',
-        }
-
-        const requestBody = {
-            email: email,
-            type: "JOIN"
-        }
-
-        const options: FetchRequestOptions = {
-            url: `${API_BASE_URL}${ENDPOINTS.AUTH.SEND_MAIL}`,
-            method: method,
-            headers: headers,
-            credentials: 'include',
-            contentType: 'application/json',
-            body: requestBody
-        }
-
-        emailFetchRequest(options);
+        handleJoinMainRequest();
     }
 
     useEffect(function validateEmailFetch() {
@@ -241,6 +231,23 @@ const Join = () => {
         }
     }, [validEmail])
 
+    const handleNicknameValidationRequest = () => {
+        const method = ENDPOINTS.USER.VALIDATE_NICKNAME.METHOD;
+        const url = ENDPOINTS.USER.VALIDATE_NICKNAME.URL;
+
+        const options: FetchRequestOptions = {
+            url: url(nickname),
+            method: method,
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            credentials: 'include',
+            contentType: 'application/json'
+        }
+
+        nicknameFetchRequest(options);
+    }
+
     const validateNickname = () => {
         if (!/^[^\s]{1,11}$/.test(nickname)) {
             setValidNickname(false);
@@ -250,20 +257,7 @@ const Join = () => {
             return;
         }
 
-        const method: Method = 'GET'
-        const headers = {
-            'Content-Type': 'application/json',
-        }
-
-        const options: FetchRequestOptions = {
-            url: `${API_BASE_URL}${ENDPOINTS.USER.VALIDATE_NICKNAME}?nickname=${nickname}`,
-            method: method,
-            headers: headers,
-            credentials: 'include',
-            contentType: 'application/json'
-        }
-
-        nicknameFetchRequest(options);
+        handleNicknameValidationRequest();
     }
 
     useEffect(function closeNickname() {
@@ -359,6 +353,31 @@ const Join = () => {
         setRepasswordHelperTextVisibility('hidden');
     }, [repassword])
 
+    const handleJoinRequest = () => {
+        const method = ENDPOINTS.USER.JOIN.METHOD;
+        const url = ENDPOINTS.USER.JOIN.URL;
+
+        const formData = new FormData();
+
+        if (profileImage !== undefined) {
+            formData.append('profileImage', profileImage);
+        }
+
+        formData.append('email', email);
+        formData.append('nickname', nickname);
+        formData.append('password', password);
+
+        const options: FetchRequestOptions = {
+            url: url,
+            method: method,
+            credentials: 'include',
+            contentType: 'multipart/form-data',
+            body: formData,
+        };
+
+        joinFetchRequest(options)
+    }
+
     const handleJoin = () => {
         if (!validEmail) {
             setEmailHelperText('*이메일 인증을 완료 해주세요');
@@ -388,26 +407,7 @@ const Join = () => {
             return;
         }
 
-        const method: Method = 'POST';
-        const formData = new FormData();
-
-        if (profileImage !== undefined) {
-            formData.append('profileImage', profileImage);
-        }
-
-        formData.append('email', email);
-        formData.append('nickname', nickname);
-        formData.append('password', password);
-
-        const options: FetchRequestOptions = {
-            url: `${API_BASE_URL}${ENDPOINTS.USER.DEFAULT}`,
-            method: method,
-            credentials: 'include',
-            contentType: 'multipart/form-data',
-            body: formData,
-        };
-
-        joinFetchRequest(options)
+        handleJoinRequest();
     }
 
     useEffect(function loadJoinFetchRequest() {

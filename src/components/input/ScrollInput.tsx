@@ -1,6 +1,10 @@
-import styled from 'styled-components';
-import downIcon from '../../assets/down.png';
 import { useState, useRef, useEffect } from 'react';
+
+import styled from 'styled-components';
+
+import downIcon from '../../assets/down.png';
+
+
 
 const Container = styled.div`
     height: 40px;
@@ -91,12 +95,16 @@ const Item = styled.div`
     }
 `
 
+
+
 interface ScrollInputProps {
     title: string;
     options: string[];
     selectedOption: string;
     handleInputChange: (option: string) => void;
 }
+
+
 
 const ScrollInput: React.FC<ScrollInputProps> = (props) => {
     const { title, options, selectedOption, handleInputChange } = props;

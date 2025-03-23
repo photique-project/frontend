@@ -1,5 +1,8 @@
 import styled from 'styled-components';
+
 import removeIcon from '../assets/x.png'
+
+
 
 const Container = styled.div`
     padding-left: 7px;
@@ -29,10 +32,14 @@ const RemoveIcon = styled.img`
     cursor: pointer;
 `;
 
+
+
 interface TagProps {
     text: string;
     handleTagRemove: () => void;
 }
+
+
 
 const Tag: React.FC<TagProps> = (props) => {
     const { text, handleTagRemove } = props;

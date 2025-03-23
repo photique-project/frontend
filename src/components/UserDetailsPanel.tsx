@@ -1,5 +1,5 @@
 import { useEffect, useState, useRef } from 'react';
-
+import { useNavigate } from "react-router-dom";
 import styled from 'styled-components';
 
 import imageIcon from '../assets/image.png';
@@ -7,6 +7,7 @@ import bookmarkIcon from '../assets/bookmark-small.png';
 import userIcon from '../assets/users-small.png';
 import settingsIcon from '../assets/settings-small.png';
 import logoutIcon from '../assets/logout-small.png';
+import likeImageIcon from '../assets/like-black.png';
 
 const Container = styled.div`
     width: 300px;
@@ -121,11 +122,13 @@ interface UserDetailsPanelProps {
     following: number | null;
     createdAt: string | null;
     handleDisplay: () => void;
+    handleLogout: () => void;
 }
 
 const UserDetailsPanel: React.FC<UserDetailsPanelProps> = (props) => {
-    const { id, nickname, profileImage, introduction, singleWork, exhibition, follower, following, handleDisplay } = props;
+    const { id, nickname, profileImage, introduction, singleWork, exhibition, follower, following, handleDisplay, handleLogout } = props;
 
+    const navigate = useNavigate();
     const userDetailsPanelRef = useRef<HTMLDivElement | null>(null);
 
     // 패널 외부 클릭 감지 후 닫기
@@ -144,6 +147,10 @@ const UserDetailsPanel: React.FC<UserDetailsPanelProps> = (props) => {
             document.removeEventListener("mousedown", handleClickOutside);
         };
     }, []);
+
+    const handleNavigateToMyPage = (menu: string) => {
+        navigate("/mypage", { state: { menu: menu } });
+    }
 
     return (
         <Container ref={userDetailsPanelRef}>
@@ -179,32 +186,37 @@ const UserDetailsPanel: React.FC<UserDetailsPanelProps> = (props) => {
             </UserStatBox>
 
             <ItemBox>
-                <Item>
+                <Item onClick={() => handleNavigateToMyPage('my')}>
                     <ItemIcon src={imageIcon} />
-                    <ItemText>내 게시물</ItemText>
+                    <ItemText>내 작품</ItemText>
                 </Item>
 
-                <Item>
+                <Item onClick={() => handleNavigateToMyPage('like')}>
+                    <ItemIcon src={likeImageIcon} />
+                    <ItemText>좋아요 작품</ItemText>
+                </Item>
+
+                <Item onClick={() => handleNavigateToMyPage('bookmark')}>
                     <ItemIcon src={bookmarkIcon} />
                     <ItemText>저장된 전시회</ItemText>
                 </Item>
             </ItemBox>
 
             <ItemBox>
-                <Item>
+                <Item onClick={() => handleNavigateToMyPage('follow')}>
                     <ItemIcon src={userIcon} />
                     <ItemText>팔로우 관리</ItemText>
                 </Item>
             </ItemBox>
 
             <ItemBox>
-                <Item>
+                <Item onClick={() => handleNavigateToMyPage('settings')}>
                     <ItemIcon src={settingsIcon} />
                     <ItemText>계정설정</ItemText>
                 </Item>
             </ItemBox>
 
-            <ItemBox>
+            <ItemBox onClick={handleLogout}>
                 <Item>
                     <ItemIcon src={logoutIcon} />
                     <ItemText style={{ color: '#f50000' }}>로그아웃</ItemText>

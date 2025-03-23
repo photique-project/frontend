@@ -1,19 +1,17 @@
 import { useState, useEffect, useRef } from 'react';
-import { useParams, useNavigate, useLocation } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
 import { CompatClient, Stomp } from "@stomp/stompjs";
 import SockJS from 'sockjs-client'
-import { API_BASE_URL } from '../config/environment';
-import ENDPOINTS from '../api/endpoints';
+
+import { FetchRequestOptions } from '../types/http';
 import useAuthStore from '../zustand/store';
-
+import ENDPOINTS from '../api/endpoints';
 import useFetch from '../hooks/useFetch';
-
 import styled, { keyframes } from 'styled-components';
 
 import ExhibitionChatMessage from '../components/ExhibitionChatMessage';
 import ExhibitionComment from '../components/ExhibitionComment';
 import ToastMessage from '../components/ToastMessage';
-import Header from '../components/Header';
 
 import heartIcon from '../assets/heart.png';
 import heartFillIcon from '../assets/heart-fill.png';
@@ -33,6 +31,8 @@ import rightBlackIcon from '../assets/right-black.png';
 import trashIcon from '../assets/trash-red.png';
 import alertIcon from '../assets/alert.png';
 import loadingIcon from '../assets/loading-large.png';
+import { END } from 'redux-saga';
+import { RuleTester } from 'eslint';
 
 const Image = styled.img`
     height: 100%;
@@ -919,23 +919,6 @@ const LoadingIcon = styled.img`
     animation: ${rotate} 1.2s ease-in-out infinite;
 `
 
-
-
-
-
-type Method = 'GET' | 'POST' | 'PATCH' | 'DELETE';
-
-interface FetchRequestOptions {
-    url: string;
-    method: Method
-    headers?: Record<string, string>;
-    credentials: 'include' | 'same-origin';
-    contentType: 'application/json' | 'multipart/form-data';
-    body?: Record<string, any> | FormData | null;
-}
-
-
-
 interface Chat {
     type: 'JOIN' | 'LEAVE' | 'CHAT';
     me: boolean;
@@ -1044,7 +1027,6 @@ const Exhibition = () => {
 
     const scrollToBottom = () => {
         if (chatListRef.current) {
-
             chatListRef.current.scrollTo({
                 top: chatListRef.current.scrollHeight,
                 behavior: "smooth",
@@ -1121,9 +1103,12 @@ const Exhibition = () => {
     } = useFetch<ExhibitionData>();
 
     const handleExhibitionDataRequest = () => {
+        const method = ENDPOINTS.EXHIBITION.GET_DETAILS.METHOD;
+        const url = ENDPOINTS.EXHIBITION.GET_DETAILS.URL;
+
         const options: FetchRequestOptions = {
-            url: `${API_BASE_URL}${ENDPOINTS.PRERIX}${ENDPOINTS.EXHIBITION.DOMAIN}/${exhibitionId}?userId=${user.id !== null ? user.id : ''}`,
-            method: 'GET',
+            url: `${url(exhibition.id, user.id ? user.id : 0)}`,
+            method: method,
             headers: {
                 'Content-Type': 'application/json',
             },
@@ -1212,11 +1197,11 @@ const Exhibition = () => {
     }
 
     function connectStomp() {
-        const sock = new SockJS(`${API_BASE_URL}${ENDPOINTS.CHAT.CONNECTION}`);
+        const sock = new SockJS(`${ENDPOINTS.CHAT.CONNECTION.URL}`);
         const stomp = Stomp.over(sock);
 
         stomp.onConnect = () => {
-            stomp.subscribe(`${ENDPOINTS.CHAT.SUB}/${exhibitionId}`,
+            stomp.subscribe(`${ENDPOINTS.CHAT.SUB(exhibition.id)}`,
                 (message) => {
                     const newMessage = JSON.parse(message.body);
                     handleMessage(newMessage)
@@ -1274,7 +1259,7 @@ const Exhibition = () => {
         };
 
         stompWs.publish({
-            destination: `${ENDPOINTS.CHAT.PUB}/${exhibitionId}`,
+            destination: `${ENDPOINTS.CHAT.PUB(exhibition.id)}`,
             body: JSON.stringify(body)
         });
 
@@ -1304,7 +1289,7 @@ const Exhibition = () => {
         }
 
         const options: FetchRequestOptions = {
-            url: `${API_BASE_URL}${ENDPOINTS.PRERIX}${ENDPOINTS.EXHIBITION.DOMAIN}/${exhibition.id}${ENDPOINTS.LIKE}`,
+            url: `${ENDPOINTS.EXHIBITION.LIKE.URL}`,
             method: method,
             headers: {
                 'Content-Type': 'application/json',
@@ -1421,7 +1406,7 @@ const Exhibition = () => {
         }
 
         const options: FetchRequestOptions = {
-            url: `${API_BASE_URL}${ENDPOINTS.PRERIX}${ENDPOINTS.EXHIBITION.DOMAIN}/${exhibition.id}${ENDPOINTS.BOOKMARK}`,
+            url: `${ENDPOINTS.EXHIBITION.BOOKMARK.URL}`,
             method: method,
             headers: {
                 'Content-Type': 'application/json',
@@ -1525,9 +1510,12 @@ const Exhibition = () => {
     } = useFetch<CommentPageData>();
 
     const handleCommentPageRequest = (page = 0) => {
+        const method = ENDPOINTS.EXHIBITION.GET_COMMENT_PAGE.METHOD;
+        const url = ENDPOINTS.EXHIBITION.GET_COMMENT_PAGE.URL;
+
         const options: FetchRequestOptions = {
-            url: `${API_BASE_URL}${ENDPOINTS.PRERIX}${ENDPOINTS.EXHIBITION.DOMAIN}/${exhibitionId}${ENDPOINTS.COMMENT}?page=${page}&size=5&sort=createdAt,desc`,
-            method: 'GET',
+            url: `${url(exhibition.id, 'createdAt,desc', page, 5)}`,
+            method: method,
             headers: {
                 'Content-Type': 'application/json',
             },
@@ -1583,9 +1571,12 @@ const Exhibition = () => {
             content: commentInput.trim(),
         }
 
+        const method = ENDPOINTS.EXHIBITION.WRITE_COMMENT.METHOD;
+        const url = ENDPOINTS.EXHIBITION.WRITE_COMMENT.URL;
+
         const options: FetchRequestOptions = {
-            url: `${API_BASE_URL}${ENDPOINTS.PRERIX}${ENDPOINTS.EXHIBITION.DOMAIN}/${exhibitionId}${ENDPOINTS.COMMENT}`,
-            method: 'POST',
+            url: url(exhibition.id),
+            method: method,
             headers: {
                 'Content-Type': 'application/json',
             },
@@ -1662,9 +1653,12 @@ const Exhibition = () => {
             content: commentInput.trim()
         }
 
+        const method = ENDPOINTS.EXHIBITION.UPDATE_COMMENT.METHOD;
+        const url = ENDPOINTS.EXHIBITION.UPDATE_COMMENT.URL;
+
         const options: FetchRequestOptions = {
-            url: `${API_BASE_URL}${ENDPOINTS.PRERIX}${ENDPOINTS.EXHIBITION.DOMAIN}/${exhibitionId}${ENDPOINTS.COMMENT}/${commentUpdateTargetId}`,
-            method: 'PATCH',
+            url: url(exhibition.id, commentUpdateTargetId),
+            method: method,
             headers: {
                 'Content-Type': 'application/json',
             },
@@ -1694,7 +1688,7 @@ const Exhibition = () => {
 
         if (commentUpdateStatusCode === 400) {
             setToastMessageDisplay(true);
-            setFirstText('감상평 실패 !');
+            setFirstText('감상평 수정실패 !');
             setSecondText('입력값을 확인해주세요');
             setIsSucess(false);
 
@@ -1707,7 +1701,7 @@ const Exhibition = () => {
 
         if (commentUpdateStatusCode === 401) {
             setToastMessageDisplay(true);
-            setFirstText('감상평 실패 !');
+            setFirstText('감상평 수정실패 !');
             setSecondText('로그인 상태를 확인해주세요');
             setIsSucess(false);
 
@@ -1756,9 +1750,13 @@ const Exhibition = () => {
             return;
         }
 
+        const method = ENDPOINTS.EXHIBITION.REMOVE.METHOD;
+        const url = ENDPOINTS.EXHIBITION.REMOVE.URL;
+
+        // 왜전시회 삭제? 댓글사제는? 그리고 여기 이펙트이름왜잉럼
         const options: FetchRequestOptions = {
-            url: `${API_BASE_URL}${ENDPOINTS.PRERIX}${ENDPOINTS.EXHIBITION.DOMAIN}/${exhibitionId}`,
-            method: 'DELETE',
+            url: url(exhibition.id),
+            method: method,
             headers: {
                 'Content-Type': 'application/json',
             },
@@ -1769,7 +1767,7 @@ const Exhibition = () => {
         exhibitionDeleteRequest(options);
     }
 
-    useEffect(function singleWorkDeleteResponse() {
+    useEffect(function exhibitionDeleteResponse() {
         if (exhibitionDeleteStatusCode === 204) {
             setToastMessageDisplay(true);
             setFirstText('전시회 삭제완료 !');

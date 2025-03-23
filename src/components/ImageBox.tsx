@@ -6,6 +6,8 @@ import upIcon from '../assets/up.png';
 import downIcon from '../assets/d.png';
 import closeIcon from '../assets/close-large.png';
 
+
+
 const Container = styled.div`
     padding: 20px;
     width: calc(100% - 40px);
@@ -154,6 +156,8 @@ const ExhibitionImageDescription = styled.textarea`
     }
 `
 
+
+
 interface Work {
     image: File;
     previewImage: string;
@@ -170,6 +174,8 @@ interface ImageBoxProps {
     handleMoveUp: (index: number) => void;
     handleMoveDown: (index: number) => void;
 }
+
+
 
 const ImageBox: React.FC<ImageBoxProps> = (props) => {
     const { index, work, handleTitleInputChange, handleDescriptionInputChange, handleRemove, handleMoveUp, handleMoveDown } = props;

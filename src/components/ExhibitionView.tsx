@@ -1,7 +1,9 @@
 import { useState, useEffect } from 'react';
-
 import styled from 'styled-components';
+
 import ExhibitionCard from './ExhibitionCard';
+
+
 
 const Container = styled.div`
     margin-top: 40px;
@@ -24,6 +26,8 @@ const Container = styled.div`
         width: calc((6 / 7) * 100%);
     }
 `
+
+
 
 interface Tag {
     name: string;
@@ -61,6 +65,8 @@ interface ExhibitionViewProps {
     exhibitionDataPage: ExhibitionDataPage;
     exhibitionDataPageStatusCode: number;
 }
+
+
 
 const ExhibitionView: React.FC<ExhibitionViewProps> = (props) => {
     const { exhibitionDataPageLoading, exhibitionDataPage, exhibitionDataPageStatusCode } = props;

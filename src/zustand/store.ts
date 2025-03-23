@@ -1,7 +1,19 @@
 import { createStore } from "zustand";
 import { persist } from 'zustand/middleware';
-import { API_BASE_URL } from '../config/environment';
 import ENDPOINTS from '../api/endpoints';
+
+interface User {
+    id: number | null;
+    email: string | null;
+    nickname: string | null;
+    profileImage: string | null;
+    introduction: string | null;
+    singleWork: number | null;
+    exhibition: number | null;
+    follower: number | null;
+    following: number | null;
+    createdAt: string | null;
+}
 
 type AuthStore = {
     isLoggedIn: boolean; // 로그인 상태
@@ -9,19 +21,9 @@ type AuthStore = {
     login: () => void; // 로그인 함수
     logout: () => void; // 로그아웃 함수
     userId: number | null;
-    user: {
-        id: number | null;
-        email: string | null;
-        nickname: string | null;
-        profileImage: string | null;
-        introduction: string | null;
-        singleWork: number | null;
-        exhibition: number | null;
-        follower: number | null;
-        following: number | null;
-        createdAt: string | null;
-    };
+    user: User;
 };
+
 
 const useAuthStore = createStore(
     persist<AuthStore>(
@@ -43,8 +45,11 @@ const useAuthStore = createStore(
             },
 
             login: async () => {
+                const method = ENDPOINTS.AUTH.WHO_AM_I.METHOD;
+                const url = ENDPOINTS.AUTH.WHO_AM_I.URL;
+
                 const requestOptions: RequestInit = {
-                    method: 'GET',
+                    method: method,
                     headers: {
                         'Content-Type': 'application/json',
                     },
@@ -52,7 +57,7 @@ const useAuthStore = createStore(
                 };
 
                 try {
-                    const response = await fetch(`${API_BASE_URL}${ENDPOINTS.AUTH.GET_USER_ID}`, requestOptions);
+                    const response = await fetch(url, requestOptions);
 
                     if (response.ok) {
                         const responseData = await response.json();
@@ -61,7 +66,7 @@ const useAuthStore = createStore(
                             userId: responseData.data.id,
                         }));
 
-                        const userResponse = await fetch(`${API_BASE_URL}${ENDPOINTS.USER.DEFAULT}/${responseData.data.id}`, requestOptions);
+                        const userResponse = await fetch(ENDPOINTS.USER.GET_DETAILS.URL(responseData.data.id, 0), requestOptions);
 
                         if (userResponse.ok) {
                             const responseData = await userResponse.json();

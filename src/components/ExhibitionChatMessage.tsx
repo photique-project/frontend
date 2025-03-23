@@ -1,7 +1,5 @@
 import styled from 'styled-components';
 
-import ex1 from '../assets/ex1.jpg';
-
 const Container = styled.div<{ me: boolean }>`
     width: 100%;
     
@@ -104,7 +102,7 @@ const ExhibitionChatMessage: React.FC<ExhibitionChatMessageProps> = (props) => {
                         {!chatData.me ?
                             <>
                                 <LeftBox>
-                                    <ProfileImage src={ex1} />
+                                    <ProfileImage src={chatData.profileImage} />
                                 </LeftBox>
 
                                 <CenterBox me={chatData.me}>
@@ -128,7 +126,7 @@ const ExhibitionChatMessage: React.FC<ExhibitionChatMessageProps> = (props) => {
                                 </CenterBox>
 
                                 <LeftBox>
-                                    <ProfileImage src={ex1} />
+                                    <ProfileImage src={chatData.profileImage} />
                                 </LeftBox>
                             </>
                         }

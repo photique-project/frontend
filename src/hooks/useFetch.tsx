@@ -1,13 +1,5 @@
 import { useState } from 'react';
-
-interface FetchRequestOptions {
-    url: string;
-    method: 'GET' | 'POST' | 'DELETE' | 'PATCH';
-    headers?: Record<string, string>;
-    credentials: 'include' | 'same-origin';
-    contentType: 'application/json' | 'multipart/form-data';
-    body?: Record<string, any> | FormData | null;
-}
+import { FetchRequestOptions } from '../types/http';
 
 interface UseFetchReturn<T> {
     loading: boolean;

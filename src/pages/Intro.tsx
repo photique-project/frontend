@@ -10,6 +10,8 @@ import exhibitionIcon from '../assets/exhibition.png';
 import personIcon from '../assets/person.png';
 import searchIcon from '../assets/search.png';
 
+
+
 const Container = styled.div`
     display: flex;
     flex-direction: column;
@@ -208,9 +210,6 @@ const ThirdIntroBoxSubText = styled.div`
         line-height: 24px;
     }
 `;
-
-
-
 
 
 

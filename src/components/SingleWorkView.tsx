@@ -1,11 +1,13 @@
 import { useState, useEffect } from 'react';
 import styled, { keyframes } from 'styled-components';
+
 import SingleWorkBox from '../components/SingleWorkBox';
 
 import loadingIcon from '../assets/loading-large.png';
 import heartIcon from '../assets/heart.png';
 import viewIcon from '../assets/view.png';
 import heartFillIcon from '../assets/heart-fill.png';
+
 
 
 const BestSingleWorkBox = styled.div`
@@ -202,6 +204,8 @@ const LoadingIcon = styled.img`
     animation: ${rotate} 1.2s ease-in-out infinite;
 `
 
+
+
 interface Writer {
     id: number;
     nickname: string;
@@ -233,6 +237,8 @@ interface SingleWorkViewProps {
     singleWorkDataPage: SearchSingleWorkData;
     singleWorkDataStatusCode: number;
 }
+
+
 
 const SingleWorkView: React.FC<SingleWorkViewProps> = (props) => {
     const { handleOpenSingleWorkDetail, popularSingleWorkLoading, popularSingleWorkData, singleWorkDataPageLoading, singleWorkDataPage, singleWorkDataStatusCode } = props;

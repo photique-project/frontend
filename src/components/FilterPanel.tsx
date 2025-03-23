@@ -1,6 +1,9 @@
 import { useRef, useEffect } from 'react';
 import styled from 'styled-components';
+
 import ShortButton from './button/ShortButton';
+
+
 
 const Container = styled.div`
     width: 770px;
@@ -109,6 +112,8 @@ const ButtonBox = styled.div`
     gap: 10px;
 `;
 
+
+
 type SearchTarget = 'work' | 'writer';
 type SortingTarget = 'createdAt' | 'likeCount' | 'viewCount' | 'commentCount';
 type SortOrder = 'asc' | 'desc'
@@ -124,6 +129,8 @@ interface FilterPanelProps {
     handleReset: () => void;
     closePanel: () => void;
 }
+
+
 
 const FilterPanel: React.FC<FilterPanelProps> = (props) => {
     const {

@@ -1,12 +1,11 @@
 import { useState, useRef, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { GithubPicker } from 'react-color';
-import { API_BASE_URL } from '../config/environment';
+
+import { FetchRequestOptions } from '../types/http';
 import useAuthStore from '../zustand/store';
 import ENDPOINTS from '../api/endpoints';
-
 import styled, { keyframes } from 'styled-components';
-
 import useFetch from '../hooks/useFetch';
 
 import Header from '../components/Header';
@@ -25,7 +24,6 @@ import tagIcon from '../assets/input-tag.png';
 import imagesIcon from '../assets/images.png';
 import diamondIcon from '../assets/diamond.png';
 import loadingIcon from '../assets/loading-large.png';
-import { workerData } from 'worker_threads';
 
 
 const Container = styled.div`
@@ -450,18 +448,6 @@ const LoadingIcon = styled.img`
     animation: ${rotate} 1.2s ease-in-out infinite;
 `
 
-
-type Method = 'GET' | 'POST' | 'PATCH' | 'DELETE';
-
-interface FetchRequestOptions {
-    url: string;
-    method: Method
-    headers?: Record<string, string>;
-    credentials: 'include' | 'same-origin';
-    contentType: 'application/json' | 'multipart/form-data';
-    body?: Record<string, any> | FormData | null;
-}
-
 interface Tag {
     name: string;
 }
@@ -871,9 +857,12 @@ const NewExhibition = () => {
             formData.append(`works[${index}].description`, work.description);
         });
 
+        const method = ENDPOINTS.EXHIBITION.WRITE.METHOD;
+        const url = ENDPOINTS.EXHIBITION.WRITE.URL;
+
         const options: FetchRequestOptions = {
-            url: `${API_BASE_URL}${ENDPOINTS.PRERIX}${ENDPOINTS.EXHIBITION.DOMAIN}`,
-            method: 'POST',
+            url: url,
+            method: method,
             credentials: 'include',
             contentType: 'multipart/form-data',
             body: formData

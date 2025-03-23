@@ -1,6 +1,8 @@
 import styled, { keyframes } from "styled-components";
+
 import successIcon from "../assets/success.png";
 import failIcon from "../assets/fail.png";
+
 
 
 const Container = styled.div<{ isSuccess: boolean }>`
@@ -109,11 +111,15 @@ const SecondText = styled.div`
     color: white;
 `;
 
+
+
 interface ToastMessageProps {
     firstText: string;
     secondText: string;
     isSuccess: boolean;
 }
+
+
 
 const ToastMessage: React.FC<ToastMessageProps> = (props) => {
     const { firstText, secondText, isSuccess } = props;

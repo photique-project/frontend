@@ -1,8 +1,10 @@
 import { useState, Dispatch, SetStateAction, useEffect } from 'react';
+import styled from 'styled-components';
 
 import imageIcon from '../../assets/add-image.png';
 import cancelIcon from '../../assets/cancel.png';
-import styled from 'styled-components';
+
+
 
 const Container = styled.label<{ width: string, ratio: string, marginTop: number, isDragging: boolean }>`
     margin-top: ${({ marginTop }) => `${marginTop}px`};
@@ -95,6 +97,8 @@ const CancelIcon = styled.img`
     height: 25px;
 `
 
+
+
 interface ImageInputProps {
     width: string;
     ratio: string;
@@ -105,6 +109,8 @@ interface ImageInputProps {
     inputDisabled: boolean;
     curImage?: string;
 }
+
+
 
 const ImageInput: React.FC<ImageInputProps> = (props) => {
     const { width, ratio, marginTop, image, setImage, setValidImage, inputDisabled, curImage } = props;

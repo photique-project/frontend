@@ -1,7 +1,9 @@
 import styled from 'styled-components';
+
 import heartIcon from '../assets/heart.png';
 import viewIcon from '../assets/view.png';
 import heartFillIcon from '../assets/heart-fill.png';
+
 
 
 const Container = styled.div`
@@ -123,6 +125,7 @@ const SingleWorkView = styled.div`
 `
 
 
+
 interface Writer {
     id: number;
     nickname: string;
@@ -142,6 +145,8 @@ interface SingleWorkBoxProps {
     singleWorkData: SingleWorkData;
     handleOpenSingleWorkDetail: (singleWorkId: number) => void;
 }
+
+
 
 const SingleWorkBox: React.FC<SingleWorkBoxProps> = (props) => {
     // 여기서 아이디 가지고 있다가 열기

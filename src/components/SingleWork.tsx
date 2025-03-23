@@ -1,12 +1,11 @@
 import { useState, useEffect, useRef } from 'react';
-import { API_BASE_URL } from '../config/environment';
 import { useNavigate } from 'react-router-dom';
-import ENDPOINTS from '../api/endpoints';
-import useAuthStore from '../zustand/store';
 import styled, { keyframes } from 'styled-components';
 
+import ENDPOINTS from '../api/endpoints';
+import { FetchRequestOptions } from '../types/http';
+import useAuthStore from '../zustand/store';
 import useFetch from '../hooks/useFetch';
-
 import ToastMessage from './ToastMessage';
 import Comment from './Comment';
 
@@ -32,6 +31,7 @@ import heartFillIcon from '../assets/heart-fill.png';
 import leftBlackIcon from '../assets/left-black.png';
 import rightBlackIcon from '../assets/right-black.png';
 import categoryGrayIcon from '../assets/category-gray.png';
+
 
 
 const Container = styled.div`
@@ -231,8 +231,6 @@ const ImageLikeIcon = styled.img`
 
     cursor: pointer;
 
-    
-
     &:hover {
     transform: scale(1.2);
     animation: ${swing} 0.5s ease-in-out infinite;
@@ -285,8 +283,6 @@ const ImageViewValue = styled.div`
         font-size: 14px;
     }
 `
-
-
 
 const ImageMenuBox = styled.div`
     margin-right: 20px;
@@ -694,10 +690,6 @@ const ImageInfoTagBox = styled.div`
     }
 `
 
-
-
-
-
 const ImageInfoFooter = styled.div`
     margin-top: 15px;
     margin-bottom: 40px;
@@ -930,7 +922,6 @@ const CommentLastPage = styled.div`
     }
 `
 
-
 const CommentWriterProfileImage = styled.img`
     width: 40px;
     height: 40px;
@@ -1004,7 +995,6 @@ const CommentInputCompleteButton = styled.div`
     align-items: center;
 
     gap: 10px;
-
 
     border: 1px solid rgba(0, 0, 0, 0.2);
     border-radius: 5px;
@@ -1104,7 +1094,6 @@ const CommentInputUpdateCancelButtonText = styled.div`
         font-size: 14px;
     }
 `
-
 
 const DeleteBackground = styled.div`
     width: 100%;
@@ -1242,16 +1231,7 @@ const LoadingIcon = styled.img`
     animation: ${rotate} 1.2s ease-in-out infinite;
 `
 
-type Method = 'GET' | 'POST' | 'PATCH' | 'DELETE';
 
-interface FetchRequestOptions {
-    url: string;
-    method: Method
-    headers?: Record<string, string>;
-    credentials: 'include' | 'same-origin';
-    contentType: 'application/json' | 'multipart/form-data';
-    body?: Record<string, any> | FormData | null;
-}
 
 interface SingleWorkUpdateState {
     writer: {
@@ -1327,14 +1307,16 @@ interface CommentPageData {
     totalPages: number;
 }
 
-
 interface SingleWorkProps {
     singleWorkId: number;
     close: (singleWorkId?: number) => void;
 }
 
+
+
 const SingleWork: React.FC<SingleWorkProps> = (props) => {
     const { singleWorkId, close } = props;
+    const user = useAuthStore.getState().user;
     const categoryMap: { [key: string]: string } = {
         "landscape": "풍경",
         "portrait": "인물",
@@ -1411,9 +1393,12 @@ const SingleWork: React.FC<SingleWorkProps> = (props) => {
             content: commentInput.trim()
         }
 
+        const method = ENDPOINTS.SINGLE_WORK.UPDATE_COMMENT.METHOD;
+        const url = ENDPOINTS.SINGLE_WORK.UPDATE_COMMENT.URL;
+
         const options: FetchRequestOptions = {
-            url: `${API_BASE_URL}${ENDPOINTS.SINGLE_WORK.SEARCH}/${singleWorkId}${ENDPOINTS.SINGLE_WORK.COMMENT}/${commentUpdateTargetId}`,
-            method: 'PATCH',
+            url: url(singleWork.id, commentUpdateTargetId),
+            method: method,
             headers: {
                 'Content-Type': 'application/json',
             },
@@ -1505,10 +1490,14 @@ const SingleWork: React.FC<SingleWorkProps> = (props) => {
         fetchRequest: commentPageRequest
     } = useFetch<CommentPageData>();
 
+
     const handleCommentPageRequest = (page = 0) => {
+        const method = ENDPOINTS.SINGLE_WORK.GET_COMMENT_PAGE.METHOD;
+        const url = ENDPOINTS.SINGLE_WORK.GET_COMMENT_PAGE.URL;
+
         const options: FetchRequestOptions = {
-            url: `${API_BASE_URL}${ENDPOINTS.SINGLE_WORK.SEARCH}/${singleWorkId}${ENDPOINTS.SINGLE_WORK.COMMENT}?page=${page}&size=5&sort=createdAt,desc`,
-            method: 'GET',
+            url: url(singleWork.id, 'createdAt,desc', page, 5),
+            method: method,
             headers: {
                 'Content-Type': 'application/json',
             },
@@ -1550,9 +1539,12 @@ const SingleWork: React.FC<SingleWorkProps> = (props) => {
             content: commentInput.trim(),
         }
 
+        const method = ENDPOINTS.SINGLE_WORK.WRITE_COMMENT.METHOD;
+        const url = ENDPOINTS.SINGLE_WORK.WRITE_COMMENT.URL;
+
         const options: FetchRequestOptions = {
-            url: `${API_BASE_URL}${ENDPOINTS.SINGLE_WORK.SEARCH}/${singleWorkId}${ENDPOINTS.SINGLE_WORK.COMMENT}`,
-            method: 'POST',
+            url: url(singleWork.id),
+            method: method,
             headers: {
                 'Content-Type': 'application/json',
             },
@@ -1647,10 +1639,13 @@ const SingleWork: React.FC<SingleWorkProps> = (props) => {
         fetchRequest: singleWorkRequest
     } = useFetch<SingleWork>();
 
-    useEffect(function requestSingleWorkDetail() {
+    const handleSingleWorkDetailsRequest = () => {
+        const method = ENDPOINTS.SINGLE_WORK.GET_DETAILS.METHOD;
+        const url = ENDPOINTS.SINGLE_WORK.GET_DETAILS.URL;
+
         const options: FetchRequestOptions = {
-            url: `${API_BASE_URL}${ENDPOINTS.SINGLE_WORK.SEARCH}/${singleWorkId}?userId=${useAuthStore.getState().userId !== null ? useAuthStore.getState().userId : ''}`,
-            method: 'GET',
+            url: url(singleWork.id, user.id ? user.id : 0),
+            method: method,
             headers: {
                 'Content-Type': 'application/json',
             },
@@ -1659,6 +1654,10 @@ const SingleWork: React.FC<SingleWorkProps> = (props) => {
         }
 
         singleWorkRequest(options);
+    }
+
+    useEffect(function handleInitSingleWorkDetailsRequest() {
+        handleSingleWorkDetailsRequest();
     }, []);
 
     useEffect(function handleSingleWorkDetailResponse() {
@@ -1692,9 +1691,12 @@ const SingleWork: React.FC<SingleWorkProps> = (props) => {
             return;
         }
 
+        const method = ENDPOINTS.SINGLE_WORK.REMOVE.METHOD;
+        const url = ENDPOINTS.SINGLE_WORK.REMOVE.URL;
+
         const options: FetchRequestOptions = {
-            url: `${API_BASE_URL}${ENDPOINTS.SINGLE_WORK.SEARCH}/${singleWorkId}`,
-            method: 'DELETE',
+            url: url(singleWork.id),
+            method: method,
             headers: {
                 'Content-Type': 'application/json',
             },
@@ -1795,11 +1797,13 @@ const SingleWork: React.FC<SingleWorkProps> = (props) => {
         const request = singleWork.isLiked ? dislikeRequest : likeRequest;
 
         const requestBody = {
-            userId: useAuthStore.getState().userId,
+            userId: user.id,
         }
 
+        const url = ENDPOINTS.SINGLE_WORK.LIKE.URL;
+
         const options: FetchRequestOptions = {
-            url: `${API_BASE_URL}${ENDPOINTS.SINGLE_WORK.SEARCH}/${singleWorkId}${ENDPOINTS.SINGLE_WORK.LIKE}`,
+            url: url(singleWork.id),
             method: method,
             headers: {
                 'Content-Type': 'application/json',
@@ -1918,8 +1922,10 @@ const SingleWork: React.FC<SingleWorkProps> = (props) => {
             followingId: singleWork.writer.id,
         }
 
+        const url = ENDPOINTS.USER.FOLLOW.URL;
+
         const options: FetchRequestOptions = {
-            url: `${API_BASE_URL}${ENDPOINTS.USER.DEFAULT}/${useAuthStore.getState().userId}${ENDPOINTS.USER.FOLLOW}`,
+            url: url(user.id),
             method: method,
             headers: {
                 'Content-Type': 'application/json',

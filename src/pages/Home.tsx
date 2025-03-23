@@ -1,14 +1,13 @@
-import { API_BASE_URL, API_PREFIX } from '../config/environment';
-import ENDPOINTS from '../api/endpoints';
 import { useEffect, useState, useRef } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import styled, { keyframes } from "styled-components";
 
+import ENDPOINTS from '../api/endpoints';
+import { FetchRequestOptions } from '../types/http';
 import useFetch from '../hooks/useFetch';
 
 import Header from '../components/Header';
 import SingleWorkView from '../components/SingleWorkView';
-import LikeView from '../components/LikeView';
 import Tag from '../components/Tag';
 import FilterPanel from '../components/FilterPanel';
 import ExhibitionView from '../components/ExhibitionView';
@@ -20,8 +19,6 @@ import gridBlackIcon from '../assets/grid-black.png';
 import gridWhiteIcon from '../assets/grid-white.png';
 import exhibitionBlackIcon from '../assets/exhibition-black.png';
 import exhibitionWhiteIcon from '../assets/exhibition-white.png';
-import likeBlackIcon from '../assets/like-black.png';
-import likeWhiteIcon from '../assets/like-white.png';
 import upActiveIcon from '../assets/up-active.png';
 import upNonactiveIcon from '../assets/up-nonactive.png';
 import writeActiveIcon from '../assets/write-active.png';
@@ -431,18 +428,6 @@ const HistoryPanelIcon = styled.img<{ activeSrc?: string }>`
 `
 
 
-
-type Method = 'GET' | 'POST' | 'PATCH' | 'DELETE';
-
-interface FetchRequestOptions {
-    url: string;
-    method: Method
-    headers?: Record<string, string>;
-    credentials: 'include' | 'same-origin';
-    contentType: 'application/json' | 'multipart/form-data';
-    body?: Record<string, any> | FormData | null;
-}
-
 type SearchTarget = 'work' | 'writer';
 type SortingTarget = 'createdAt' | 'likeCount' | 'viewCount' | 'commentCount';
 type SortOrder = 'asc' | 'desc'
@@ -501,6 +486,8 @@ interface ExhibitionDataPage {
 }
 
 const Home = () => {
+
+    const user = useAuthStore.getState().user;
     const categoryMap: { [key: string]: string } = {
         "풍경": "landscape",
         "인물": "portrait",
@@ -563,7 +550,6 @@ const Home = () => {
     // 세 가지 뷰
     const [singleWorkView, setSingleWorkView] = useState<boolean>(true);
     const [exhibitionView, setExhibitionView] = useState<boolean>(false);
-    const [likeView, setLikeView] = useState<boolean>(false);
 
     // 현재 검색페이지
     const [page, setPage] = useState<number>(0);
@@ -577,9 +563,12 @@ const Home = () => {
     } = useFetch<SingleWorkDataPage>();
 
     const handleSingleWorkDataPageRequest = (page: number) => {
+        const method = ENDPOINTS.SINGLE_WORK.SEARCH.METHOD;
+        const url = ENDPOINTS.SINGLE_WORK.SEARCH.URL;
+
         const options: FetchRequestOptions = {
-            url: `${API_BASE_URL}${ENDPOINTS.SINGLE_WORK.SEARCH}?target=${searchTarget}&keywords=${inputValue}&categories=${categoryQueryParam}&sort=${sortingTarget},${sortingOrder}&page=${page}&size=30&userId=${useAuthStore.getState().userId !== null ? useAuthStore.getState().userId : ''}`,
-            method: 'GET',
+            url: `${url(searchTarget, inputValue, categoryQueryParam, `${sortingTarget},${sortingOrder}`, page, 30, user.id ? user.id : 0)}`,
+            method: method,
             headers: {
                 'Content-Type': 'application/json',
             },
@@ -607,9 +596,12 @@ const Home = () => {
 
     // 홈페이지 마운트하면 인기 단일작품 요청
     useEffect(function requestPopularSingleWorkRequest() {
+        const method = ENDPOINTS.SINGLE_WORK.GET_POPULAR.METHOD;
+        const url = ENDPOINTS.SINGLE_WORK.GET_POPULAR.URL;
+
         const options: FetchRequestOptions = {
-            url: `${API_BASE_URL}${ENDPOINTS.SINGLE_WORK.POPULAR}?userId=${useAuthStore.getState().userId !== null ? useAuthStore.getState().userId : ''}`,
-            method: 'GET',
+            url: `${url(user.id ? user.id : 0)}`,
+            method: method,
             headers: {
                 'Content-Type': 'application/json',
             },
@@ -638,9 +630,12 @@ const Home = () => {
     } = useFetch<ExhibitionDataPage>();
 
     const handleExhibitionDataPageRequest = (page: number) => {
+        const method = ENDPOINTS.EXHIBITION.SEARCH.METHOD;
+        const url = ENDPOINTS.EXHIBITION.SEARCH.URL;
+
         const options: FetchRequestOptions = {
-            url: `${API_BASE_URL}${API_PREFIX}${ENDPOINTS.EXHIBITION.DOMAIN}?target=${searchTarget}&keywords=${inputValue}&sort=${sortingTarget},${sortingOrder}&page=${page}&size=30&userId=${useAuthStore.getState().userId !== null ? useAuthStore.getState().userId : ''}`,
-            method: 'GET',
+            url: `${url(searchTarget, inputValue, `${sortingTarget},${sortingOrder}`, page, 30, user.id ? user.id : 0)}`,
+            method: method,
             headers: {
                 'Content-Type': 'application/json',
             },
@@ -749,7 +744,6 @@ const Home = () => {
         if (id === 'single-work') {
             setSingleWorkView(true);
             setExhibitionView(false);
-            setLikeView(false);
             handleSingleWorkDataPageRequest(0);
 
             return;
@@ -758,15 +752,10 @@ const Home = () => {
         if (id === 'exhibition') {
             setExhibitionView(true);
             setSingleWorkView(false);
-            setLikeView(false);
             handleExhibitionDataPageRequest(0);
 
             return;
         }
-
-        setLikeView(true);
-        setExhibitionView(false);
-        setSingleWorkView(false);
     }
 
     // 새 게시글 옵션 모달

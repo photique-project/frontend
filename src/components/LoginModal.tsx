@@ -1,21 +1,24 @@
 import { useEffect, useState } from 'react';
 import styled from 'styled-components';
 
-import ShortNormalInput from './input/ShortNormalInput';
-import LongButton from './button/LongButton';
+import { FetchRequestOptions } from '../types/http';
+import ENDPOINTS from '../api/endpoints';
+import useFetch from '../hooks/useFetch';
+import useAuthStore from '../zustand/store';
+
+import ShortNormalInput from '../components/input/ShortNormalInput';
+import LongButton from '../components/button/LongButton';
 import CheckBox from '../components/CheckBox';
 import LoginModalNav from '../components/LoginModalNav';
 import SNSLine from '../components/SNSLine';
 import HelperText from '../components/HelperText';
+import PasswordInput from '../components/input/PasswordInput';
+import OAuthIcons from '../components/OAuthIcons';
 
 import logoIcon from '../assets/logo.png';
 import closeIcon from '../assets/close.png';
-import PasswordInput from './input/PasswordInput';
-import OAuthIcons from './OAuthIcons';
-import useFetch from '../hooks/useFetch';
-import { API_BASE_URL } from '../config/environment';
-import ENDPOINTS from '../api/endpoints';
-import useAuthStore from '../zustand/store';
+
+
 
 const Container = styled.div`
     width: 100%;
@@ -34,9 +37,8 @@ const Container = styled.div`
 `;
 
 const LoginModalBox = styled.div`
-    width: 360px;
-    height: 452px;
-    padding: 20px;
+    width: calc(450px - 60px);
+    padding: 30px;
 
     display: flex;
     flex-direction: column;
@@ -74,7 +76,7 @@ const CloseIcon = styled.img`
 
 const LogoIcon = styled.img`
     margin-top: 5px;
-    width: 130px;
+    width: 150px;
 
     @media (max-width: 420px) {
         width: 100px;
@@ -82,24 +84,17 @@ const LogoIcon = styled.img`
 `;
 
 const HelperTextBox = styled.div`
-    width: 300px;
+    width: 100%;
     height: 12px;
 `;
 
-type Method = 'GET' | 'POST' | 'PATCH' | 'DELETE';
 
-interface FetchRequestOptions {
-    url: string;
-    method: Method
-    headers?: Record<string, string>;
-    credentials: 'include' | 'same-origin';
-    contentType: 'application/json' | 'multipart/form-data';
-    body?: Record<string, any> | FormData | null;
-}
 
 interface LoginModalProps {
     closeModal: () => void;
 }
+
+
 
 const LoginModal: React.FC<LoginModalProps> = (props) => {
     const { closeModal } = props;
@@ -147,10 +142,8 @@ const LoginModal: React.FC<LoginModalProps> = (props) => {
 
         setHelperTextVisibility('hidden');
 
-        const method: Method = 'POST'
-        const headers = {
-            'Content-Type': 'application/json',
-        }
+        const method = ENDPOINTS.AUTH.LOGIN.METHOD;
+        const url = ENDPOINTS.AUTH.LOGIN.URL;
 
         const requestBody = {
             email: email,
@@ -158,9 +151,11 @@ const LoginModal: React.FC<LoginModalProps> = (props) => {
         }
 
         const options: FetchRequestOptions = {
-            url: `${API_BASE_URL}${ENDPOINTS.AUTH.LOGIN}`,
+            url: url,
             method: method,
-            headers: headers,
+            headers: {
+                'Content-Type': 'application/json',
+            },
             credentials: 'include',
             contentType: 'application/json',
             body: requestBody
@@ -188,7 +183,6 @@ const LoginModal: React.FC<LoginModalProps> = (props) => {
                 setHelperTextVisibility('hidden');
                 const login = useAuthStore.getState().login;
                 await login(); // 로그인요청으로 받은 토큰으로 유저아이디 값을 전역 저장소에 세팅
-                // 현재로그인하고 아이디 제대로 받아왔는데 헤더에서 스토어에서 꺼내면 해당 아이디값이 null로찍힘
                 closeModal();
                 return;
             }

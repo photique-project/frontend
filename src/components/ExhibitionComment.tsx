@@ -1,12 +1,10 @@
-
 import { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { API_BASE_URL } from '../config/environment';
-import ENDPOINTS from '../api/endpoints';
-import useFetch from '../hooks/useFetch';
-
 import styled, { keyframes } from 'styled-components';
 
+import { FetchRequestOptions } from '../types/http';
+import ENDPOINTS from '../api/endpoints';
+import useFetch from '../hooks/useFetch';
 import useAuthStore from '../zustand/store';
 
 import ToastMessage from './ToastMessage';
@@ -16,7 +14,8 @@ import pencilIcon from '../assets/pencil.png'
 import trashIcon from '../assets/trash-red.png';
 import alertIcon from '../assets/alert.png';
 import loadingIcon from '../assets/loading-large.png';
-import { Navigate } from 'react-router-dom';
+
+
 
 const Container = styled.div`
     width: 100%;
@@ -273,16 +272,6 @@ const LoadingIcon = styled.img`
 `
 
 
-type Method = 'GET' | 'POST' | 'PATCH' | 'DELETE';
-
-interface FetchRequestOptions {
-    url: string;
-    method: Method
-    headers?: Record<string, string>;
-    credentials: 'include' | 'same-origin';
-    contentType: 'application/json' | 'multipart/form-data';
-    body?: Record<string, any> | FormData | null;
-}
 
 interface Writer {
     id: number;
@@ -303,6 +292,7 @@ interface CommentProps {
     handleCommentPageRequest: (page?: number) => void;
     handleCommentupdateMode: (input?: string, commentId?: number) => void;
 }
+
 
 
 const ExhibitionComment: React.FC<CommentProps> = (props) => {
@@ -355,13 +345,16 @@ const ExhibitionComment: React.FC<CommentProps> = (props) => {
     } = useFetch<void>();
 
     const handleDeleteComment = () => {
+        const method = ENDPOINTS.EXHIBITION.REMOVE_COMMENT.METHOD;
+        const url = ENDPOINTS.EXHIBITION.REMOVE_COMMENT.URL;
+
         const body = {
             writerId: user.id,
         }
 
         const options: FetchRequestOptions = {
-            url: `${API_BASE_URL}${ENDPOINTS.PRERIX}${ENDPOINTS.EXHIBITION.DOMAIN}/${exhibitionId}${ENDPOINTS.COMMENT}/${data.id}`,
-            method: 'DELETE',
+            url: url(exhibitionId, data.id),
+            method: method,
             headers: {
                 'Content-Type': 'application/json',
             },

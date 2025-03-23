@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 
 import styled from 'styled-components';
+import useAuthStore from '../zustand/store';
 
 import exitIcon from '../assets/exit.png';
 import userIcon from '../assets/user-white.png';
@@ -10,7 +11,8 @@ import chatIcon from '../assets/chat.png';
 import notebookIcon from '../assets/notebook.png';
 import leftIcon from '../assets/arrow-left.png';
 import rightIcon from '../assets/arrow-right.png';
-import ex1 from '../assets/ex1.jpg';
+
+
 
 const PreviewContainer = styled.div`
     margin-top: 40px;
@@ -277,8 +279,11 @@ interface ExhibitionCreatePreview {
     exhibitionData: ExhibitionData;
 }
 
+
+
 const ExhibitionCreatePreview: React.FC<ExhibitionCreatePreview> = (props) => {
     const { exhibitionData } = props;
+    const user = useAuthStore.getState().user;
 
     const [currentIdx, setCurrentIndex] = useState<number>(0);
 
@@ -362,8 +367,8 @@ const ExhibitionCreatePreview: React.FC<ExhibitionCreatePreview> = (props) => {
                     </ExhibitionPreviewImageInfoBox>
 
                     <ExhibitionWriterBox>
-                        <WriterProfileImage src={ex1} />
-                        <WriterNickname>닉네임</WriterNickname>
+                        <WriterProfileImage src={user.profileImage} />
+                        <WriterNickname>{user.nickname}</WriterNickname>
                     </ExhibitionWriterBox>
                 </ExhibitionPreviewFooter>
 

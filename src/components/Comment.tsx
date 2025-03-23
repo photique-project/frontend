@@ -1,11 +1,9 @@
 import { useState, useEffect, useRef } from 'react';
-import { API_BASE_URL } from '../config/environment';
-import ENDPOINTS from '../api/endpoints';
-
 import styled, { keyframes } from 'styled-components';
 
+import { FetchRequestOptions } from '../types/http';
+import ENDPOINTS from '../api/endpoints';
 import useAuthStore from '../zustand/store';
-
 import useFetch from '../hooks/useFetch';
 
 import ToastMessage from './ToastMessage';
@@ -15,6 +13,8 @@ import pencilIcon from '../assets/pencil.png'
 import trashIcon from '../assets/trash-red.png';
 import alertIcon from '../assets/alert.png';
 import loadingIcon from '../assets/loading-large.png';
+
+
 
 const Container = styled.div`
     width: 100%;
@@ -270,16 +270,7 @@ const LoadingIcon = styled.img`
     animation: ${rotate} 1.2s ease-in-out infinite;
 `
 
-type Method = 'GET' | 'POST' | 'PATCH' | 'DELETE';
 
-interface FetchRequestOptions {
-    url: string;
-    method: Method
-    headers?: Record<string, string>;
-    credentials: 'include' | 'same-origin';
-    contentType: 'application/json' | 'multipart/form-data';
-    body?: Record<string, any> | FormData | null;
-}
 
 interface Writer {
     id: number;
@@ -301,8 +292,11 @@ interface CommentProps {
     handleCommentupdateMode: (input?: string, commentId?: number) => void;
 }
 
+
+
 const Comment: React.FC<CommentProps> = (props) => {
     const { data, singleWorkId, handleCommentPageRequest, handleCommentupdateMode } = props;
+    const user = useAuthStore.getState().user;
 
     // 토스트 메시지 
     const [toastMessageDisplay, setToastMessageDisplay] = useState<boolean>(false);
@@ -348,13 +342,16 @@ const Comment: React.FC<CommentProps> = (props) => {
     } = useFetch<void>();
 
     const handleDeleteComment = () => {
+        const method = ENDPOINTS.SINGLE_WORK.REMOVE_COMMENT.METHOD;
+        const url = ENDPOINTS.SINGLE_WORK.REMOVE_COMMENT.URL;
+
         const body = {
-            writerId: useAuthStore.getState().userId,
+            writerId: user.id,
         }
 
         const options: FetchRequestOptions = {
-            url: `${API_BASE_URL}${ENDPOINTS.SINGLE_WORK.SEARCH}/${singleWorkId}${ENDPOINTS.SINGLE_WORK.COMMENT}/${data.id}`,
-            method: 'DELETE',
+            url: url(singleWorkId, data.id),
+            method: method,
             headers: {
                 'Content-Type': 'application/json',
             },

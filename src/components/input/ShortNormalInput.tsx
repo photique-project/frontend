@@ -1,7 +1,9 @@
 import styled from 'styled-components';
 
+
+
 const Container = styled.div<{ marginTop: number }>`
-    width: 300px;
+    width: 100%;
     height: 50px;
     margin-top: ${({ marginTop }) => `${marginTop}px`};
     display: flex;
@@ -16,7 +18,7 @@ const Container = styled.div<{ marginTop: number }>`
 `;
 
 const Input = styled.input`
-    width: 275px;
+    width: calc(100% - 24px);
     height: 47px;
     padding-left: 12px;
     padding-right: 12px;
@@ -44,6 +46,8 @@ const Input = styled.input`
     }
 `;
 
+
+
 interface ShortNormalInputProps {
     placeHolder: string;
     marginTop: number;
@@ -51,6 +55,8 @@ interface ShortNormalInputProps {
     handleChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
     inputDisabled: boolean;
 }
+
+
 
 const ShortNormalInput: React.FC<ShortNormalInputProps> = (props) => {
     const { placeHolder, marginTop, text, handleChange, inputDisabled } = props;

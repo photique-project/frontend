@@ -1,14 +1,14 @@
 import { useState, useEffect } from 'react';
 import { format } from "date-fns";
 import { useNavigate, useLocation } from 'react-router-dom';
-import { API_BASE_URL } from '../config/environment';
 import styled, { keyframes } from 'styled-components';
 import DatePicker from "react-datepicker";
-import ENDPOINTS from '../api/endpoints';
-import useAuthStore from '../zustand/store';
 import { parse } from 'date-fns';
 import "react-datepicker/dist/react-datepicker.css";
 
+import { FetchRequestOptions } from '../types/http';
+import ENDPOINTS from '../api/endpoints';
+import useAuthStore from '../zustand/store';
 import useFetch from '../hooks/useFetch';
 
 import ToastMessage from '../components/ToastMessage';
@@ -31,7 +31,6 @@ import calendarIcon from '../assets/input-calendar.png';
 import tagIcon from '../assets/input-tag.png';
 import categoryIcon from '../assets/category.png';
 import loadingIcon from '../assets/loading-large.png';
-
 
 
 
@@ -542,17 +541,6 @@ interface SingleWork {
     description: string;
 }
 
-type Method = 'GET' | 'POST' | 'PATCH' | 'DELETE';
-
-interface FetchRequestOptions {
-    url: string;
-    method: Method
-    headers?: Record<string, string>;
-    credentials: 'include' | 'same-origin';
-    contentType: 'application/json' | 'multipart/form-data';
-    body?: Record<string, any> | FormData | null;
-}
-
 const SingleWorkUpdate = () => {
     const apertureOptions = ["미입력", "f/0.7", "f/0.8", "f/0.85", "f/0.95", "f/1", "f/1.2", "f/1.4", "f/1.8", "f/2", "f/2.8", "f/3.2", "f/3.5", "f/4", "f/4.5", "f/5", "f/5.6", "f/6.3", "f/7.1", "f/8", "f/9", "f/10", "f/11", "f/13", "f/14", "f/16", "f/22", "f/32", "f/40", "f/45", "f/64"];
     const shutterSpeedOptions = ["미입력", "1/8000", "1/4000", "1/2000", "1/1000", "1/500", "1/250", "1/125", "1/60", "1/30", "1/15", "1/8", "1/4", "1/2", "1", "2", "4", "8", "15", "30"];
@@ -983,9 +971,12 @@ const SingleWorkUpdate = () => {
         formData.append('title', singleWork.title.trim());
         formData.append('description', singleWork.description.trim());
 
+        const method = ENDPOINTS.SINGLE_WORK.UPDATE.METHOD;
+        const url = ENDPOINTS.SINGLE_WORK.UPDATE.URL;
+
         const options: FetchRequestOptions = {
-            url: `${API_BASE_URL}${ENDPOINTS.SINGLE_WORK.SEARCH}/${singleWork.id}`,
-            method: 'PATCH',
+            url: url(singleWork.id),
+            method: method,
             credentials: 'include',
             contentType: 'multipart/form-data',
             body: formData

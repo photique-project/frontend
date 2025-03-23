@@ -1,5 +1,6 @@
 import styled from 'styled-components';
 
+
 const Container = styled.div`
     width: 500px;
     height: 250px;
@@ -27,7 +28,7 @@ const Container = styled.div`
 `;
 
 const IconBox = styled.div`
-  width: 100%;  
+    width: 100%;  
 `;
 
 const Icon = styled.img`
@@ -80,11 +81,15 @@ const SubText = styled.div`
     }
 `;
 
+
+
 interface IntroCardProps {
     icon: string;
     mainText: string;
     subText: React.ReactNode;
 }
+
+
 
 const IntroCard: React.FC<IntroCardProps> = (props) => {
     const { icon, mainText, subText } = props;

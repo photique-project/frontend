@@ -1,12 +1,12 @@
-import { API_BASE_URL, API_PREFIX } from '../config/environment';
-import { useEffect, useState, useRef } from 'react';
+import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import styled from 'styled-components';
 
+import { FetchRequestOptions } from '../types/http';
 import useAuthStore from '../zustand/store';
 import useFetch from '../hooks/useFetch';
 import ENDPOINTS from '../api/endpoints';
 
-import styled from 'styled-components';
 import LoginModal from '../components/LoginModal';
 import UserDetailsPanel from './UserDetailsPanel';
 import ShortButton from './button/ShortButton';
@@ -194,26 +194,17 @@ const NotificationIcon = styled.img`
     }
 `
 
-type Method = 'GET' | 'POST' | 'PATCH' | 'DELETE';
 
-interface FetchRequestOptions {
-    url: string;
-    method: Method
-    headers?: Record<string, string>;
-    credentials: 'include' | 'same-origin';
-    contentType: 'application/json' | 'multipart/form-data';
-    body?: Record<string, any> | FormData | null;
-}
 
 interface HeaderProps {
     display?: 'none' | 'flex'
 }
 
+
+
 const Header: React.FC<HeaderProps> = (props) => {
     const { display = 'flex' } = props;
     const navigate = useNavigate();
-
-    const userDetailsPanelRef = useRef<HTMLDivElement | null>(null);
 
     const [isMenuOpen, setIsMenuOpen] = useState<boolean>(false);
     const [loginModalDisplay, setLoginModalDisplay] = useState<boolean>(false);
@@ -253,8 +244,7 @@ const Header: React.FC<HeaderProps> = (props) => {
 
     useEffect(function requestNotificationService() {
         function connectSSE() {
-            const eventSource = new EventSource(`${API_BASE_URL}${ENDPOINTS.USER.DEFAULT}/${userDetails.id}${ENDPOINTS.NOTIFICATION.CONNECTION}`);
-
+            const eventSource = new EventSource(ENDPOINTS.NOTIFICATION.CONNECTION(userDetails.id));
 
             eventSource.onopen = function () {
                 console.log("notification subscribe is completed");
@@ -278,10 +268,6 @@ const Header: React.FC<HeaderProps> = (props) => {
             connectSSE();
         }
 
-        // 새로고침은 정적파일 자체를 다시 받아오고 전체를 마운트하는 것이므로 언마운트 코드 실행 X
-        return () => {
-
-        }
     }, [isLoggedIn]); // 로그인이 완료되면 알림 서비스를 위한 SSE 요청
 
 
@@ -314,16 +300,18 @@ const Header: React.FC<HeaderProps> = (props) => {
         setLoginModalDisplay(true);
     }
 
+    // TODO: 이후에 로그아웃 api호출을 authStore로 옮기기
     const handleLogout = () => {
-        const method: Method = 'POST'
-        const headers = {
-            'Content-Type': 'application/json',
-        }
+        const method = ENDPOINTS.AUTH.LOGOUT.METHOD;
+        const url = ENDPOINTS.AUTH.LOGOUT.URL;
+
 
         const options: FetchRequestOptions = {
-            url: `${API_BASE_URL}${ENDPOINTS.AUTH.LOGOUT}`,
+            url: url,
             method: method,
-            headers: headers,
+            headers: {
+                'Content-Type': 'application/json',
+            },
             credentials: 'include',
             contentType: 'application/json',
         }
@@ -375,6 +363,7 @@ const Header: React.FC<HeaderProps> = (props) => {
                                 follower={userDetails.follower}
                                 following={userDetails.following}
                                 handleDisplay={handleUserDetailsPanelDisplay}
+                                handleLogout={handleLogout}
                             />}
 
 
