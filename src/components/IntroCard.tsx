@@ -1,5 +1,6 @@
 import styled from 'styled-components';
 
+
 const Container = styled.div`
     width: 500px;
     height: 250px;
@@ -22,11 +23,12 @@ const Container = styled.div`
 
     @media (max-width: 480px) {
         width: 80%;
+        height: auto;
     }
 `;
 
 const IconBox = styled.div`
-  width: 100%;  
+    width: 100%;  
 `;
 
 const Icon = styled.img`
@@ -37,6 +39,7 @@ const Icon = styled.img`
         width: 40px;
         height: 40px;
     }
+
 `;
 
 const MainText = styled.div`
@@ -49,6 +52,11 @@ const MainText = styled.div`
         margin-top: 10px;
         font-size: 20px;
         line-height: 20px;
+    }
+
+    @media (max-width: 480px) {
+        font-size: 16px;
+        line-height: 17px;
     }
 `;
 
@@ -66,13 +74,22 @@ const SubText = styled.div`
         font-size: 16px;
         line-height: 24px;
     }
+
+    @media (max-width: 480px) {
+        font-size: 12px;
+        line-height: 18px;
+    }
 `;
+
+
 
 interface IntroCardProps {
     icon: string;
     mainText: string;
     subText: React.ReactNode;
 }
+
+
 
 const IntroCard: React.FC<IntroCardProps> = (props) => {
     const { icon, mainText, subText } = props;

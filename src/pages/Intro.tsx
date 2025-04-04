@@ -10,6 +10,8 @@ import exhibitionIcon from '../assets/exhibition.png';
 import personIcon from '../assets/person.png';
 import searchIcon from '../assets/search.png';
 
+
+
 const Container = styled.div`
     display: flex;
     flex-direction: column;
@@ -194,7 +196,7 @@ const ThirdIntroBoxMainText = styled.div`
 const ThirdIntroBoxSubText = styled.div`
     margin-top: 40px;
     margin-bottom: 100px;
-    width: 870px;
+    width: 80%;
 
     font-size: 20px;
     font-weight: 700;
@@ -204,14 +206,10 @@ const ThirdIntroBoxSubText = styled.div`
     color: rgba(0, 0, 0, 0.5);
 
     @media (max-width: 768px) {
-        width: 80%;
         font-size: 16px;
         line-height: 24px;
     }
 `;
-
-
-
 
 
 

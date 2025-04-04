@@ -1,5 +1,7 @@
 import styled from 'styled-components';
 
+
+
 const Button = styled.button<{ type: "white" | "black" | "none" }>`
     width: 90px;
     height: 40px;
@@ -33,11 +35,15 @@ const Button = styled.button<{ type: "white" | "black" | "none" }>`
     }
 `;
 
+
+
 interface ShortButtonProps {
     text: string;
     type: "white" | "black" | "none";
     action: () => void;
 }
+
+
 
 const ShortButton: React.FC<ShortButtonProps> = (props) => {
     const { text, type, action } = props;

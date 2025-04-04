@@ -1,12 +1,13 @@
 import { useState } from 'react';
+import styled from 'styled-components';
 
 import eyeIcon from '../../assets/eye.png';
 import eyeOffIcon from '../../assets/eye-off.png';
 
-import styled from 'styled-components';
+
 
 const Container = styled.div<{ marginTop: number }>`
-    width: 300px;
+    width: 100%;
     height: 50px;
     margin-top: ${({ marginTop }) => `${marginTop}px`};
 
@@ -25,7 +26,7 @@ const Container = styled.div<{ marginTop: number }>`
 `;
 
 const Input = styled.input`
-    width: 275px;
+    width: calc(100% - 24px);
     height: 47px;
     padding-left: 12px;
     padding-right: 12px;
@@ -64,6 +65,7 @@ const ViewIcon = styled.img`
 `;
 
 
+
 interface PasswordInputProps {
     placeHolder: string;
     marginTop: number
@@ -71,6 +73,8 @@ interface PasswordInputProps {
     handleChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
     inputDisabled: boolean;
 }
+
+
 
 const PasswordInput: React.FC<PasswordInputProps> = (props) => {
     const { placeHolder, marginTop, text, handleChange, inputDisabled } = props;

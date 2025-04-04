@@ -1,7 +1,10 @@
 import styled from 'styled-components';
+
 import mailIcon from '../assets/mail.png';
 import githubIcon from '../assets/github.png';
 import discordIcon from '../assets/discord.png';
+
+
 
 const Container = styled.footer`
     margin-top: 100px;
@@ -46,6 +49,8 @@ const FooterContentText = styled.div`
 
     color: white;
 `;
+
+
 
 const Footer = () => {
     return (

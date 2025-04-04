@@ -1,7 +1,9 @@
 import styled from 'styled-components';
 
+
+
 const Button = styled.button<{ type: "white" | "black" | "none", marginTop: number }>`
-    width: 300px;
+    width: 100%;
     height: 50px;
     margin-top: ${({ marginTop }) => `${marginTop}px`};
 
@@ -30,12 +32,16 @@ const Button = styled.button<{ type: "white" | "black" | "none", marginTop: numb
     }
 `;
 
+
+
 interface LongButtonProps {
     text: string;
     type: "white" | "black" | "none";
     marginTop: number;
     onClick: () => void;
 }
+
+
 
 const LongButton: React.FC<LongButtonProps> = (props) => {
     const { text, type, marginTop, onClick } = props;

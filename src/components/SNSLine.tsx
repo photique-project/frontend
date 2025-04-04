@@ -1,5 +1,7 @@
 import styled from 'styled-components';
 
+
+
 const Container = styled.div<{ marginTop: number }>`
     width: 350px;  
     margin-top: ${({ marginTop }) => `${marginTop}px`};
@@ -23,10 +25,14 @@ const Line = styled.div`
     background-color: rgba(0, 0, 0, 0.2);
 `;
 
+
+
 interface SNSLineProps {
     text: string;
     marginTop: number;
 }
+
+
 
 const SNSLine: React.FC<SNSLineProps> = (props) => {
     const { text, marginTop } = props;

@@ -1,13 +1,5 @@
 import { useState } from 'react';
-
-interface FetchRequestOptions {
-    url: string;
-    method: 'GET' | 'POST' | 'DELETE' | 'PATCH';
-    headers?: Record<string, string>;
-    credentials: 'include' | 'same-origin';
-    contentType: 'application/json' | 'multipart/form-data';
-    body?: Record<string, any> | FormData | null;
-}
+import { FetchRequestOptions } from '../types/http';
 
 interface UseFetchReturn<T> {
     loading: boolean;
@@ -49,8 +41,8 @@ const useFetch = <T = unknown>(): UseFetchReturn<T> => {
             setStatusCode(response.status);
 
             if (response.ok) {
-                const responseData: T | null = response.status === 200 ? await response.json() : null;
-                setData(responseData);
+                const responseData: { data: T } | null = response.status === 200 ? await response.json() : null;
+                setData(responseData.data);
 
             } else {
                 const error = await response.json();

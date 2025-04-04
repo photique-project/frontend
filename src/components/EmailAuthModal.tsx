@@ -1,15 +1,16 @@
 import { useState, useEffect, Dispatch, SetStateAction } from 'react';
-import { API_BASE_URL } from '../config/environment';
-import ENDPOINTS from '../api/endpoints';
 import styled, { keyframes } from 'styled-components';
 
-import HelperText from './HelperText';
+import { FetchRequestOptions } from '../types/http';
+import ENDPOINTS from '../api/endpoints';
+import useFetch from '../hooks/useFetch';
 
+import HelperText from './HelperText';
 import CheckInput from './input/CheckInput';
 
 import closeIcon from '../assets/close.png';
 import loadingIcon from '../assets/loading.png';
-import useFetch from '../hooks/useFetch';
+
 
 
 const Container = styled.div`
@@ -108,6 +109,23 @@ const CompleteButton = styled.button`
     }
 `;
 
+
+const rotate = keyframes`
+  from {
+      transform: rotate(0deg);
+    }
+    to {
+        transform: rotate(360deg);
+    }
+    `;
+
+const Loading = styled.img`
+    width: 20px;
+    animation: ${rotate} 1.2s ease-in-out infinite;
+`;
+
+
+
 interface EmailAuthModalProps {
     email: string,
     closeModal: () => void;
@@ -115,43 +133,18 @@ interface EmailAuthModalProps {
     setValidEmail: Dispatch<SetStateAction<boolean>>;
 }
 
-type Method = 'GET' | 'POST' | 'PATCH' | 'DELETE';
 
-interface FetchRequestOptions {
-    url: string;
-    method: 'GET' | 'POST' | 'DELETE' | 'PATCH';
-    headers: Record<string, string>;
-    credentials: 'include' | 'same-origin';
-    contentType: 'application/json' | 'multipart/form-data';
-    body?: Record<string, any> | FormData | null;
-}
-
-const rotate = keyframes`
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
-`;
-
-const Loading = styled.img`
-  width: 20px;
-  animation: ${rotate} 1.2s ease-in-out infinite;
-`;
 
 const EmailAuthModal: React.FC<EmailAuthModalProps> = (props) => {
     const {
         loading: authCodeLoading,
         statusCode: authCodeStatusCode,
-        data: authCodeData,
         fetchRequest: authCodeFetchRequest
     } = useFetch<void>();
 
     const {
         loading: resendLoading,
         statusCode: resendStatusCode,
-        data: resendData,
         fetchRequest: resendFetchRequest
     } = useFetch<void>();
 
@@ -184,10 +177,8 @@ const EmailAuthModal: React.FC<EmailAuthModalProps> = (props) => {
             return;
         }
 
-        const method: Method = 'POST'
-        const headers = {
-            'Content-Type': 'application/json',
-        }
+        const method = ENDPOINTS.AUTH.VALIDATE_CODE.METHOD;
+        const url = ENDPOINTS.AUTH.VALIDATE_CODE.URL;
 
         const requestBody = {
             email: email,
@@ -195,9 +186,11 @@ const EmailAuthModal: React.FC<EmailAuthModalProps> = (props) => {
         }
 
         const options: FetchRequestOptions = {
-            url: `${API_BASE_URL}${ENDPOINTS.AUTH.VALIDATE_CODE}`,
+            url: url,
             method: method,
-            headers: headers,
+            headers: {
+                'Content-Type': 'application/json',
+            },
             credentials: 'include',
             contentType: 'application/json',
             body: requestBody
@@ -265,10 +258,8 @@ const EmailAuthModal: React.FC<EmailAuthModalProps> = (props) => {
     }, [helperTextColor])
 
     const handleResend = async () => {
-        const method: Method = 'POST'
-        const headers = {
-            'Content-Type': 'application/json',
-        }
+        const method = ENDPOINTS.AUTH.SEND_JOIN_MAIL.METHOD;
+        const url = ENDPOINTS.AUTH.SEND_JOIN_MAIL.URL;
 
         const requestBody = {
             email: email,
@@ -276,9 +267,11 @@ const EmailAuthModal: React.FC<EmailAuthModalProps> = (props) => {
         }
 
         const options: FetchRequestOptions = {
-            url: `${API_BASE_URL}${ENDPOINTS.AUTH.SEND_MAIL}`,
+            url: url,
             method: method,
-            headers: headers,
+            headers: {
+                'Content-Type': 'application/json',
+            },
             credentials: 'include',
             contentType: 'application/json',
             body: requestBody

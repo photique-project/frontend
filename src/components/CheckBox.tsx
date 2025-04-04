@@ -1,7 +1,9 @@
 import styled from 'styled-components';
 
+
+
 const Container = styled.div<{ marginTop: number }>`
-    width: 300px;
+    width: 100%;
     margin-top: ${({ marginTop }) => `${marginTop}px`};
 
     display: flex;
@@ -26,6 +28,7 @@ const Label = styled.label`
 const Box = styled.input`
     
 `;
+
 
 interface CheckBoxProps {
     text: string;

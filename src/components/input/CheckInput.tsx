@@ -1,6 +1,8 @@
 import { Dispatch, SetStateAction } from 'react';
 import styled, { keyframes } from 'styled-components';
+
 import loadingIcon from '../../assets/loading.png';
+
 
 
 const Container = styled.div<{ marginTop: number }>`
@@ -93,6 +95,8 @@ const Loading = styled.img`
   animation: ${rotate} 1.2s ease-in-out infinite;
 `;
 
+
+
 interface CheckInputProps {
     placeHolder: string | number;
     marginTop: number;
@@ -103,6 +107,8 @@ interface CheckInputProps {
     loading: boolean;
     inputDisabled: boolean;
 }
+
+
 
 const CheckInput: React.FC<CheckInputProps> = (props) => {
     const { placeHolder, marginTop, action, text, handleChange, setValidText, loading, inputDisabled } = props;

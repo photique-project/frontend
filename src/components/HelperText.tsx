@@ -1,5 +1,7 @@
 import styled from 'styled-components';
 
+
+
 const Container = styled.div<{ visibility: 'visible' | 'hidden', color: 'red' | 'blue' | 'green' }>`
     margin-top: 5px;
     width: 100%;
@@ -13,11 +15,15 @@ const Container = styled.div<{ visibility: 'visible' | 'hidden', color: 'red' | 
     visibility: ${({ visibility }) => visibility};
 `;
 
+
+
 interface HelperTextProps {
     text: string;
     visibility: 'visible' | 'hidden';
     color: 'red' | 'blue' | 'green';
 }
+
+
 
 const HelperText: React.FC<HelperTextProps> = (props) => {
     const { text, visibility, color } = props;

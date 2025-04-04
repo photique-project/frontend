@@ -5,7 +5,7 @@ import Header from '../components/Header';
 import CheckInput from '../components/input/CheckInput';
 import EmailAuthModal from '../components/EmailAuthModal';
 import PasswordInput from '../components/input/PasswordInput';
-import LongButton from '../components/LongButton';
+import LongButton from '../components/button/LongButton';
 import useFetch from '../hooks/useFetch';
 
 const Container = styled.div`
