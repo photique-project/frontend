@@ -31,8 +31,8 @@ import rightBlackIcon from '../assets/right-black.png';
 import trashIcon from '../assets/trash-red.png';
 import alertIcon from '../assets/alert.png';
 import loadingIcon from '../assets/loading-large.png';
-import { END } from 'redux-saga';
-import { RuleTester } from 'eslint';
+
+
 
 const Image = styled.img`
     height: 100%;
@@ -1104,10 +1104,11 @@ const Exhibition = () => {
 
     const handleExhibitionDataRequest = () => {
         const method = ENDPOINTS.EXHIBITION.GET_DETAILS.METHOD;
-        const url = ENDPOINTS.EXHIBITION.GET_DETAILS.URL;
+        const url = ENDPOINTS.EXHIBITION.GET_DETAILS.URL(exhibitionId, user.id ? user.id : 0);
+
 
         const options: FetchRequestOptions = {
-            url: `${url(exhibition.id, user.id ? user.id : 0)}`,
+            url: url,
             method: method,
             headers: {
                 'Content-Type': 'application/json',
@@ -1197,11 +1198,11 @@ const Exhibition = () => {
     }
 
     function connectStomp() {
-        const sock = new SockJS(`${ENDPOINTS.CHAT.CONNECTION.URL}`);
+        const sock = new SockJS(ENDPOINTS.CHAT.CONNECTION.URL);
         const stomp = Stomp.over(sock);
 
         stomp.onConnect = () => {
-            stomp.subscribe(`${ENDPOINTS.CHAT.SUB(exhibition.id)}`,
+            stomp.subscribe(`${ENDPOINTS.CHAT.SUB(parseInt(exhibitionId))}`,
                 (message) => {
                     const newMessage = JSON.parse(message.body);
                     handleMessage(newMessage)
@@ -1259,7 +1260,7 @@ const Exhibition = () => {
         };
 
         stompWs.publish({
-            destination: `${ENDPOINTS.CHAT.PUB(exhibition.id)}`,
+            destination: `${ENDPOINTS.CHAT.PUB(parseInt(exhibitionId))}`,
             body: JSON.stringify(body)
         });
 
@@ -1289,7 +1290,7 @@ const Exhibition = () => {
         }
 
         const options: FetchRequestOptions = {
-            url: `${ENDPOINTS.EXHIBITION.LIKE.URL}`,
+            url: ENDPOINTS.EXHIBITION.LIKE.URL(parseInt(exhibitionId)),
             method: method,
             headers: {
                 'Content-Type': 'application/json',
@@ -1406,7 +1407,7 @@ const Exhibition = () => {
         }
 
         const options: FetchRequestOptions = {
-            url: `${ENDPOINTS.EXHIBITION.BOOKMARK.URL}`,
+            url: ENDPOINTS.EXHIBITION.BOOKMARK.URL(parseInt(exhibitionId)),
             method: method,
             headers: {
                 'Content-Type': 'application/json',
@@ -1511,10 +1512,10 @@ const Exhibition = () => {
 
     const handleCommentPageRequest = (page = 0) => {
         const method = ENDPOINTS.EXHIBITION.GET_COMMENT_PAGE.METHOD;
-        const url = ENDPOINTS.EXHIBITION.GET_COMMENT_PAGE.URL;
+        const url = ENDPOINTS.EXHIBITION.GET_COMMENT_PAGE.URL(exhibitionId, 'createdAt,desc', page, 5);
 
         const options: FetchRequestOptions = {
-            url: `${url(exhibition.id, 'createdAt,desc', page, 5)}`,
+            url: url,
             method: method,
             headers: {
                 'Content-Type': 'application/json',

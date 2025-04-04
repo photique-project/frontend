@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
 
@@ -154,7 +154,7 @@ const MenuButton = styled.div`
 
 const UserProfileImageBox = styled.div`
     width: 50px;
-    height: 40px;
+    height: 50px;
 
     display: flex;
     flex-direction: row;
@@ -183,17 +183,77 @@ const UserProfileImage = styled.img`
     }
 `
 
+const IconBox = styled.div`
+    width: 50px;
+    height: 50px;
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+
+    position: relative;
+
+    border-radius: 5px;
+    
+    cursor: pointer;
+
+    &:hover {
+        background-color: rgba(0, 0, 0, 0.07);
+    }
+`
+
 const NotificationIcon = styled.img`
     width: 32px;
     height: 32px;
 
     transition: transform 0.2s ease-in-out; 
+`
 
-    &:hover {
-        transform: scale(1.1); 
+const MessageBox = styled.div`
+    padding: 10px;
+
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    white-space: nowrap;
+
+    border-radius: 10px;
+    color: white;
+
+    position: absolute;
+    top: 100%;
+    
+    font-size: 16px;
+    font-weight: 700;
+
+    background-color: rgba(0, 0, 0, 0.3);
+
+    animation: fadeInOut 3s ease-in-out forwards;
+
+    @keyframes fadeInOut {
+        0% {
+            opacity: 0;
+            transform: translateY(-10px);
+        }
+        10% {
+            opacity: 1;
+            transform: translateY(0);
+        }
+        90% {
+            opacity: 1;
+            transform: translateY(0);
+        }
+        100% {
+            opacity: 0;
+            transform: translateY(10px);
+        }
     }
 `
 
+interface CountUnread {
+    unreadCount: number;
+}
 
 
 interface HeaderProps {
@@ -205,11 +265,52 @@ interface HeaderProps {
 const Header: React.FC<HeaderProps> = (props) => {
     const { display = 'flex' } = props;
     const navigate = useNavigate();
+    const user = useAuthStore.getState().user;
 
     const [isMenuOpen, setIsMenuOpen] = useState<boolean>(false);
     const [loginModalDisplay, setLoginModalDisplay] = useState<boolean>(false);
     const [userDetailsPanelDisplay, setUserDetailsPanelDisplay] = useState<boolean>(false);
     const [eventSource, setEventSource] = useState<EventSource | null>(null);
+    const eventSourceRef = useRef<EventSource>(null);
+
+    // 읽지 않은 알림 개수
+    const [countUnreadNotifications, setCountUnreadNotification] = useState<number>(0);
+
+    // 알림 메시지
+    const [displayNotificationMessage, setDisplayNotificationMessage] = useState<boolean>();
+
+    const {
+        loading: countUnreadNotificationsLoading,
+        statusCode: countUnreadNotificationsStatusCode,
+        data: countUnreadNotificationsData,
+        fetchRequest: countUnreadNorificationsFetchRequest
+    } = useFetch<CountUnread>();
+
+    const handleCountUnreadNotificationsRequest = () => {
+        const method = ENDPOINTS.NOTIFICATION.COUNT_UNREAD.METHOD;
+        const url = ENDPOINTS.NOTIFICATION.COUNT_UNREAD.URL(user.id);
+
+        const options: FetchRequestOptions = {
+            url: url,
+            method: method,
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            credentials: 'include',
+            contentType: 'application/json',
+        }
+
+        countUnreadNorificationsFetchRequest(options);
+    }
+
+    useEffect(function handleCountUnreadNotificationsResponse() {
+        if (countUnreadNotificationsStatusCode === 200 && countUnreadNotificationsData) {
+            setCountUnreadNotification(countUnreadNotificationsData.unreadCount);
+            return;
+        }
+
+    }, [countUnreadNotificationsStatusCode, countUnreadNotificationsData]);
+
 
     const {
         loading: logoutLoading,
@@ -220,12 +321,16 @@ const Header: React.FC<HeaderProps> = (props) => {
     const isLoggedIn = useAuthStore.getState().isLoggedIn;
     const isComplete = useAuthStore.getState().isComplete;
     const userDetails = useAuthStore.getState().user;
-    const login = useAuthStore.getState().login;
     const logout = useAuthStore.getState().logout;
 
-    // 유저아이디있다면 유저데이터 요청먼저 보내고 응답에따라서 로그아웃 처리
-    useEffect(function isLoggedIn() {
-        login();
+    useEffect(function cleanUp() {
+        return () => {
+
+            if (eventSourceRef.current) {
+                console.log('클린업')
+                eventSourceRef.current.close();
+            }
+        };
     }, [])
 
     useEffect(function checkAuth() {
@@ -240,18 +345,23 @@ const Header: React.FC<HeaderProps> = (props) => {
         }
 
         logout();
-    }, [isComplete]) // 인증요청 완료됐을 때 해당 요청 실행
+    }, [isComplete]) // 인증요청 완료됐을 때 해당 이펙트 실행
 
     useEffect(function requestNotificationService() {
         function connectSSE() {
             const eventSource = new EventSource(ENDPOINTS.NOTIFICATION.CONNECTION(userDetails.id));
 
-            eventSource.onopen = function () {
-                console.log("notification subscribe is completed");
-            };
+            eventSource.onopen = function () { };
 
             eventSource.onmessage = function (event) {
-                console.log(event.data);
+                if (event.data === 'new') {
+                    handleCountUnreadNotificationsRequest();
+                    setDisplayNotificationMessage(true);
+
+                    setTimeout(() => {
+                        setDisplayNotificationMessage(false);
+                    }, 3000);
+                }
             };
 
             eventSource.onerror = function (event) {
@@ -260,12 +370,14 @@ const Header: React.FC<HeaderProps> = (props) => {
                 setTimeout(connectSSE, 1000); // 1초 후 재연결
             }
 
+            eventSourceRef.current = eventSource;
             setEventSource(eventSource)
 
         }
 
         if (isLoggedIn) {
             connectSSE();
+            handleCountUnreadNotificationsRequest();
         }
 
     }, [isLoggedIn]); // 로그인이 완료되면 알림 서비스를 위한 SSE 요청
@@ -285,6 +397,10 @@ const Header: React.FC<HeaderProps> = (props) => {
         navigate('/home');
     };
 
+    const navigateToNotificationPage = () => {
+        navigate('/notification');
+    };
+
     const openMenu = () => {
         setIsMenuOpen((prev) => !prev);
     };
@@ -292,7 +408,6 @@ const Header: React.FC<HeaderProps> = (props) => {
     const showLoginModal = () => {
         if (loginModalDisplay) {
             setLoginModalDisplay(false);
-            window.location.reload();
 
             return;
         }
@@ -371,9 +486,13 @@ const Header: React.FC<HeaderProps> = (props) => {
                         </UserProfileImageBox>
                     }
                     {isLoggedIn &&
-                        <UserProfileImageBox>
-                            <NotificationIcon src={bellIcon} alt='알림' />
-                        </UserProfileImageBox>
+                        <IconBox onClick={navigateToNotificationPage}>
+                            <NotificationIcon src={countUnreadNotifications > 0 ? bellDotIcon : bellIcon} alt='알림' />
+                            {displayNotificationMessage &&
+                                <MessageBox>
+                                    새 알림 도착
+                                </MessageBox>}
+                        </IconBox>
                     }
                     <ShortButton text="About" type="none" action={navigateToIntroPage}></ShortButton>
                 </HeaderButtonBox>

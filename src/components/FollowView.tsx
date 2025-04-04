@@ -1,11 +1,15 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import styled, { keyframes } from "styled-components";
 
+import useFetch from '../hooks/useFetch';
 import useAuthStore from "../zustand/store";
+import ENDPOINTS from '../api/endpoints';
+import { FetchRequestOptions } from '../types/http';
 
 import SearchUserCard from "./SearchUserCard";
 
 import seachIcon from '../assets/search-white.png';
+import loadingIcon from '../assets/loading-large.png';
 
 
 
@@ -153,17 +157,43 @@ const UserListBox = styled.div`
 
     display: flex;
     flex-direction: column;
+    position: relative;
 
     background-color: white;
 
     box-shadow: 0 2px 4px -1px rgba(0, 0, 0, 0.25);
 `
 
+const LoadingBox = styled.div`
+    width: 100%;
+    aspect-ratio: 1/1;
+
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+`
+
+const rotate = keyframes`
+    from {
+        transform: rotate(0deg);
+    }
+    to {
+        transform: rotate(360deg);
+    }
+`;
+
+const LoadingIcon = styled.img`
+    width: 50px;
+    height: 50px;
+
+    animation: ${rotate} 1.2s ease-in-out infinite;
+`
 
 
 type SearchOptionType = 'all' | 'follower' | 'following';
 
-interface SearchUser {
+interface SearchUserData {
     id: number;
     nickname: string;
     introduction: string;
@@ -171,22 +201,76 @@ interface SearchUser {
     isFollowing: boolean;
 }
 
+interface SearchUserDataPage {
+    content: SearchUserData[];
+    pageable: {
+        pageNumber: number;
+    }
+    last: boolean;
+}
+
 
 
 const FollowView = () => {
     const [selectedSearchOption, setSelectedSearchOption] = useState<SearchOptionType>('all');
+    const [searchUsers, setSearchUsers] = useState<SearchUserData[]>([]);
+    const user = useAuthStore.getState().user;
+
+    // 닉네임 검색
+    const [nicknameInput, setNicknameInput] = useState<string>('');
+
+    const handleNicknameInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const input = e.target.value.substring(0, 11);
+        setNicknameInput(input);
+    }
 
     const handleSelectedSearchOption = (searchOption: SearchOptionType) => {
         setSelectedSearchOption(searchOption);
     }
 
-    const temp: SearchUser = {
-        id: useAuthStore.getState().user.id,
-        nickname: useAuthStore.getState().user.nickname,
-        introduction: useAuthStore.getState().user.introduction,
-        profileImage: useAuthStore.getState().user.profileImage,
-        isFollowing: false,
+    useEffect(function handleSearchUserDataPageRequest() {
+        handleSearchUserDatePageRequest();
+    }, [selectedSearchOption])
+
+    // 유저검색
+    const {
+        loading: searchUserDataPageLoading,
+        statusCode: searchUserDataPageStatusCode,
+        data: searchUserDataPage,
+        fetchRequest: searchUserDataPageRequest
+    } = useFetch<SearchUserDataPage>();
+
+    const handleSearchUserDatePageRequest = async (page: number = 0) => {
+        const method = ENDPOINTS.USER.SEARCH.METHOD;
+        const url = selectedSearchOption === 'all' ? ENDPOINTS.USER.SEARCH.URL(nicknameInput, `createdAt,desc`, page, 1000000, user.id ? user.id : 0) : selectedSearchOption === 'follower' ? ENDPOINTS.USER.GET_FOLLOWERS.URL(user.id) : ENDPOINTS.USER.GET_FOLLOWINGS.URL(user.id);
+
+        const options: FetchRequestOptions = {
+            url: url,
+            method: method,
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            credentials: 'include',
+            contentType: 'application/json',
+        }
+
+        await searchUserDataPageRequest(options);
     }
+
+    useEffect(function handleSearchUserDataPageResponse() {
+        if (searchUserDataPageStatusCode == 200 && searchUserDataPage) {
+            setSearchUsers(searchUserDataPage.content)
+            return;
+        }
+
+        if (searchUserDataPageStatusCode == 404) {
+            setSearchUsers([]);
+            return;
+        }
+
+    }, [searchUserDataPageStatusCode, searchUserDataPage]);
+
+
 
     return (
         <Container>
@@ -197,11 +281,15 @@ const FollowView = () => {
                 <UserSearchBox>
                     <UserSearchInputBox>
                         <SearchIcon src={seachIcon} />
-                        <SearchInput placeholder="닉네임 검색" />
+                        <SearchInput
+                            placeholder="닉네임 검색"
+                            value={nicknameInput}
+                            onChange={handleNicknameInputChange}
+                        />
 
                     </UserSearchInputBox>
 
-                    <SearchButton>검색</SearchButton>
+                    <SearchButton onClick={() => handleSearchUserDatePageRequest()}>검색</SearchButton>
                 </UserSearchBox>
 
 
@@ -232,11 +320,49 @@ const FollowView = () => {
             </FollowViewHeader>
 
             <UserListBox>
+                {/* 전체일 때 */}
+                {!searchUserDataPageLoading && searchUserDataPageStatusCode !== 404 && searchUserDataPage &&
+                    <>
+                        {selectedSearchOption === 'all' &&
+                            searchUsers.map((searchUser, index) => (
+                                <SearchUserCard
+                                    key={searchUser.id}
+                                    searchUser={searchUser}
+                                />
+                            ))
+                        }
+                        {/* 내 팔로워 */}
+                        {selectedSearchOption === 'follower' &&
+                            searchUsers.map((searchUser, index) => (
+                                <SearchUserCard
+                                    key={searchUser.id}
+                                    searchUser={searchUser}
+                                />
+                            ))
+                        }
+                        {/* 내 팔로잉 */}
+                        {selectedSearchOption === 'following' &&
+                            searchUsers.map((searchUser, index) => (
+                                <SearchUserCard
+                                    key={searchUser.id}
+                                    searchUser={searchUser}
+                                />
+                            ))
+                        }
+                    </>
+                }
 
-                <SearchUserCard searchUser={
-                    temp
-                } />
-
+                {/* Not Found처리랑 로딩 처리할 차례 */}
+                {searchUserDataPageLoading &&
+                    <LoadingBox>
+                        <LoadingIcon src={loadingIcon} />
+                    </LoadingBox>
+                }
+                {!searchUserDataPageLoading && searchUserDataPageStatusCode === 404 &&
+                    <LoadingBox>
+                        검색결과가 없습니다
+                    </LoadingBox>
+                }
             </UserListBox>
 
         </Container>

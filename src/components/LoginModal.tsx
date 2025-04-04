@@ -182,7 +182,7 @@ const LoginModal: React.FC<LoginModalProps> = (props) => {
             if (loginStatusCode === 201) {
                 setHelperTextVisibility('hidden');
                 const login = useAuthStore.getState().login;
-                await login(); // 로그인요청으로 받은 토큰으로 유저아이디 값을 전역 저장소에 세팅
+                await login(); // 로그인 요청으로 받은 토큰으로 유저아이디 값을 전역 저장소에 세팅
                 closeModal();
                 return;
             }

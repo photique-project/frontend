@@ -18,6 +18,9 @@ import userWhiteIcon from '../assets/user-w.png';
 import settingsWhiteIcon from '../assets/settings-w.png';
 import likeImageWhiteIcon from '../assets/like-w.png';
 import FollowView from '../components/FollowView';
+import BookmarkView from '../components/BookmarkView';
+import LikeView from '../components/LikeView';
+import MyPostView from '../components/MyPostView';
 
 const Container = styled.div`
     display: flex;
@@ -272,6 +275,15 @@ const MyPage = () => {
                     }
                     {selectedMenu === 'follow' &&
                         <FollowView />
+                    }
+                    {selectedMenu === 'bookmark' &&
+                        <BookmarkView />
+                    }
+                    {selectedMenu === 'like' &&
+                        <LikeView />
+                    }
+                    {selectedMenu === 'my' &&
+                        <MyPostView />
                     }
 
                 </MainBox>

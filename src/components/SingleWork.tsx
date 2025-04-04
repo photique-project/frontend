@@ -10,8 +10,6 @@ import ToastMessage from './ToastMessage';
 import Comment from './Comment';
 
 import closeIcon from '../assets/white-close.png';
-import leftIcon from '../assets/arrow-left.png';
-import rightIcon from '../assets/arrow-right.png';
 import viewIcon from '../assets/view.png';
 import menuIcon from '../assets/dot-menu.png';
 import clockIcon from '../assets/clock.png';
@@ -42,6 +40,8 @@ const Container = styled.div`
     flex-direction: row;
 
     position:fixed;
+    left: 0;
+    top: 0;
 
     background-color: rgba(0, 0, 0, 0.7);
 
@@ -89,6 +89,7 @@ const BodyBox = styled.div`
 
 const SideBarBox = styled.div`
     padding: 40px;  
+    width: 50px;
 
     display: flex;
     flex-direction: column;
@@ -100,17 +101,6 @@ const SideBarBox = styled.div`
         display: none;
     }
 `;
-
-const MoveIcon = styled.img`
-    width: 50px;
-    height: 50px;
-
-    cursor: pointer;
-
-    @media (max-width: 768px) {
-        display: none;
-    }
-`
 
 const MainBox = styled.div`
     width: calc(100% - 80px);
@@ -475,13 +465,13 @@ const FollowButton = styled.button<{ isFollowing: boolean }>`
 
     position: relative;
 
-    background-color: ${({ isFollowing }) => isFollowing ? "black" : "white"};
-    color: ${({ isFollowing }) => isFollowing ? "white" : "black"};
+    background-color: ${({ isFollowing }) => isFollowing ? "white" : "black"};
+    color: ${({ isFollowing }) => isFollowing ? "black" : "white"};
     border: none;
     border-radius: 5px;
 
     &:hover {
-        background-color: ${({ isFollowing }) => isFollowing ? "rgba(0, 0, 0, 0.7)" : "rgba(0, 0, 0, 0.1)"};
+        background-color: ${({ isFollowing }) => isFollowing ? "rgba(0, 0, 0, 0.1)" : "rgba(0, 0, 0, 0.7)"};
     }
 
     @media (max-width: 768px) {
@@ -1496,7 +1486,7 @@ const SingleWork: React.FC<SingleWorkProps> = (props) => {
         const url = ENDPOINTS.SINGLE_WORK.GET_COMMENT_PAGE.URL;
 
         const options: FetchRequestOptions = {
-            url: url(singleWork.id, 'createdAt,desc', page, 5),
+            url: url(singleWorkId, 'createdAt,desc', page, 5),
             method: method,
             headers: {
                 'Content-Type': 'application/json',
@@ -1644,7 +1634,7 @@ const SingleWork: React.FC<SingleWorkProps> = (props) => {
         const url = ENDPOINTS.SINGLE_WORK.GET_DETAILS.URL;
 
         const options: FetchRequestOptions = {
-            url: url(singleWork.id, user.id ? user.id : 0),
+            url: url(singleWorkId, user.id ? user.id : 0),
             method: method,
             headers: {
                 'Content-Type': 'application/json',
@@ -2061,9 +2051,8 @@ const SingleWork: React.FC<SingleWorkProps> = (props) => {
 
 
             <BodyBox>
-                <SideBarBox>
-                    <MoveIcon src={leftIcon} />
-                </SideBarBox>
+                <SideBarBox />
+
 
                 {!singleWorkLoading && singleWork && <>
                     <MainBox>
@@ -2349,12 +2338,11 @@ const SingleWork: React.FC<SingleWorkProps> = (props) => {
 
 
                     </MainBox>
+
+                    <SideBarBox />
                 </>
                 }
 
-                <SideBarBox>
-                    <MoveIcon src={rightIcon} />
-                </SideBarBox>
             </BodyBox>
 
 

@@ -43,6 +43,8 @@ interface Endpoints {
         UPDATE_COMMENT: REST_API;
         REMOVE_COMMENT: REST_API;
         GET_COMMENT_PAGE: REST_API;
+        GET_LIKE: REST_API;
+        GET_MINE: REST_API;
     };
 
     EXHIBITION: {
@@ -54,10 +56,13 @@ interface Endpoints {
         UNLIKE: REST_API;
         BOOKMARK: REST_API;
         UNBOOKMARK: REST_API;
+        GET_BOOKMARK: REST_API;
         WRITE_COMMENT: REST_API;
         UPDATE_COMMENT: REST_API;
         REMOVE_COMMENT: REST_API;
         GET_COMMENT_PAGE: REST_API;
+        GET_LIKE: REST_API;
+        GET_MINE: REST_API;
     }
 
     CHAT: {
@@ -72,21 +77,22 @@ interface Endpoints {
         REMOVE: REST_API;
         MARK: REST_API;
         MARK_ALL: REST_API;
+        COUNT_UNREAD: REST_API;
     };
 
 }
 
-// api version
+// API VERSION
 const PRERIX = '/api/v1';
 
-// domain
+// DOMAIN
 const AUTH = `${API_BASE_URL}${PRERIX}/auth`;
 const USER = `${API_BASE_URL}${PRERIX}/users`;
 const SINGLE_WORK = `${API_BASE_URL}${PRERIX}/singleworks`;
 const EXHIBITION = `${API_BASE_URL}${PRERIX}/exhibitions`;
-const CHAT = `${API_BASE_URL}${PRERIX}/chats`;
+const CHAT = `${API_BASE_URL}${PRERIX}/chats/connection`;
 
-// endpoint
+// ENDPOINT
 const ENDPOINTS: Endpoints = {
     // auth API
     AUTH: {
@@ -141,21 +147,15 @@ const ENDPOINTS: Endpoints = {
         SEARCH: {
             METHOD: 'GET',
             URL: (keyword: string, sort: string, page: number, size: number, userId: number) =>
-                `${USER}?
-                keyword=${keyword}&
-                sort=${sort}&
-                page=${page}&
-                size=${size}&
-                userId=${userId}
-            `
+                `${USER}?keyword=${keyword}&sort=${sort}&page=${page}&size=${size}&userId=${userId}`
         },
         FOLLOW: {
             METHOD: 'POST',
-            URL: (id: number) => `${USER}/${id}/follow`
+            URL: (id: number) => `${USER}/${id}/follows`
         },
         UNFOLLOW: {
             METHOD: 'DELETE',
-            URL: (id: number) => `${USER}/${id}/follow`
+            URL: (id: number) => `${USER}/${id}/follows`
         },
         GET_FOLLOWERS: {
             METHOD: 'GET',
@@ -188,15 +188,7 @@ const ENDPOINTS: Endpoints = {
         SEARCH: {
             METHOD: 'GET',
             URL: (target: string, keywords: string, categories: string, sort: string, page: number, size: number, userId: number) =>
-                `${SINGLE_WORK}?
-                target=${target}&
-                keywords=${keywords}&
-                categories=${categories}&
-                sort=${sort}&
-                page=${page}&
-                size=${size}&
-                userId=${userId}
-            `
+                `${SINGLE_WORK}?target=${target}&keywords=${keywords}&categories=${categories}&sort=${sort}&page=${page}&size=${size}&userId=${userId}`
         },
         GET_POPULAR: {
             METHOD: 'GET',
@@ -226,6 +218,16 @@ const ENDPOINTS: Endpoints = {
             METHOD: 'GET',
             URL: (id: number, sort: string, page: number, size: number) => `${SINGLE_WORK}/${id}/comments?sort=${sort}&page=${page}&size=${size}`,
         },
+        GET_LIKE: {
+            METHOD: 'GET',
+            URL: (userId: number, sort: string, page: number, size: number) =>
+                `${SINGLE_WORK}/like?userId=${userId}&sort=${sort}&page=${page}&size=${size}`,
+        },
+        GET_MINE: {
+            METHOD: 'GET',
+            URL: (userId: number, sort: string, page: number, size: number) =>
+                `${SINGLE_WORK}/me?userId=${userId}&sort=${sort}&page=${page}&size=${size}`,
+        },
     },
 
     // exhibition API
@@ -245,14 +247,7 @@ const ENDPOINTS: Endpoints = {
         SEARCH: {
             METHOD: 'GET',
             URL: (target: string, keywords: string, sort: string, page: number, size: number, userId: number) =>
-                `${EXHIBITION}?
-                target=${target}&
-                keywords=${keywords}&
-                sort=${sort}&
-                page=${page}&
-                size=${size}&
-                userId=${userId}
-            `
+                `${EXHIBITION}?target=${target}&keywords=${keywords}&sort=${sort}&page=${page}&size=${size}&userId=${userId}`
         },
         LIKE: {
             METHOD: 'POST',
@@ -270,6 +265,11 @@ const ENDPOINTS: Endpoints = {
             METHOD: 'DELETE',
             URL: (id: number) => `${EXHIBITION}/${id}/bookmark`,
         },
+        GET_BOOKMARK: {
+            METHOD: 'GET',
+            URL: (userId: number, sort: string, page: number, size: number) =>
+                `${EXHIBITION}/bookmark?userId=${userId}&sort=${sort}&page=${page}&size=${size}`,
+        },
         WRITE_COMMENT: {
             METHOD: 'POST',
             URL: (id: number) => `${EXHIBITION}/${id}/comments`,
@@ -285,6 +285,16 @@ const ENDPOINTS: Endpoints = {
         GET_COMMENT_PAGE: {
             METHOD: 'GET',
             URL: (id: number, sort: string, page: number, size: number) => `${EXHIBITION}/${id}/comments?sort=${sort}&page=${page}&size=${size}`,
+        },
+        GET_LIKE: {
+            METHOD: 'GET',
+            URL: (userId: number, sort: string, page: number, size: number) =>
+                `${EXHIBITION}/like?userId=${userId}&sort=${sort}&page=${page}&size=${size}`,
+        },
+        GET_MINE: {
+            METHOD: 'GET',
+            URL: (userId: number, sort: string, page: number, size: number) =>
+                `${EXHIBITION}/me?userId=${userId}&sort=${sort}&page=${page}&size=${size}`,
         },
     },
 
@@ -303,7 +313,7 @@ const ENDPOINTS: Endpoints = {
         CONNECTION: (id: number) => `${USER}/${id}/notifications/subscribe`,
         GET_PAGE: {
             METHOD: 'GET',
-            URL: (id: number) => `${USER}/${id}/notifications`,
+            URL: (id: number, page: number, size: number) => `${USER}/${id}/notifications?page=${page}&size=${size}`,
         },
         REMOVE: {
             METHOD: 'DELETE',
@@ -316,7 +326,11 @@ const ENDPOINTS: Endpoints = {
         MARK_ALL: {
             METHOD: 'PATCH',
             URL: (id: number) => `${USER}/${id}/notifications`,
-        }
+        },
+        COUNT_UNREAD: {
+            METHOD: 'GET',
+            URL: (id: number) => `${USER}/${id}/notifications/unread`,
+        },
     },
 };
 

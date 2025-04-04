@@ -1,6 +1,9 @@
-import { useState } from "react";
-import styled, { keyframes } from "styled-components";
+import { useState, useEffect } from "react";
+import styled from "styled-components";
 
+import { FetchRequestOptions } from "../types/http";
+import ENDPOINTS from "../api/endpoints";
+import useFetch from "../hooks/useFetch";
 import useAuthStore from "../zustand/store";
 import SearchUserDetailsModal from "./SearchUserDetailsModal";
 
@@ -94,7 +97,7 @@ const OpenDetailsIcon = styled.img`
     height: 24px;
 `
 
-const FollowButton = styled.button`
+const FollowButton = styled.button<{ isFollowing: boolean }>`
     padding-left: 20px;
     padding-right: 20px;
 
@@ -107,14 +110,13 @@ const FollowButton = styled.button`
     font-size: 16px;
     font-weight: 700;
 
-    color: white;
-
     border: none;
     border-radius: 10px;
-    background-color: black;
+    background-color: ${({ isFollowing }) => isFollowing ? "white" : "black"};
+    color: ${({ isFollowing }) => isFollowing ? "black" : "white"};
 
     &:hover {
-        background-color: rgba(0, 0, 0, 0.5);
+        background-color: ${({ isFollowing }) => isFollowing ? "rgba(0, 0, 0, 0.1)" : "rgba(0, 0, 0, 0.7)"};
     }
 `
 
@@ -158,7 +160,14 @@ interface SearchUserCardProps {
 
 
 const SearchUserCard: React.FC<SearchUserCardProps> = (props) => {
-    const { searchUser } = props;
+    const [searchUser, setSearchUser] = useState<SearchUser>(props.searchUser);
+    const user = useAuthStore.getState().user;
+
+    // 외부에 전달할 때 index값이 바뀌지 않아서 이전 그대로 렌더링해버림
+    // 그래서 동기화 코드 삽입
+    useEffect(() => {
+        setSearchUser(props.searchUser);
+    }, [props.searchUser]);
 
     // 유저상세조회
     const [searchUserDetailsDisplay, setSearchUserDetailsDisplay] = useState<boolean>(false);
@@ -166,6 +175,114 @@ const SearchUserCard: React.FC<SearchUserCardProps> = (props) => {
     const handleSearchUserDetailsDisplay = () => {
         setSearchUserDetailsDisplay(!searchUserDetailsDisplay);
     }
+
+    // 팔로우 요청
+    const {
+        loading: followLoading,
+        statusCode: followStatusCode,
+        fetchRequest: followRequest
+    } = useFetch<void>();
+
+    const {
+        loading: unfollowLoading,
+        statusCode: unfollowStatusCode,
+        fetchRequest: unfollowRequest
+    } = useFetch<void>();
+
+    const handleFollowRequest = () => {
+        const method = searchUser.isFollowing ? 'DELETE' : 'POST';
+        const request = searchUser.isFollowing ? unfollowRequest : followRequest;
+
+        const requestBody = {
+            followingId: searchUser.id,
+        }
+
+        const url = ENDPOINTS.USER.FOLLOW.URL;
+
+        const options: FetchRequestOptions = {
+            url: url(user.id),
+            method: method,
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            credentials: 'include',
+            contentType: 'application/json',
+            body: requestBody
+        }
+
+        request(options);
+    }
+
+    useEffect(function handleFollowResponse() {
+        if (followStatusCode) {
+            if (followStatusCode == 201) {
+                setSearchUser(prev => ({
+                    ...prev,
+                    isFollowing: true,
+                }));
+                return;
+            }
+
+            if (followStatusCode == 401) {
+                return;
+
+            }
+
+            if (followStatusCode == 403) {
+                return;
+            }
+
+            if (followStatusCode == 404) {
+                return;
+            }
+
+            if (followStatusCode == 409) {
+                return;
+            }
+
+            if (followStatusCode == 500) {
+                return;
+            }
+        }
+    }, [followStatusCode])
+
+
+    useEffect(function handleUnfollowResponse() {
+        if (unfollowStatusCode) {
+            if (unfollowStatusCode == 204) {
+                setSearchUser(prev => ({
+                    ...prev,
+                    isFollowing: false,
+                }));
+                return;
+            }
+
+            if (unfollowStatusCode == 401) {
+
+                return;
+            }
+
+            if (unfollowStatusCode == 403) {
+                return;
+            }
+
+            if (unfollowStatusCode == 404) {
+                return;
+            }
+
+            if (unfollowStatusCode == 500) {
+                return;
+            }
+        }
+    }, [unfollowStatusCode])
+
+    const handleSearchUserCardFollow = (isFollowing: boolean) => {
+        setSearchUser(prev => ({
+            ...prev,
+            isFollowing: isFollowing,
+        }));
+    }
+
 
     return (
         <Container>
@@ -184,13 +301,15 @@ const SearchUserCard: React.FC<SearchUserCardProps> = (props) => {
                     상세보기
                 </OpenDatailsButton>
 
-                <FollowButton>
-                    <FollowIcon src={userPlusIcon} />
+                <FollowButton
+                    onClick={handleFollowRequest}
+                    isFollowing={searchUser.isFollowing}
+                >
+                    <FollowIcon src={searchUser.isFollowing ? userCheckIcon : userPlusIcon} alt='follow' />
                     팔로우
                 </FollowButton>
 
             </SearchUserButtonBox>
-
 
 
             {searchUserDetailsDisplay &&
@@ -198,7 +317,7 @@ const SearchUserCard: React.FC<SearchUserCardProps> = (props) => {
                     <SearchUserDetailsModal
                         handleClose={handleSearchUserDetailsDisplay}
                         userId={2}
-                        isFollowing={false}
+                        handleSearchUserCardFollow={handleSearchUserCardFollow}
                     />
                 </ModalBackground>
             }

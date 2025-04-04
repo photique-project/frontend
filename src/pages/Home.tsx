@@ -2,8 +2,8 @@ import { useEffect, useState, useRef } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import styled, { keyframes } from "styled-components";
 
-import ENDPOINTS from '../api/endpoints';
 import { FetchRequestOptions } from '../types/http';
+import ENDPOINTS from '../api/endpoints';
 import useFetch from '../hooks/useFetch';
 
 import Header from '../components/Header';
@@ -27,10 +27,6 @@ import helpActiveIcon from '../assets/help-active.png';
 import helpNonactiveIcon from '../assets/help-nonactive.png';
 import discordActiveIcon from '../assets/discord-active.png';
 import discordNonactiveIcon from '../assets/discord-nonactive.png';
-import arrowLeftNonactiveIcon from '../assets/arrow-left-nonactive.png';
-import arrowLeftActiveIcon from '../assets/arrow-left-active.png';
-import arrowRightNonactiveIcon from '../assets/arrow-right-nonactive.png';
-import arrowRightActiveIcon from '../assets/arrow-right-active.png';
 import singleWorkIcon from '../assets/singlework-new.png';
 import exhibitionIcon from '../assets/exhibition-new.png';
 import useAuthStore from '../zustand/store';
@@ -415,15 +411,6 @@ const HistoryPanelIconBox = styled.div`
 
     @media (max-width: 480px) {
         display: none;
-    }
-`
-
-const HistoryPanelIcon = styled.img<{ activeSrc?: string }>`
-    width: 36px;
-    height: 36px;
-
-    ${HistoryPanelIconBox}:hover & {
-        content: url(${({ activeSrc }) => activeSrc});
     }
 `
 
@@ -817,6 +804,21 @@ const Home = () => {
         }
     }
 
+    // 디스코드 초대
+    const handleInviteDiscordServer = () => {
+        const width = 500;
+        const height = 700;
+        const left = (window.innerWidth - width) / 2;
+        const top = (window.innerHeight - height) / 2;
+
+        window.open(
+            ' https://discord.gg/Q5SNJaCC',  // 여기에 디스코드 초대 링크 입력
+            '_blank',
+            `width=${width},height=${height},left=${left},top=${top},resizable=yes,scrollbars=yes`
+        );
+
+    }
+
 
     return (
         <Container>
@@ -917,14 +919,10 @@ const Home = () => {
                 <ActionIconBox>
                     <ActionIcon src={helpNonactiveIcon} activeSrc={helpActiveIcon} />
                 </ActionIconBox>
-                <ActionIconBox>
+                <ActionIconBox onClick={handleInviteDiscordServer}>
                     <ActionIcon src={discordNonactiveIcon} activeSrc={discordActiveIcon} />
                 </ActionIconBox>
             </ActionBox>
-
-            <HistoryPanelIconBox>
-                <HistoryPanelIcon src={arrowLeftNonactiveIcon} activeSrc={arrowLeftActiveIcon} />
-            </HistoryPanelIconBox>
 
             {openSingleWorkDetail && <SingleWork singleWorkId={selectedSingleWorkId} close={handleOpenSingleWorkDetail}></SingleWork>}
 

@@ -266,7 +266,7 @@ interface SingleWorkDataPage {
 
 
 
-const LikeView = () => {
+const MyPostView = () => {
     const [selectedTarget, setSelectedTarget] = useState<Target>('singlework');
     const [selectedOrder, setSelectedOrder] = useState<Order>('recent');
     const user = useAuthStore.getState().user;
@@ -319,8 +319,8 @@ const LikeView = () => {
 
     const handlePageRequest = async (page: number = 0) => {
         const sort = selectedOrder === 'recent' ? 'createdAt,desc' : 'createdAt,asc'
-        const method = selectedTarget === 'singlework' ? ENDPOINTS.SINGLE_WORK.GET_LIKE.METHOD : ENDPOINTS.EXHIBITION.GET_LIKE.METHOD;
-        const url = selectedTarget === 'singlework' ? ENDPOINTS.SINGLE_WORK.GET_LIKE.URL(user.id, sort, page, 30) : ENDPOINTS.EXHIBITION.GET_LIKE.URL(user.id, sort, page, 30);
+        const method = selectedTarget === 'singlework' ? ENDPOINTS.SINGLE_WORK.GET_MINE.METHOD : ENDPOINTS.EXHIBITION.GET_LIKE.METHOD;
+        const url = selectedTarget === 'singlework' ? ENDPOINTS.SINGLE_WORK.GET_MINE.URL(user.id, sort, page, 30) : ENDPOINTS.EXHIBITION.GET_LIKE.URL(user.id, sort, page, 30);
         const request = selectedTarget === 'singlework' ? singleWorkDataPageRequest : exhibitionDataPageRequest;
 
         const options: FetchRequestOptions = {
@@ -355,7 +355,7 @@ const LikeView = () => {
             return;
         }
 
-        if (exhibitionPageStatusCode === 404) {
+        if (exhibitionPageStatusCode === 404 && exhibitionPage) {
             setExhibitions([]);
             return;
         }
@@ -546,4 +546,4 @@ const LikeView = () => {
     )
 }
 
-export default LikeView;
+export default MyPostView;
