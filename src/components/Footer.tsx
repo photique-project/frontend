@@ -66,7 +66,7 @@ const Footer = () => {
                 </FooterContent>
                 <FooterContent>
                     <FooterContentIcon src={discordIcon}></FooterContentIcon>
-                    <FooterContentText>정민성#0060</FooterContentText>
+                    <FooterContentText>ian_0430</FooterContentText>
                 </FooterContent>
             </FooterContentBox>
         </Container>
