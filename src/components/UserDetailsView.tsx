@@ -625,9 +625,9 @@ const PasswordInputLabel = styled.label`
     font-size: 16px;
     font-weight: 700;
 
-    word-wrap: break-word;  /* 단어 단위 줄바꿈 */
-    word-break: break-word; /* 강제 줄바꿈 */
-    white-space: normal;    /* 자동 줄바꿈 허용 */
+    word-wrap: break-word;  
+    word-break: break-word; 
+    white-space: normal;  
 `
 
 const PasswordUpdateRequestButton = styled.button`
@@ -796,7 +796,6 @@ const UserDetailsView: React.FC<UserDetailsViewProps> = (props) => {
 
     // 로그인 정보
     const user = useAuthStore.getState().user;
-    const login = useAuthStore.getState().login;
 
     // 이미지
     const [isDragging, setIsDragging] = useState<boolean>(false);
@@ -897,7 +896,7 @@ const UserDetailsView: React.FC<UserDetailsViewProps> = (props) => {
     }
 
     const handleNicknameReset = () => {
-        setValidNickname(false);
+        setValidNickname(true);
         setNicknameHelperText('닉네임');
         setNicknameHelperTextColor('black');
         setNicknameInput(user.nickname);
@@ -1000,7 +999,6 @@ const UserDetailsView: React.FC<UserDetailsViewProps> = (props) => {
     const [updateSuccess, setUpdateSuccess] = useState<boolean>(false);
 
     useEffect(function () {
-        console.log(previewImage !== user.profileImage)
         if (validImage && validNickname && validIntroduction && (nicknameInput !== user.nickname || introductionInput !== (user.introduction ? user.introduction : '') || previewImage !== user.profileImage)) {
             setUpdateToastMessageDisplay(true);
             return;
@@ -1008,7 +1006,7 @@ const UserDetailsView: React.FC<UserDetailsViewProps> = (props) => {
 
         setUpdateToastMessageDisplay(false);
 
-    }, [previewImage, image, validNickname, introductionInput]);
+    }, [previewImage, image, nicknameInput, validNickname, introductionInput]);
 
 
 
@@ -1049,10 +1047,10 @@ const UserDetailsView: React.FC<UserDetailsViewProps> = (props) => {
         }
 
         const method = ENDPOINTS.USER.UPDATE.METHOD;
-        const url = ENDPOINTS.USER.UPDATE.URL;
+        const url = ENDPOINTS.USER.UPDATE.URL(user.id);
 
         const options: FetchRequestOptions = {
-            url: url(user.id),
+            url: url,
             method: method,
             credentials: 'include',
             contentType: 'multipart/form-data',
