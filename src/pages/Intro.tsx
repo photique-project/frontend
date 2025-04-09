@@ -54,13 +54,15 @@ const FirstIntroBox = styled.div`
     align-items: center;
     
     width: 100%;
-    height: 480px;
+    padding-top: 70px;
+    padding-bottom: 70px; 
     flex-shrink: 0;
     
     background-color: black;
 
     @media (max-width: 768px) {
-        height: 380px;
+        padding-top: 50px;
+        padding-bottom: 50px; 
     }
 `;
 
@@ -69,28 +71,28 @@ const MainText = styled.div`
     margin-right: 50px;
 
     color: white;
-    font-size: 40px;
+    font-size: 30px;
     font-weight: 700;
-    line-height: 40px;
+    line-height: 50px;
 
     @media (max-width: 768px) {
         font-size: 24px;
-        line-height: 24px;
+        line-height: 30px;
     }
 `;
 
 const SubText = styled.div`
-    margin-top:30px;
+    margin-top:10px;
     margin-left: 50px;
     margin-right: 50px;
     
-    font-size: 30px;
+    font-size: 25px;
     line-height: 30px;
     color: white;
 
     @media (max-width: 768px) {
         font-size: 20px;
-        line-height: 20px;
+        line-height: 24px;
         margin-top: 20px;
     }
 `;
@@ -120,6 +122,10 @@ const MainShortcutButton = styled.button`
         font-size: 14px;
         line-height: 14px;
         margin-top: 40px;
+    }
+
+    @media (max-width: 432px) {
+        width: 80%;
     }
 `;
 
@@ -236,8 +242,6 @@ const Intro = () => {
                     <SecondIntroBoxMainText>서비스</SecondIntroBoxMainText>
 
                     <SecondIntroBoxCardBox>
-                        {/* 컴포넌트 내부에 하위 자식이 더 존재하기 때문에 닫힌 태그가 별도로 있는 형태로는 작성 불가능 */}
-                        {/* 열린 태그 닫힌 태그가 별도로 있다는 뜻은 자식을 전달할 수 있다는 말이므로 컴포넌트 내부 자식과 충돌방지 */}
                         <IntroCard icon={cameraIcon} mainText="작품 업로드" subText="사진을 쉽게 업로드하고 다른 작가의 사진을 감상할 수 있어요" />
                         <IntroCard icon={exhibitionIcon} mainText="전시회 개최" subText="작품을 모아 하나의 주제로 전시회를 개최할 수 있어요" />
                         <IntroCard icon={personIcon} mainText="작가 팔로우" subText={<>다른 작가의 팔로우를 통해 소식을 받아볼 수 있어요<br />또한 직접 메시지를 주고 받을 수도 있어요</>} />
