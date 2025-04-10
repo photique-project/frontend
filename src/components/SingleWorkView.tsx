@@ -134,7 +134,7 @@ const SingleWorkView: React.FC<SingleWorkViewProps> = (props) => {
         <>
             {singleWorkDataPageLoading &&
                 <LoadingBox>
-                    <Loader />
+                    <Loader fontColor='black' />
                 </LoadingBox>
             }
             {!singleWorkDataPageLoading && notFound &&

@@ -115,7 +115,7 @@ const ExhibitionView: React.FC<ExhibitionViewProps> = (props) => {
         <>
             {exhibitionDataPageLoading &&
                 <LoadingBox>
-                    <Loader />
+                    <Loader fontColor='black' />
                 </LoadingBox>
             }
             {!exhibitionDataPageLoading && notFound &&
