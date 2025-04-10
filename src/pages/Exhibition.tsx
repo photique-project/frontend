@@ -1255,7 +1255,7 @@ const Exhibition = () => {
     const sendChat = () => {
         const body = {
             id: 'CHAT',
-            userId: 1,
+            userId: user.id,
             content: chatInput,
         };
 
