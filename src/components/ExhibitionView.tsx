@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import styled from 'styled-components';
 
 import ExhibitionCard from './ExhibitionCard';
+import Loader from './Loader';
 
 
 
@@ -25,6 +26,18 @@ const Container = styled.div`
     @media (max-width: 480px) {
         width: calc((6 / 7) * 100%);
     }
+`
+
+const LoadingBox = styled.div`
+    width: 100%;
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+
+    font-size: 16px;
+    font-weight: 700;
 `
 
 
@@ -99,19 +112,32 @@ const ExhibitionView: React.FC<ExhibitionViewProps> = (props) => {
 
 
     return (
+        <>
+            {exhibitionDataPageLoading &&
+                <LoadingBox>
+                    <Loader />
+                </LoadingBox>
+            }
+            {!exhibitionDataPageLoading && notFound &&
+                <>
+                    <LoadingBox>
+                        검색결과가 없습니다
+                    </LoadingBox>
+                </>
+            }
+            {!exhibitionDataPageLoading && !notFound &&
+                <Container>
+                    {exhibitions.map((exhibition, index) => (
+                        <ExhibitionCard
+                            key={exhibition.id}
+                            exhibitionData={exhibition}
+                        />
 
-        <Container>
-            {notFound &&
-                <>검색결과가 없습니다</>}
-            {!notFound && exhibitions.map((exhibition, index) => (
-                <ExhibitionCard
-                    key={exhibition.id}
-                    exhibitionData={exhibition}
-                />
+                    ))}
 
-            ))}
-
-        </Container>
+                </Container>
+            }
+        </>
     )
 }
 
