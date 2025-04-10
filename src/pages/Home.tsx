@@ -47,6 +47,7 @@ const Container = styled.div`
 `;
 
 const SearchBox = styled.div<{ isScrolled: boolean }>`
+    padding-bottom: ${({ isScrolled }) => (isScrolled ? '0' : '20px')};
     width: 100%;
 
     display: flex;
@@ -61,7 +62,7 @@ const SearchBox = styled.div<{ isScrolled: boolean }>`
 `
 
 const SearchBoxMainText = styled.div<{ isScrolled: boolean }>`
-    margin-top: ${({ isScrolled }) => (isScrolled ? '0' : '70px')};
+    margin-top: ${({ isScrolled }) => (isScrolled ? '0' : '40px')};
     font-size: ${({ isScrolled }) => (isScrolled ? '0' : '30px')};
     line-height: ${({ isScrolled }) => (isScrolled ? '0' : '40px')};
     
@@ -83,7 +84,6 @@ const SearchBoxMainText = styled.div<{ isScrolled: boolean }>`
 `;
 
 const SearchBoxSubText = styled.div<{ isScrolled: boolean }>`
-    margin-top: ${({ isScrolled }) => (isScrolled ? '0' : '15px')};
     font-size: ${({ isScrolled }) => (isScrolled ? '0' : '20px')};
     line-height: ${({ isScrolled }) => (isScrolled ? '0' : '40px')};
     margin-left:10px;
@@ -192,7 +192,6 @@ const Tab = styled.div`
     padding-right:10px;
     padding-top:5px;
     padding-bottom:5px;
-    height: 65px;
     
 
     display: flex;
@@ -207,22 +206,19 @@ const Tab = styled.div`
     background-color: white;
 
     @media (max-width: 480px) {
-        margin-top: 80px;
-        width: 180px;
-        height: 45px;
+        margin-top: 40px;
     }
 `;
 
 const TabIconBox = styled.div<{ viewMode: boolean }>`
-    width: 55px;
-    height: 55px;
+    padding: 10px;
 
     display: flex;
     flex-direction: column;
     justify-content: center;
     align-items: center;
     
-    border-radius: 27.5px;
+    border-radius: 50%;
 
     background-color: ${({ viewMode }) => (viewMode ? 'black' : 'white')};
     transition: background-color 0.3s ease-in-out;
@@ -234,18 +230,17 @@ const TabIconBox = styled.div<{ viewMode: boolean }>`
     }
 
     @media (max-width: 480px) {
-        width: 35px;
-        height: 35px;
+        padding: 10px;
     }
 `;
 
 const GridIcon = styled.img`
-    width: 32px;
-    height: 32px;
+    width: 28px;
+    height: 28px;
 
     @media (max-width: 480px) {
-        width: 24px;
-        height: 24px;
+        width: 20px;
+        height: 20px;
     }
 `;
 
@@ -851,7 +846,6 @@ const Home = () => {
                         closePanel={showFilterPanel}
                     />}
                 </SearchInputBox>
-
 
             </SearchBox>
 
