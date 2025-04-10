@@ -386,28 +386,6 @@ const ActionIcon = styled.img<{ activeSrc?: string }>`
     }
 `
 
-const HistoryPanelIconBox = styled.div`
-    width: 50px;
-    height: 50px;
-
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-
-    box-shadow: 0 1px 4px 0 rgba(0, 0, 0, 0.25);
-    border-top-left-radius: 10px;
-    border-bottom-left-radius: 10px;
-
-    position: fixed;
-    top: calc(50% - 25px);
-    right: 0;
-
-
-    @media (max-width: 480px) {
-        display: none;
-    }
-`
 
 
 type SearchTarget = 'work' | 'writer';
@@ -566,33 +544,6 @@ const Home = () => {
         handleSingleWorkDataPageRequest(0);
     }, []);
 
-
-
-    // 인기 단일작품 가져오는 useFetch
-    const {
-        loading: popularSingleWorkLoading,
-        statusCode: popularSingleWorkStatusCode,
-        data: popularSingleWorkData,
-        fetchRequest: popularSingleWorkRequest
-    } = useFetch<SingleWorkData>();
-
-    // 홈페이지 마운트하면 인기 단일작품 요청
-    useEffect(function requestPopularSingleWorkRequest() {
-        const method = ENDPOINTS.SINGLE_WORK.GET_POPULAR.METHOD;
-        const url = ENDPOINTS.SINGLE_WORK.GET_POPULAR.URL;
-
-        const options: FetchRequestOptions = {
-            url: `${url(user.id ? user.id : 0)}`,
-            method: method,
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            credentials: 'include',
-            contentType: 'application/json',
-        }
-
-        popularSingleWorkRequest(options);
-    }, []);
 
 
 
