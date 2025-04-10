@@ -316,7 +316,7 @@ const SearchUserCard: React.FC<SearchUserCardProps> = (props) => {
                 <ModalBackground>
                     <SearchUserDetailsModal
                         handleClose={handleSearchUserDetailsDisplay}
-                        userId={2}
+                        userId={searchUser.id}
                         handleSearchUserCardFollow={handleSearchUserCardFollow}
                     />
                 </ModalBackground>
