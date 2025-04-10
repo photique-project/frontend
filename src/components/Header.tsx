@@ -270,7 +270,6 @@ const Header: React.FC<HeaderProps> = (props) => {
     const [isMenuOpen, setIsMenuOpen] = useState<boolean>(false);
     const [loginModalDisplay, setLoginModalDisplay] = useState<boolean>(false);
     const [userDetailsPanelDisplay, setUserDetailsPanelDisplay] = useState<boolean>(false);
-    const [eventSource, setEventSource] = useState<EventSource | null>(null);
     const eventSourceRef = useRef<EventSource>(null);
 
     // 읽지 않은 알림 개수
@@ -327,7 +326,6 @@ const Header: React.FC<HeaderProps> = (props) => {
         return () => {
 
             if (eventSourceRef.current) {
-                console.log('클린업')
                 eventSourceRef.current.close();
             }
         };
@@ -371,7 +369,6 @@ const Header: React.FC<HeaderProps> = (props) => {
             }
 
             eventSourceRef.current = eventSource;
-            setEventSource(eventSource)
 
         }
 
