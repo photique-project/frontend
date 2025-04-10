@@ -98,7 +98,15 @@ const Text = styled.div`
     font-weight: 700;
 `
 
-const Loader = () => {
+type FontColor = 'white' | 'black';
+
+interface LoaderProps {
+    fontColor: FontColor;
+}
+
+const Loader: React.FC<LoaderProps> = (props) => {
+    const { fontColor } = props;
+
     return (
         <><Container>
             <StyledWrapper>
@@ -113,7 +121,7 @@ const Loader = () => {
                     </div>
                 </div>
             </StyledWrapper>
-            <Text>Loading</Text>
+            <Text style={{ color: fontColor }}>Loading</Text>
         </Container>
         </>
     );

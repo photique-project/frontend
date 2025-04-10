@@ -8,6 +8,7 @@ import useAuthStore from '../zustand/store';
 import useFetch from '../hooks/useFetch';
 import ToastMessage from './ToastMessage';
 import Comment from './Comment';
+import Loader from './Loader';
 
 import closeIcon from '../assets/white-close.png';
 import viewIcon from '../assets/view.png';
@@ -1221,6 +1222,16 @@ const LoadingIcon = styled.img`
     animation: ${rotate} 1.2s ease-in-out infinite;
 `
 
+const LoadingBox = styled.div`
+    width: 100%;
+    height: 100vh;
+
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+`
+
 
 
 interface SingleWorkUpdateState {
@@ -2052,6 +2063,11 @@ const SingleWork: React.FC<SingleWorkProps> = (props) => {
 
             <BodyBox>
                 <SideBarBox />
+                {singleWorkLoading &&
+                    <LoadingBox>
+                        <Loader fontColor={'white'} />
+                    </LoadingBox>
+                }
 
 
                 {!singleWorkLoading && singleWork && <>
@@ -2339,9 +2355,9 @@ const SingleWork: React.FC<SingleWorkProps> = (props) => {
 
                     </MainBox>
 
-                    <SideBarBox />
                 </>
                 }
+                <SideBarBox />
 
             </BodyBox>
 
