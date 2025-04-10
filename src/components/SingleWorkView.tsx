@@ -7,151 +7,12 @@ import loadingIcon from '../assets/loading-large.png';
 import heartIcon from '../assets/heart.png';
 import viewIcon from '../assets/view.png';
 import heartFillIcon from '../assets/heart-fill.png';
+import Loader from './Loader';
 
 
 
-const BestSingleWorkBox = styled.div`
+const Container = styled.div`
     margin-top: 40px;
-    width: 1200px;
-
-    display: flex;
-    flex-direction: column;
-    
-    border-radius: 15px;
-
-    position: relative;
-
-    cursor: pointer;
-
-    &:hover > div { 
-        opacity: 1; 
-    }
-
-    @media (max-width: 1400px) {
-        width: calc((6 / 7) * 100% - 90px);
-    }
-
-    @media (max-width: 480px) {
-        width: calc((6 / 7) * 100%);
-    }
-`
-
-const BestSingleWork = styled.img`
-    width: 100%;
-    border: 1px solid rgba(0, 0, 0, 0.1);
-    box-sizing: border-box;
-
-    border-radius: 15px;
-`
-
-const BestSingleWorkInfo = styled.div`
-    width: 100%;
-    height: 80px;
-
-    display: flex;
-    flex-direction: row;
-    align-items: center;
-    justify-content: space-between;
-    
-
-    border-top-left-radius: 15px;
-    border-top-right-radius: 15px;
-
-    background: linear-gradient(to bottom, #000000 0%, rgba(51, 51, 51, 0.5) 75%, rgba(102, 102 , 102, 0) 100%);
-
-    position: absolute;
-
-    opacity: 0; 
-    transition: opacity 0.3s ease; 
-`
-
-const BestSingleWorkWriterBox = styled.div`
-    margin-left: 24px;
-    display: flex;
-    flex-direction: row;
-    align-items: center;
-    gap: 10px;
-`
-
-const BestSingleWorkUserImage = styled.img`
-    width: 40px;
-    height: 40px;
-
-    border-radius: 10px;
-`
-
-const BestSingleWorkUserNickname = styled.div`
-    font-size: 20px;
-    
-    color: white;
-`
-
-const BestSingleWorkHitBox = styled.div`
-    display: flex;
-    flex-direction: row;
-    align-items: center;
-`
-
-const BestSingleWorkLikeBox = styled.div`
-    margin-right: 14px;
-    display: flex;
-    flex-direction: row;
-    align-items: center;
-
-    gap: 10px;
-`
-
-const BestSingleWorkLikeIcon = styled.img`
-    width: 32px;
-    height: 32px;
-`
-
-const BestSingleWorkLike = styled.div`
-    font-size: 20px;
-    font-weight: 700;
-    
-    color: white;
-`
-
-const BestSingleWorkViewBox = styled.div`
-    margin-right: 24px;
-    display: flex;
-    flex-direction: row;
-    align-items: center;
-
-    gap: 10px;
-`
-
-const BestSingleWorkViewIcon = styled.img`
-    width: 32px;
-    height: 32px;
-`
-
-const BestSingleWorkView = styled.div`
-    font-size: 20px;
-    font-weight: 700;
-    color: white;
-`
-
-const Line = styled.div`
-    flex-shrink: 0;
-    margin-top: 20px;
-    width: 1200px;
-    height: 2px;
-
-    background-color: rgba(0, 0, 0, 0.2);
-
-    @media (max-width: 1400px) {
-        width: calc((6 / 7) * 100%  - 90px);
-    }
-
-    @media (max-width: 480px) {
-        width: calc((6 / 7) * 100%);
-    }
-`
-
-const SingleWorkBoxes = styled.div`
-    margin-top: 50px;
     margin-bottom: 100px;
     width: 1200px;
     
@@ -179,29 +40,15 @@ const SingleWorkColumn = styled.div`
 `
 
 const LoadingBox = styled.div`
-    margin-top: 20%;
-    margin-bottom: 20%;
     width: 100%;
+    height: 100vh; // 브라우저 높이 크기이지만, 상위에서 레이아웃 배치 규칙에 따라 남은 전체크기를 차지한 상태
     display: flex;
     flex-direction: column;
     justify-content: center;
     align-items: center;
-`
 
-const rotate = keyframes`
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
-`;
-
-const LoadingIcon = styled.img`
-    width: 50px;
-    height: 50px;
-
-    animation: ${rotate} 1.2s ease-in-out infinite;
+    font-size: 16px;
+    font-weight: 700;
 `
 
 
@@ -231,8 +78,6 @@ interface SearchSingleWorkData {
 
 interface SingleWorkViewProps {
     handleOpenSingleWorkDetail: (singleWorkId?: number) => void;
-    popularSingleWorkLoading: boolean;
-    popularSingleWorkData: SingleWorkData;
     singleWorkDataPageLoading: boolean;
     singleWorkDataPage: SearchSingleWorkData;
     singleWorkDataStatusCode: number;
@@ -241,9 +86,8 @@ interface SingleWorkViewProps {
 
 
 const SingleWorkView: React.FC<SingleWorkViewProps> = (props) => {
-    const { handleOpenSingleWorkDetail, popularSingleWorkLoading, popularSingleWorkData, singleWorkDataPageLoading, singleWorkDataPage, singleWorkDataStatusCode } = props;
+    const { handleOpenSingleWorkDetail, singleWorkDataPageLoading, singleWorkDataPage, singleWorkDataStatusCode } = props;
     const [isSmallScreen, setIsSmallScreen] = useState<boolean>(window.innerWidth <= 768);
-    const popularSingleWorkId = popularSingleWorkData ? popularSingleWorkData.id : null;
     const [notFound, setNotFound] = useState<boolean>(false);
 
     const [singleWorks, setSingleWorks] = useState<SingleWorkData[]>([]);
@@ -288,51 +132,20 @@ const SingleWorkView: React.FC<SingleWorkViewProps> = (props) => {
 
     return (
         <>
-            {popularSingleWorkLoading &&
+            {singleWorkDataPageLoading &&
                 <LoadingBox>
-                    <LoadingIcon src={loadingIcon} />
+                    <Loader />
                 </LoadingBox>
             }
-            {!popularSingleWorkLoading && popularSingleWorkData &&
-                <BestSingleWorkBox onClick={() => handleOpenSingleWorkDetail(popularSingleWorkId)}>
-
-                    <BestSingleWorkInfo>
-
-                        <BestSingleWorkWriterBox>
-                            <BestSingleWorkUserImage src={popularSingleWorkData.writer.profileImage} alt='Best Single Work'></BestSingleWorkUserImage>
-                            <BestSingleWorkUserNickname>{popularSingleWorkData.writer.nickname}</BestSingleWorkUserNickname>
-                        </BestSingleWorkWriterBox>
-
-                        <BestSingleWorkHitBox>
-                            <BestSingleWorkLikeBox>
-                                <BestSingleWorkLikeIcon src={popularSingleWorkData.isLiked ? heartFillIcon : heartIcon} alt='like'></BestSingleWorkLikeIcon>
-                                <BestSingleWorkLike>{popularSingleWorkData.likeCount}</BestSingleWorkLike>
-                            </BestSingleWorkLikeBox>
-
-                            <BestSingleWorkViewBox>
-                                <BestSingleWorkViewIcon src={viewIcon} alt='view'></BestSingleWorkViewIcon>
-                                <BestSingleWorkView>{popularSingleWorkData.viewCount}</BestSingleWorkView>
-                            </BestSingleWorkViewBox>
-
-                        </BestSingleWorkHitBox>
-
-                    </BestSingleWorkInfo>
-
-                    <BestSingleWork src={popularSingleWorkData.image}></BestSingleWork>
-                </BestSingleWorkBox>
+            {!singleWorkDataPageLoading && notFound &&
+                <>
+                    <LoadingBox>
+                        검색결과가 없습니다
+                    </LoadingBox>
+                </>
             }
-
-
-
-
-            <Line />
-
-            <SingleWorkBoxes>
-                {notFound && <>
-                    검색결과가 없습니다</>}
-
-
-                {!notFound && !isSmallScreen &&
+            {!singleWorkDataPageLoading && !notFound && <Container>
+                {!isSmallScreen &&
                     <>
                         <SingleWorkColumn>
                             {singleWorks.map((singleWork, index) => (
@@ -376,7 +189,9 @@ const SingleWorkView: React.FC<SingleWorkViewProps> = (props) => {
                         </SingleWorkColumn>
                     </>
                 }
-                {!notFound && isSmallScreen &&
+
+
+                {isSmallScreen &&
                     <SingleWorkColumn>
                         {singleWorks.map((singleWork, index) => (
                             <SingleWorkBox
@@ -388,7 +203,8 @@ const SingleWorkView: React.FC<SingleWorkViewProps> = (props) => {
                     </SingleWorkColumn>
                 }
 
-            </SingleWorkBoxes>
+            </Container>
+            }
         </>
     )
 }

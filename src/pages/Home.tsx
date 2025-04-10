@@ -864,8 +864,6 @@ const Home = () => {
                 {singleWorkView &&
                     <SingleWorkView
                         handleOpenSingleWorkDetail={handleOpenSingleWorkDetail}
-                        popularSingleWorkLoading={popularSingleWorkLoading}
-                        popularSingleWorkData={popularSingleWorkData}
                         singleWorkDataPageLoading={singleWorkDataPageLoading}
                         singleWorkDataPage={singleWorkDataPage}
                         singleWorkDataStatusCode={singleWorkDataPageStatusCode}
