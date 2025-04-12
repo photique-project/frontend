@@ -409,9 +409,7 @@ interface SingleWorkData {
 
 interface SingleWorkDataPage {
     content: SingleWorkData[];
-    pageable: {
-        pageNumber: number;
-    }
+    number: number;
     last: boolean;
 }
 interface Tag {
@@ -439,9 +437,7 @@ interface ExhibitionData {
 
 interface ExhibitionDataPage {
     content: ExhibitionData[];
-    pageable: {
-        pageNumber: number;
-    }
+    number: number;
     last: boolean;
 }
 
@@ -582,11 +578,11 @@ const Home = () => {
     // 정상응답이 왔다면 현재 페이지 값으로 할당
     useEffect(function incrementSingleWorkPage() {
         if (singleWorkDataPage) {
-            setPage(singleWorkDataPage.pageable.pageNumber);
+            setPage(singleWorkDataPage.number);
         }
 
         if (exhibitionDataPage) {
-            setPage(exhibitionDataPage.pageable.pageNumber);
+            setPage(exhibitionDataPage.number);
         }
 
     }, [singleWorkDataPage, exhibitionDataPage]);

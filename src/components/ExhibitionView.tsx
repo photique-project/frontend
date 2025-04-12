@@ -67,9 +67,7 @@ interface ExhibitionData {
 
 interface ExhibitionDataPage {
     content: ExhibitionData[];
-    pageable: {
-        pageNumber: number;
-    }
+    number: number;
     last: boolean;
 }
 
@@ -90,7 +88,7 @@ const ExhibitionView: React.FC<ExhibitionViewProps> = (props) => {
     // 검색한 전시회 배열 할당
     useEffect(function isCompletedLoading() {
         if (!exhibitionDataPageLoading && exhibitionDataPage) {
-            if (exhibitionDataPage.pageable.pageNumber === 0) {
+            if (exhibitionDataPage.number === 0) {
                 setExhibitions(exhibitionDataPage.content)
             } else {
                 setExhibitions((prev) => [...prev, ...exhibitionDataPage.content])

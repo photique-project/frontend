@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, DO_NOT_USE_OR_YOU_WILL_BE_FIRED_EXPERIMENTAL_REACT_NODES } from 'react';
 import styled, { keyframes } from 'styled-components';
 
 import SingleWorkBox from '../components/SingleWorkBox';
@@ -70,9 +70,7 @@ interface SingleWorkData {
 
 interface SearchSingleWorkData {
     content: SingleWorkData[];
-    pageable: {
-        pageNumber: number;
-    }
+    number: number;
     last: boolean;
 }
 
@@ -94,7 +92,7 @@ const SingleWorkView: React.FC<SingleWorkViewProps> = (props) => {
 
     useEffect(function isCompletedLoading() {
         if (!singleWorkDataPageLoading && singleWorkDataPage) {
-            if (singleWorkDataPage.pageable.pageNumber === 0) {
+            if (singleWorkDataPage.number === 0) {
                 setSingleWorks(singleWorkDataPage.content);
             } else {
                 setSingleWorks((prev) => [...prev, ...singleWorkDataPage.content])
