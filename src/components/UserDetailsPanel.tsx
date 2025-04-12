@@ -1,6 +1,10 @@
-import { useEffect, useRef } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useNavigate } from "react-router-dom";
 import styled from 'styled-components';
+
+import useFetch from '../hooks/useFetch';
+import { FetchRequestOptions } from '../types/http';
+import Loader from './Loader';
 
 import imageIcon from '../assets/image.png';
 import bookmarkIcon from '../assets/bookmark-small.png';
@@ -8,6 +12,7 @@ import userIcon from '../assets/users-small.png';
 import settingsIcon from '../assets/settings-small.png';
 import logoutIcon from '../assets/logout-small.png';
 import likeImageIcon from '../assets/like-black.png';
+import ENDPOINTS from '../api/endpoints';
 
 const Container = styled.div`
     width: 300px;
@@ -110,26 +115,80 @@ const ItemText = styled.div`
 
 `
 
+interface UserDetails {
+    id: number,
+    email: string,
+    nickname: string,
+    profileImage: string,
+    introduction: string,
+    singleWork: number,
+    exhibition: number,
+    follower: number,
+    following: number,
+    createdAt: string
+}
+
 interface UserDetailsPanelProps {
-    id: number | null;
-    email: string | null;
-    nickname: string | null;
-    profileImage: string | null;
-    introduction: string | null;
-    singleWork: number | null;
-    exhibition: number | null;
-    follower: number | null;
-    following: number | null;
-    createdAt: string | null;
+    id: number;
     handleDisplay: () => void;
     handleLogout: () => void;
 }
 
 const UserDetailsPanel: React.FC<UserDetailsPanelProps> = (props) => {
-    const { id, nickname, profileImage, introduction, singleWork, exhibition, follower, following, handleDisplay, handleLogout } = props;
-
+    const { id, handleDisplay, handleLogout } = props;
     const navigate = useNavigate();
     const userDetailsPanelRef = useRef<HTMLDivElement | null>(null);
+
+    // 유저 상세 데이터
+    const [userDetails, setUserDetails] = useState<UserDetails>();
+
+    const {
+        loading: userDetailsLoading,
+        statusCode: userDetailsStatusCode,
+        data: userDetailsData,
+        fetchRequest: userDetailsFetchRequest
+    } = useFetch<UserDetails>();
+
+    const handleUserDetailsRequest = () => {
+        const method = ENDPOINTS.USER.GET_DETAILS.METHOD;
+        const url = ENDPOINTS.USER.GET_DETAILS.URL(id, 0);
+
+        const options: FetchRequestOptions = {
+            url: url,
+            method: method,
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            credentials: 'include',
+            contentType: 'application/json'
+        }
+
+        userDetailsFetchRequest(options);
+    }
+
+    useEffect(function handleUserDetailsRequestEffect() {
+        handleUserDetailsRequest();
+    }, []);
+
+    useEffect(function handleUserDetailsResponseEffect() {
+        if (userDetailsStatusCode == 200 && userDetailsData) {
+            setUserDetails(userDetailsData);
+            return;
+        }
+
+        if (userDetailsStatusCode == 401) {
+            return;
+        }
+
+        if (userDetailsStatusCode == 404) {
+            return;
+        }
+
+        if (userDetailsStatusCode == 500) {
+            return;
+        }
+
+    }, [userDetailsStatusCode, userDetailsData]);
 
     // 패널 외부 클릭 감지 후 닫기
     useEffect(() => {
@@ -154,74 +213,81 @@ const UserDetailsPanel: React.FC<UserDetailsPanelProps> = (props) => {
 
     return (
         <Container ref={userDetailsPanelRef}>
-            <UserProfileBox>
-                <ProfileImage src={profileImage} />
-                <NicknameBox>
-                    {nickname}
-                </NicknameBox>
+            {userDetailsLoading &&
+                <Loader fontColor='black' />
+            }
+            {!userDetailsLoading && userDetails &&
+                <>
+                    <UserProfileBox>
+                        <ProfileImage src={userDetails.profileImage} />
+                        <NicknameBox>
+                            {userDetails.nickname}
+                        </NicknameBox>
 
-            </UserProfileBox>
+                    </UserProfileBox>
 
-            <UserStatBox>
-                <StatBox>
-                    <StatName>단일작품</StatName>
-                    <StatValue>{singleWork}</StatValue>
-                </StatBox>
+                    <UserStatBox>
+                        <StatBox>
+                            <StatName>단일작품</StatName>
+                            <StatValue>{userDetails.singleWork}</StatValue>
+                        </StatBox>
 
-                <StatBox>
-                    <StatName>전시회</StatName>
-                    <StatValue>{exhibition}</StatValue>
-                </StatBox>
+                        <StatBox>
+                            <StatName>전시회</StatName>
+                            <StatValue>{userDetails.exhibition}</StatValue>
+                        </StatBox>
 
-                <StatBox>
-                    <StatName>팔로워</StatName>
-                    <StatValue>{follower}</StatValue>
-                </StatBox>
+                        <StatBox>
+                            <StatName>팔로워</StatName>
+                            <StatValue>{userDetails.follower}</StatValue>
+                        </StatBox>
 
-                <StatBox>
-                    <StatName>팔로잉</StatName>
-                    <StatValue>{following}</StatValue>
-                </StatBox>
+                        <StatBox>
+                            <StatName>팔로잉</StatName>
+                            <StatValue>{userDetails.following}</StatValue>
+                        </StatBox>
 
-            </UserStatBox>
+                    </UserStatBox>
 
-            <ItemBox>
-                <Item onClick={() => handleNavigateToMyPage('my')}>
-                    <ItemIcon src={imageIcon} />
-                    <ItemText>내 작품</ItemText>
-                </Item>
+                    <ItemBox>
+                        <Item onClick={() => handleNavigateToMyPage('my')}>
+                            <ItemIcon src={imageIcon} />
+                            <ItemText>내 작품</ItemText>
+                        </Item>
 
-                <Item onClick={() => handleNavigateToMyPage('like')}>
-                    <ItemIcon src={likeImageIcon} />
-                    <ItemText>좋아요 작품</ItemText>
-                </Item>
+                        <Item onClick={() => handleNavigateToMyPage('like')}>
+                            <ItemIcon src={likeImageIcon} />
+                            <ItemText>좋아요 작품</ItemText>
+                        </Item>
 
-                <Item onClick={() => handleNavigateToMyPage('bookmark')}>
-                    <ItemIcon src={bookmarkIcon} />
-                    <ItemText>저장된 전시회</ItemText>
-                </Item>
-            </ItemBox>
+                        <Item onClick={() => handleNavigateToMyPage('bookmark')}>
+                            <ItemIcon src={bookmarkIcon} />
+                            <ItemText>저장된 전시회</ItemText>
+                        </Item>
+                    </ItemBox>
 
-            <ItemBox>
-                <Item onClick={() => handleNavigateToMyPage('follow')}>
-                    <ItemIcon src={userIcon} />
-                    <ItemText>팔로우 관리</ItemText>
-                </Item>
-            </ItemBox>
+                    <ItemBox>
+                        <Item onClick={() => handleNavigateToMyPage('follow')}>
+                            <ItemIcon src={userIcon} />
+                            <ItemText>팔로우 관리</ItemText>
+                        </Item>
+                    </ItemBox>
 
-            <ItemBox>
-                <Item onClick={() => handleNavigateToMyPage('settings')}>
-                    <ItemIcon src={settingsIcon} />
-                    <ItemText>계정설정</ItemText>
-                </Item>
-            </ItemBox>
+                    <ItemBox>
+                        <Item onClick={() => handleNavigateToMyPage('settings')}>
+                            <ItemIcon src={settingsIcon} />
+                            <ItemText>계정설정</ItemText>
+                        </Item>
+                    </ItemBox>
 
-            <ItemBox onClick={handleLogout}>
-                <Item>
-                    <ItemIcon src={logoutIcon} />
-                    <ItemText style={{ color: '#f50000' }}>로그아웃</ItemText>
-                </Item>
-            </ItemBox>
+                    <ItemBox onClick={handleLogout}>
+                        <Item>
+                            <ItemIcon src={logoutIcon} />
+                            <ItemText style={{ color: '#f50000' }}>로그아웃</ItemText>
+                        </Item>
+                    </ItemBox>
+                </>
+            }
 
         </Container>
     )
