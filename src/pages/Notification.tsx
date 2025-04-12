@@ -7,8 +7,6 @@ import { FetchRequestOptions } from '../types/http';
 import useFetch from '../hooks/useFetch';
 import useAuthStore from "../zustand/store";
 import ENDPOINTS from '../api/endpoints';
-import SingleWork from '../components/SingleWork';
-
 
 import leftBlackIcon from '../assets/left-black.png';
 import rightBlackIcon from '../assets/right-black.png';
