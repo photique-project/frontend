@@ -7,7 +7,6 @@ import useFetch from '../hooks/useFetch';
 import ENDPOINTS from '../api/endpoints';
 import SingleWork from './SingleWork';
 
-
 import userPlusIcon from '../assets/user-plus-b.png';
 import commentIcon from '../assets/comment.png';
 import heartIcon from '../assets/heart-b.png';
@@ -15,6 +14,7 @@ import bookmarkIcon from '../assets/album.png';
 import listIcon from '../assets/list-plus.png';
 import uncheckIcon from '../assets/readCircle.png';
 import checkIcon from '../assets/readCircleCheck.png';
+
 
 
 const Container = styled.div`
@@ -192,6 +192,7 @@ const NotificationCard: React.FC<NotificationCardProps> = (props) => {
 
     const handleClickCard = () => {
         handleMarkRequest();
+        console.log('닫기')
 
         if (notification.type === 'single_work_comment' || notification.type === 'single_work_like' || notification.type === 'following_single_work') {
             handleOpenSingleWorkDetail(notification.targetId)
@@ -206,26 +207,28 @@ const NotificationCard: React.FC<NotificationCardProps> = (props) => {
 
 
     return (
-        <Container
-            onClick={handleClickCard}
-        >
-            <LeftBox>
-                <TypeIcon src={findIconByType(notification.type)} />
-            </LeftBox>
+        <>
+            <Container
+                onClick={handleClickCard}
+            >
+                <LeftBox>
+                    <TypeIcon src={findIconByType(notification.type)} />
+                </LeftBox>
 
-            <CenterBox>
-                <Message>{createMessage(notification.type)}</Message>
-                <Time>{notification.createdAt}</Time>
-            </CenterBox>
+                <CenterBox>
+                    <Message>{createMessage(notification.type)}</Message>
+                    <Time>{notification.createdAt}</Time>
+                </CenterBox>
 
-            <RightBox>
-                <CheckIcon
-                    src={notification.isRead ? checkIcon : uncheckIcon}
-                />
-            </RightBox>
+                <RightBox>
+                    <CheckIcon
+                        src={notification.isRead ? checkIcon : uncheckIcon}
+                    />
+                </RightBox>
 
+            </Container>
             {openSingleWorkDetail && <SingleWork singleWorkId={selectedSingleWorkId} close={handleOpenSingleWorkDetail}></SingleWork>}
-        </Container>
+        </>
     )
 }
 
