@@ -465,15 +465,6 @@ const Header: React.FC<HeaderProps> = (props) => {
 
                             {userDetailsPanelDisplay && <UserDetailsPanel
                                 id={userDetails.id}
-                                email={userDetails.email}
-                                nickname={userDetails.nickname}
-                                profileImage={userDetails.profileImage}
-                                introduction={userDetails.introduction}
-                                createdAt={userDetails.createdAt}
-                                singleWork={userDetails.singleWork}
-                                exhibition={userDetails.exhibition}
-                                follower={userDetails.follower}
-                                following={userDetails.following}
                                 handleDisplay={handleUserDetailsPanelDisplay}
                                 handleLogout={handleLogout}
                             />}
