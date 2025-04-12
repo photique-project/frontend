@@ -31,6 +31,7 @@ import rightBlackIcon from '../assets/right-black.png';
 import trashIcon from '../assets/trash-red.png';
 import alertIcon from '../assets/alert.png';
 import loadingIcon from '../assets/loading-large.png';
+import DEFAULT from '../api/default';
 
 
 
@@ -1909,7 +1910,7 @@ const Exhibition = () => {
                         </FooterLeftBox>
 
                         <FooterRightBox>
-                            <WriterProfileImage src={exhibition.writer.profileImage} />
+                            <WriterProfileImage src={exhibition.writer.profileImage ? exhibition.writer.profileImage : DEFAULT.profileImage} />
                             <WriterNickname>{exhibition.writer.nickname}</WriterNickname>
                         </FooterRightBox>
 

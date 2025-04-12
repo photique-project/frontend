@@ -13,6 +13,7 @@ import settingsIcon from '../assets/settings-small.png';
 import logoutIcon from '../assets/logout-small.png';
 import likeImageIcon from '../assets/like-black.png';
 import ENDPOINTS from '../api/endpoints';
+import DEFAULT from '../api/default';
 
 const Container = styled.div`
     width: 300px;
@@ -219,7 +220,7 @@ const UserDetailsPanel: React.FC<UserDetailsPanelProps> = (props) => {
             {!userDetailsLoading && userDetails &&
                 <>
                     <UserProfileBox>
-                        <ProfileImage src={userDetails.profileImage} />
+                        <ProfileImage src={userDetails.profileImage ? userDetails.profileImage : DEFAULT.profileImage} />
                         <NicknameBox>
                             {userDetails.nickname}
                         </NicknameBox>

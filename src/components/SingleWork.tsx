@@ -30,6 +30,7 @@ import heartFillIcon from '../assets/heart-fill.png';
 import leftBlackIcon from '../assets/left-black.png';
 import rightBlackIcon from '../assets/right-black.png';
 import categoryGrayIcon from '../assets/category-gray.png';
+import DEFAULT from '../api/default';
 
 
 
@@ -2121,7 +2122,7 @@ const SingleWork: React.FC<SingleWorkProps> = (props) => {
                         <InfoHeaderBox>
 
                             <PhotographerInfoBox>
-                                <PhotographerProfileImage src={singleWork.writer.profileImage} />
+                                <PhotographerProfileImage src={singleWork.writer.profileImage ? singleWork.writer.profileImage : DEFAULT.profileImage} />
 
                                 <PhotographerProfile>
                                     <PhotographerNickname>{singleWork.writer.nickname}</PhotographerNickname>

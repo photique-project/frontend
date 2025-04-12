@@ -13,6 +13,7 @@ import pencilIcon from '../assets/pencil.png'
 import trashIcon from '../assets/trash-red.png';
 import alertIcon from '../assets/alert.png';
 import loadingIcon from '../assets/loading-large.png';
+import DEFAULT from '../api/default';
 
 
 
@@ -414,7 +415,7 @@ const Comment: React.FC<CommentProps> = (props) => {
     return (
         <Container>
 
-            <CommentWriterProfileImage src={data.writer.profileImage} />
+            <CommentWriterProfileImage src={data.writer.profileImage ? data.writer.profileImage : DEFAULT.profileImage} />
 
             <CommentBodyBox>
 
