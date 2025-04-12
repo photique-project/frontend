@@ -11,6 +11,7 @@ import chatIcon from '../assets/chat.png';
 import notebookIcon from '../assets/notebook.png';
 import leftIcon from '../assets/arrow-left.png';
 import rightIcon from '../assets/arrow-right.png';
+import DEFAULT from '../api/default';
 
 
 
@@ -367,7 +368,7 @@ const ExhibitionCreatePreview: React.FC<ExhibitionCreatePreview> = (props) => {
                     </ExhibitionPreviewImageInfoBox>
 
                     <ExhibitionWriterBox>
-                        <WriterProfileImage src={user.profileImage} />
+                        <WriterProfileImage src={user.profileImage ? user.profileImage : DEFAULT.profileImage} />
                         <WriterNickname>{user.nickname}</WriterNickname>
                     </ExhibitionWriterBox>
                 </ExhibitionPreviewFooter>

@@ -10,6 +10,7 @@ import SearchUserDetailsModal from "./SearchUserDetailsModal";
 import moveIcon from '../assets/move-black.png';
 import userPlusIcon from '../assets/user-plus.png';
 import userCheckIcon from '../assets/user-check.png';
+import DEFAULT from "../api/default";
 
 
 
@@ -287,7 +288,7 @@ const SearchUserCard: React.FC<SearchUserCardProps> = (props) => {
     return (
         <Container>
             <SearchUserInfo>
-                <SearchUserProfileImage src={searchUser.profileImage} />
+                <SearchUserProfileImage src={searchUser.profileImage ? searchUser.profileImage : DEFAULT.profileImage} />
                 <SearchUserTextBox>
                     <SearchUserNickname>{searchUser.nickname}</SearchUserNickname>
                     <SearchUserIntroduction>{searchUser.introduction}</SearchUserIntroduction>

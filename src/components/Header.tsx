@@ -15,6 +15,7 @@ import logo from '../assets/logo.png';
 import menuIcon from '../assets/menu.png';
 import bellIcon from '../assets/bell.png';
 import bellDotIcon from '../assets/bell-dot.png';
+import DEFAULT from '../api/default';
 
 const Container = styled.header`
     width: 100%;
@@ -461,7 +462,7 @@ const Header: React.FC<HeaderProps> = (props) => {
                     {!isLoggedIn && <ShortButton text="회원가입" type="black" action={navigateToJoinPage}></ShortButton>}
                     {isLoggedIn &&
                         <UserProfileImageBox>
-                            <UserProfileImage src={userDetails.profileImage} onClick={handleUserDetailsPanelDisplay} />
+                            <UserProfileImage src={userDetails.profileImage ? userDetails.profileImage : DEFAULT.profileImage} onClick={handleUserDetailsPanelDisplay} />
 
                             {userDetailsPanelDisplay && <UserDetailsPanel
                                 id={userDetails.id}

@@ -3,6 +3,7 @@ import styled from 'styled-components';
 import heartIcon from '../assets/heart.png';
 import viewIcon from '../assets/view.png';
 import heartFillIcon from '../assets/heart-fill.png';
+import DEFAULT from '../api/default';
 
 
 
@@ -162,7 +163,7 @@ const SingleWorkBox: React.FC<SingleWorkBoxProps> = (props) => {
             <SingleWorkInfo>
 
                 <BestSingleWorkWriterBox>
-                    <SingleWorkUserImage src={singleWorkData.writer.profileImage} alt='Single Work'></SingleWorkUserImage>
+                    <SingleWorkUserImage src={singleWorkData.writer.profileImage ? singleWorkData.writer.profileImage : DEFAULT.profileImage} alt='Single Work'></SingleWorkUserImage>
                     <SingleWorkUserNickname>{singleWorkData.writer.nickname}</SingleWorkUserNickname>
                 </BestSingleWorkWriterBox>
 

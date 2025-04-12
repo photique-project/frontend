@@ -13,6 +13,7 @@ import closeIcon from '../assets/close-large.png'
 import userPlusIcon from '../assets/user-plus.png';
 import userCheckIcon from '../assets/user-check.png';
 import loadingIcon from '../assets/loading-large.png';
+import DEFAULT from "../api/default";
 
 
 
@@ -363,7 +364,7 @@ const SearchUserDetailsModal: React.FC<SearchUserDetailsModalProps> = (props) =>
                 }
                 {userDetails &&
                     <>
-                        <ProfileImage src={userDetails.profileImage} />
+                        <ProfileImage src={userDetails.profileImage ? userDetails.profileImage : DEFAULT.profileImage} />
                         <Nickname>{userDetails.nickname}</Nickname>
                         <Introduction>{userDetails.introduction}</Introduction>
 

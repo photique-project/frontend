@@ -21,6 +21,7 @@ import FollowView from '../components/FollowView';
 import BookmarkView from '../components/BookmarkView';
 import LikeView from '../components/LikeView';
 import MyPostView from '../components/MyPostView';
+import DEFAULT from '../api/default';
 
 const Container = styled.div`
     display: flex;
@@ -205,7 +206,7 @@ const MyPage = () => {
 
                 <SideBar>
                     <UserDetailsBox>
-                        <ProfileImage src={user.profileImage} />
+                        <ProfileImage src={user.profileImage ? user.profileImage : DEFAULT.profileImage} />
                         <Nickname>{user.nickname}</Nickname>
                         <Introduction>{user.introduction ? user.introduction : '소개없음'}</Introduction>
                     </UserDetailsBox>

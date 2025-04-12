@@ -12,6 +12,7 @@ import locationGrayIcon from '../assets/location-gray.png';
 import calendarGrayIcon from '../assets/calendar-gray.png';
 import tagGrayIcon from '../assets/tag-gray.png';
 import categoryGrayIcon from '../assets/category-gray.png';
+import DEFAULT from '../api/default';
 
 
 
@@ -772,7 +773,7 @@ const SingleWorkCreatePreview: React.FC<SingleWorkCreatePreviewProps> = (props) 
             <SingleWorkHeaderInfoBox>
 
                 <SingleWorkPhotographerInfo>
-                    <PhotographerProfileImage src={singleWork.writer.profileImage}></PhotographerProfileImage>
+                    <PhotographerProfileImage src={singleWork.writer.profileImage ? singleWork.writer.profileImage : DEFAULT.profileImage}></PhotographerProfileImage>
                     <PhotographerProfile>
                         <PhotographerNickname>{singleWork.writer.nickname}</PhotographerNickname>
                         {singleWork.writer.introduction && <PhotographerIntro>{singleWork.writer.introduction}</PhotographerIntro>}

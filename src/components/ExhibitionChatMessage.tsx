@@ -1,4 +1,5 @@
 import styled from 'styled-components';
+import DEFAULT from '../api/default';
 
 const Container = styled.div<{ me: boolean }>`
     width: 100%;
@@ -102,7 +103,7 @@ const ExhibitionChatMessage: React.FC<ExhibitionChatMessageProps> = (props) => {
                         {!chatData.me ?
                             <>
                                 <LeftBox>
-                                    <ProfileImage src={chatData.profileImage} />
+                                    <ProfileImage src={chatData.profileImage ? chatData.profileImage : DEFAULT.profileImage} />
                                 </LeftBox>
 
                                 <CenterBox me={chatData.me}>

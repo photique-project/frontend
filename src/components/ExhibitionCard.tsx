@@ -9,6 +9,7 @@ import heartIcon from '../assets/heart.png';
 import viewIcon from '../assets/view.png';
 import heartFillIcon from '../assets/heart-fill.png';
 import bookmarkFillIcon from '../assets/bookmark-fill.png';
+import DEFAULT from '../api/default';
 
 
 
@@ -335,7 +336,7 @@ const ExhibitionCard: React.FC<ExhibitionCardProps> = (props) => {
             <ExhibitionCardInfo>
                 <InfoHeader>
                     <PhotographerProfile>
-                        <PhotographerProfileImage src={exhibitionData.writer.profileImage} alt='profile image'></PhotographerProfileImage>
+                        <PhotographerProfileImage src={exhibitionData.writer.profileImage ? exhibitionData.writer.profileImage : DEFAULT.profileImage} alt='profile image'></PhotographerProfileImage>
                         <PhotographerInfo>
                             <PhotographerNickname>{exhibitionData.writer.nickname}</PhotographerNickname>
                             <PhotographerIntro>{exhibitionData.writer.introduction}</PhotographerIntro>
