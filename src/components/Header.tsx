@@ -267,6 +267,7 @@ const Header: React.FC<HeaderProps> = (props) => {
     const { display = 'flex' } = props;
     const navigate = useNavigate();
     const user = useAuthStore.getState().user;
+    const login = useAuthStore.getState().login;
 
     const [isMenuOpen, setIsMenuOpen] = useState<boolean>(false);
     const [loginModalDisplay, setLoginModalDisplay] = useState<boolean>(false);
@@ -333,7 +334,9 @@ const Header: React.FC<HeaderProps> = (props) => {
     }, [])
 
     useEffect(function checkAuth() {
-        if (isLoggedIn) { // 로그인 된 상태라면 로그인 상태관리 변수 업데이트
+        if (isLoggedIn) { // 로그인된 상태라면 로그인 상태관리 변수 업데이트
+            // 현재 실제 로그인 상태인지 확인 필요
+            login();
 
             if (!userDetails.id) {
                 logout();
@@ -364,13 +367,11 @@ const Header: React.FC<HeaderProps> = (props) => {
             };
 
             eventSource.onerror = function (event) {
-                console.log("❌ SSE connection error...");
                 eventSource.close();  // 기존 연결 닫기
                 setTimeout(connectSSE, 1000); // 1초 후 재연결
             }
 
             eventSourceRef.current = eventSource;
-
         }
 
         if (isLoggedIn) {
