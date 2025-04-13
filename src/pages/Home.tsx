@@ -827,6 +827,9 @@ const Home = () => {
 
 
             <ActionBox>
+                <ActionIconBox>
+                    <ActionIcon src={upNonactiveIcon} activeSrc={upActiveIcon} onClick={scrollToTop} />
+                </ActionIconBox>
                 <ActionIconBox
                     onClick={handleNewPostOption}
                     ref={newPostOptionRef}
@@ -852,12 +855,6 @@ const Home = () => {
                 </ActionIconBox>
 
 
-                <ActionIconBox>
-                    <ActionIcon src={upNonactiveIcon} activeSrc={upActiveIcon} onClick={scrollToTop} />
-                </ActionIconBox>
-                <ActionIconBox>
-                    <ActionIcon src={helpNonactiveIcon} activeSrc={helpActiveIcon} />
-                </ActionIconBox>
                 <ActionIconBox onClick={handleInviteDiscordServer}>
                     <ActionIcon src={discordNonactiveIcon} activeSrc={discordActiveIcon} />
                 </ActionIconBox>
