@@ -7,8 +7,6 @@ import ENDPOINTS from '../api/endpoints';
 import useFetch from '../hooks/useFetch';
 
 import Header from '../components/Header';
-import OAuthIcons from '../components/OAuthIcons';
-import SNSLine from '../components/SNSLine';
 import ImageInput from '../components/input/ImageInput';
 import CheckInput from '../components/input/CheckInput';
 import EmailAuthModal from '../components/EmailAuthModal';
@@ -159,13 +157,12 @@ const Join = () => {
         }
     }, [validProfileImage])
 
-    const handleJoinMainRequest = () => {
+    const handleJoinMailRequest = () => {
         const method = ENDPOINTS.AUTH.SEND_JOIN_MAIL.METHOD;
         const url = ENDPOINTS.AUTH.SEND_JOIN_MAIL.URL;
 
         const requestBody = {
             email: email,
-            type: "JOIN"
         }
 
         const options: FetchRequestOptions = {
@@ -197,7 +194,7 @@ const Join = () => {
         }
 
         setEmailHelperTextVisibility('hidden');
-        handleJoinMainRequest();
+        handleJoinMailRequest();
     }
 
     useEffect(function validateEmailFetch() {
@@ -483,8 +480,7 @@ const Join = () => {
             <Header />
             <BodyBox>
 
-                <OAuthIcons marginTop={20} />
-                <SNSLine text='간편 회원가입' marginTop={15} />
+
 
                 <JoinFormBox>
                     <ProfileImageInputText>프로필 이미지</ProfileImageInputText>

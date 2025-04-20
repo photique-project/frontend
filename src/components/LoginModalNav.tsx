@@ -34,9 +34,13 @@ const LoginModalNav = () => {
         navigate('/join');
     };
 
+    const navigateToResetPasswordPage = () => {
+        navigate('/reset-password');
+    };
+
     return (
         <Container>
-            <Text>비밀번호 찾기</Text>
+            <Text onClick={navigateToResetPasswordPage}>비밀번호 찾기</Text>
             <Text onClick={navigateToJoinPage}>회원가입</Text>
         </Container>
     );
