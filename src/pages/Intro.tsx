@@ -202,7 +202,7 @@ const ThirdIntroBoxMainText = styled.div`
 const ThirdIntroBoxSubText = styled.div`
     margin-top: 40px;
     margin-bottom: 100px;
-    width: 80%;
+    width: 60%;
 
     font-size: 20px;
     font-weight: 700;
