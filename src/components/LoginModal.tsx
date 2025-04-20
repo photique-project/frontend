@@ -8,7 +8,6 @@ import useAuthStore from '../zustand/store';
 
 import ShortNormalInput from '../components/input/ShortNormalInput';
 import LongButton from '../components/button/LongButton';
-import CheckBox from '../components/CheckBox';
 import LoginModalNav from '../components/LoginModalNav';
 import SNSLine from '../components/SNSLine';
 import HelperText from '../components/HelperText';
@@ -88,6 +87,31 @@ const HelperTextBox = styled.div`
     height: 12px;
 `;
 
+const CheckBox = styled.div`
+    width: 100%;
+    margin-top: 5px;
+
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+
+    @media (max-width: 420px) {
+        width:100%;
+    }
+`
+
+const CheckBoxLabel = styled.label`
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+
+    font-size: 14px;
+    line-height: 14px;
+`;
+
+const Box = styled.input`
+    
+`;
 
 
 interface LoginModalProps {
@@ -104,6 +128,13 @@ const LoginModal: React.FC<LoginModalProps> = (props) => {
     const [passwordDisabled, setPasswordDisalbled] = useState<boolean>(false);
     const [helperText, setHelperText] = useState<string>('');
     const [helperTextVisibility, setHelperTextVisibility] = useState<'visible' | 'hidden'>('hidden');
+
+    // 자동 로그인 체크
+    const [autoLogin, setAutoLogin] = useState<boolean>(false);
+
+    const handleAutoLoginChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        setAutoLogin(e.target.checked);
+    };
 
     const {
         loading: loginLoading,
@@ -143,7 +174,7 @@ const LoginModal: React.FC<LoginModalProps> = (props) => {
         setHelperTextVisibility('hidden');
 
         const method = ENDPOINTS.AUTH.LOGIN.METHOD;
-        const url = ENDPOINTS.AUTH.LOGIN.URL;
+        const url = ENDPOINTS.AUTH.LOGIN.URL(autoLogin);
 
         const requestBody = {
             email: email,
@@ -213,7 +244,14 @@ const LoginModal: React.FC<LoginModalProps> = (props) => {
                 <LogoIcon src={logoIcon} />
                 <ShortNormalInput placeHolder='이메일' marginTop={30} text={email} handleChange={handleEmailChange} inputDisabled={emailDisabled} />
                 <PasswordInput placeHolder='비밀번호' marginTop={10} text={password} handleChange={handlePasswordChange} inputDisabled={passwordDisabled} />
-                <CheckBox text='자동 로그인' marginTop={5} />
+
+                <CheckBox>
+                    <CheckBoxLabel>
+                        <Box type='checkbox' checked={autoLogin} onChange={handleAutoLoginChange} />
+                        자동 로그인
+                    </CheckBoxLabel>
+                </CheckBox>
+
                 <HelperTextBox>
                     <HelperText text={helperText} visibility={helperTextVisibility} color={'red'} />
                 </HelperTextBox>
