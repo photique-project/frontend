@@ -9,10 +9,8 @@ import useAuthStore from '../zustand/store';
 import ShortNormalInput from '../components/input/ShortNormalInput';
 import LongButton from '../components/button/LongButton';
 import LoginModalNav from '../components/LoginModalNav';
-import SNSLine from '../components/SNSLine';
 import HelperText from '../components/HelperText';
 import PasswordInput from '../components/input/PasswordInput';
-import OAuthIcons from '../components/OAuthIcons';
 
 import logoIcon from '../assets/logo.png';
 import closeIcon from '../assets/close.png';
@@ -295,8 +293,7 @@ const LoginModal: React.FC<LoginModalProps> = (props) => {
 
                 <LoginModalNav />
 
-                <SNSLine text='간편 로그인' marginTop={30} />
-                <OAuthIcons marginTop={12} />
+
 
             </LoginModalBox>
 

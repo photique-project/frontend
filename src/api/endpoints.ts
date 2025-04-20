@@ -28,6 +28,7 @@ interface Endpoints {
         UNFOLLOW: REST_API;
         GET_FOLLOWERS: REST_API;
         GET_FOLLOWINGS: REST_API;
+        RESET_PASSWORD: REST_API;
     };
 
     SINGLE_WORK: {
@@ -164,6 +165,10 @@ const ENDPOINTS: Endpoints = {
         GET_FOLLOWINGS: {
             METHOD: 'GET',
             URL: (id: number) => `${USER}/${id}/following`,
+        },
+        RESET_PASSWORD: {
+            METHOD: 'PATCH',
+            URL: `${USER}/password`,
         }
     },
 
