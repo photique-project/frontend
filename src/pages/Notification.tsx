@@ -7,6 +7,7 @@ import { FetchRequestOptions } from '../types/http';
 import useFetch from '../hooks/useFetch';
 import useAuthStore from "../zustand/store";
 import ENDPOINTS from '../api/endpoints';
+import Loader from '../components/Loader';
 
 import leftBlackIcon from '../assets/left-black.png';
 import rightBlackIcon from '../assets/right-black.png';
@@ -195,6 +196,16 @@ const LastPage = styled.div`
     }
 `
 
+const LoadingBox = styled.div`
+    width: 100%;
+    aspect-ratio: 2/1;
+
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+`
+
 
 
 
@@ -329,7 +340,12 @@ const Notification = () => {
 
                     </PageBoxHeader>
 
-                    {notifications.map((notification, index) => (
+                    {notificationPageLoading &&
+                        <LoadingBox>
+                            <Loader fontColor='black' />
+                        </LoadingBox>
+                    }
+                    {!notificationPageLoading && notifications.map((notification, index) => (
                         <NotificationCard
                             notification={notification}
 
