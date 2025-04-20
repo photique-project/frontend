@@ -98,7 +98,7 @@ const ENDPOINTS: Endpoints = {
     AUTH: {
         LOGIN: {
             METHOD: 'POST',
-            URL: `${AUTH}/login`
+            URL: (auto: boolean) => `${AUTH}/login?auto=${auto}`
         },
         LOGOUT: {
             METHOD: 'POST',
