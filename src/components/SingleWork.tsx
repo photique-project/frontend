@@ -987,6 +987,8 @@ const CommentInputCompleteButton = styled.div`
     justify-content: center;
     align-items: center;
 
+    position: relative;
+
     gap: 10px;
 
     border: 1px solid rgba(0, 0, 0, 0.2);
@@ -1000,6 +1002,31 @@ const CommentInputCompleteButton = styled.div`
 
     @media (max-width: 768px) {
         width: calc(100% - 16px);
+    }
+`
+
+const MessageBox = styled.div`
+    display: flex;
+    flex-direction: row;
+
+    position: absolute;
+    white-space: nowrap;
+
+    border-radius: 10px;
+    color: white;
+    bottom: 100%;
+    right: 100%;
+
+    background-color: black;
+
+    background-color: rgba(0, 0, 0, 0.3);
+    padding: 10px;
+
+    animation: fadeIn 0.5s ease-in-out;
+
+    @keyframes fadeIn {
+        from { opacity: 0; }
+        to { opacity: 1; }
     }
 `
 
@@ -1339,6 +1366,9 @@ const SingleWork: React.FC<SingleWorkProps> = (props) => {
 
     const navigate = useNavigate();
 
+    // 댓글작성 로그인 필요 메시지 모달
+    const [messageDisplay, setMessageDiplay] = useState<boolean>(false);
+
     // 단일작품 옵션모달
     const optionModalRef = useRef<HTMLDivElement>(null);
     const [optionModalDisplay, setOptionModalDisplay] = useState<boolean>(false);
@@ -1532,13 +1562,23 @@ const SingleWork: React.FC<SingleWorkProps> = (props) => {
     } = useFetch<CommentPageData>();
 
     const handleCommentCreateRequest = () => {
+        // 로그인되지 않은 상태라면 메시지 출력
+        if (!user.id) {
+            setMessageDiplay(true);
+
+            setTimeout(() => {
+                setMessageDiplay(false);
+            }, 3000);
+            return;
+        }
+
         // 앞뒤 공백 제거했을 때 댓글 길이가 0일경우
         if (commentInput.trim().length < 1) {
             return;
         }
 
         const body = {
-            writerId: useAuthStore.getState().userId,
+            writerId: user.id,
             content: commentInput.trim(),
         }
 
@@ -1607,8 +1647,6 @@ const SingleWork: React.FC<SingleWorkProps> = (props) => {
 
         }
     }, [commentCreateStatusCode])
-
-
 
 
 
@@ -2269,8 +2307,14 @@ const SingleWork: React.FC<SingleWorkProps> = (props) => {
                                         <CommentInputCompleteButton
                                             onClick={handleCommentCreateRequest}
                                         >
+                                            {messageDisplay &&
+                                                <MessageBox>로그인이 필요합니다</MessageBox>
+                                            }
+
                                             <CommentInputCompleteButtonIcon src={sendIcon} />
-                                            <CommentInputCompleteButtonText>댓글작성</CommentInputCompleteButtonText>
+                                            <CommentInputCompleteButtonText>
+                                                댓글작성
+                                            </CommentInputCompleteButtonText>
                                         </CommentInputCompleteButton>
                                     }
                                 </CommentInputCompleteButtonBox>

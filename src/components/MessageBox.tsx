@@ -22,7 +22,6 @@ const Container = styled.div<{ left: string, right: string, top: string, bottom:
 
     opacity: 1;
     transition: opacity 0.3s ease-in-out;
- 
 `
 
 interface MessageBoxProps {
@@ -36,7 +35,6 @@ interface MessageBoxProps {
 
 const MessageBox: React.FC<MessageBoxProps> = (props) => {
     const { left, right, top, bottom, message } = props;
-    // {singleWork.isFollowing ? '현재 팔로우하고 있는 작가입니다' : '팔로우 요청하고 작가의 소식을 받아보세요 !'}
 
     return (
         <Container
