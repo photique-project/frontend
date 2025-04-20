@@ -16,7 +16,6 @@ import PasswordInput from '../components/input/PasswordInput';
 import LongButton from '../components/button/LongButton';
 import HelperText from '../components/HelperText';
 import ToastMessage from '../components/ToastMessage';
-import userEvent from '@testing-library/user-event';
 
 
 const Container = styled.div`

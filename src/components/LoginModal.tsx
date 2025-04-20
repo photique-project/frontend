@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import styled from 'styled-components';
+import styled, { keyframes } from 'styled-components';
 
 import { FetchRequestOptions } from '../types/http';
 import ENDPOINTS from '../api/endpoints';
@@ -16,6 +16,8 @@ import OAuthIcons from '../components/OAuthIcons';
 
 import logoIcon from '../assets/logo.png';
 import closeIcon from '../assets/close.png';
+import loadingIcon from '../assets/loading.png';
+
 
 
 
@@ -112,6 +114,34 @@ const CheckBoxLabel = styled.label`
 const Box = styled.input`
     
 `;
+
+const rotate = keyframes`
+  from {
+      transform: rotate(0deg);
+    }
+    to {
+        transform: rotate(360deg);
+    }
+    `;
+
+const Loading = styled.img`
+    width: 40px;
+    animation: ${rotate} 1.2s ease-in-out infinite;
+`;
+
+const LoadingBox = styled.div`
+    width: 100%;
+    height: 100%;
+
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+
+    background-color: rgba(0, 0, 0, 0.2);
+
+    position: absolute;
+`
 
 
 interface LoginModalProps {
@@ -224,7 +254,7 @@ const LoginModal: React.FC<LoginModalProps> = (props) => {
                 return;
             }
 
-            if (loginStatusCode === 401) {
+            if (loginStatusCode === 401 || loginStatusCode == 404) {
                 setHelperText('*이메일과 비밀번호를 확인해주세요');
                 setHelperTextVisibility('visible');
             }
@@ -256,7 +286,12 @@ const LoginModal: React.FC<LoginModalProps> = (props) => {
                     <HelperText text={helperText} visibility={helperTextVisibility} color={'red'} />
                 </HelperTextBox>
 
-                <LongButton text='로그인' type='black' marginTop={15} onClick={handleLogin} />
+                <LongButton
+                    text='로그인'
+                    type='black'
+                    marginTop={15}
+                    onClick={handleLogin}
+                />
 
                 <LoginModalNav />
 
@@ -264,6 +299,13 @@ const LoginModal: React.FC<LoginModalProps> = (props) => {
                 <OAuthIcons marginTop={12} />
 
             </LoginModalBox>
+
+            {loginLoading &&
+                <LoadingBox>
+                    <Loading src={loadingIcon} />
+                </LoadingBox>
+            }
+
         </Container >
     );
 }
