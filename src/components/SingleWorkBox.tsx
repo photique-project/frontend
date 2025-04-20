@@ -4,6 +4,7 @@ import heartIcon from '../assets/heart.png';
 import viewIcon from '../assets/view.png';
 import heartFillIcon from '../assets/heart-fill.png';
 import DEFAULT from '../api/default';
+import formatNumber from '../utils/converter';
 
 
 
@@ -170,12 +171,12 @@ const SingleWorkBox: React.FC<SingleWorkBoxProps> = (props) => {
                 <SingleWorkHitBox>
                     <SingleWorkLikeBox>
                         <SingleWorkLikeIcon src={singleWorkData.isLiked ? heartFillIcon : heartIcon} alt='like'></SingleWorkLikeIcon>
-                        <SingleWorkLike>{singleWorkData.likeCount}</SingleWorkLike>
+                        <SingleWorkLike>{formatNumber(singleWorkData.likeCount)}</SingleWorkLike>
                     </SingleWorkLikeBox>
 
                     <SingleWorkViewBox>
                         <SingleWorkViewIcon src={viewIcon} alt='view'></SingleWorkViewIcon>
-                        <SingleWorkView>{singleWorkData.viewCount}</SingleWorkView>
+                        <SingleWorkView>{formatNumber(singleWorkData.viewCount)}</SingleWorkView>
                     </SingleWorkViewBox>
 
                 </SingleWorkHitBox>

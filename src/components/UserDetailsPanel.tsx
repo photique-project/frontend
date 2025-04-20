@@ -14,6 +14,7 @@ import logoutIcon from '../assets/logout-small.png';
 import likeImageIcon from '../assets/like-black.png';
 import ENDPOINTS from '../api/endpoints';
 import DEFAULT from '../api/default';
+import formatNumber from '../utils/converter';
 
 const Container = styled.div`
     width: 300px;
@@ -230,22 +231,22 @@ const UserDetailsPanel: React.FC<UserDetailsPanelProps> = (props) => {
                     <UserStatBox>
                         <StatBox>
                             <StatName>단일작품</StatName>
-                            <StatValue>{userDetails.singleWork}</StatValue>
+                            <StatValue>{formatNumber(userDetails.singleWork)}</StatValue>
                         </StatBox>
 
                         <StatBox>
                             <StatName>전시회</StatName>
-                            <StatValue>{userDetails.exhibition}</StatValue>
+                            <StatValue>{formatNumber(userDetails.exhibition)}</StatValue>
                         </StatBox>
 
                         <StatBox>
                             <StatName>팔로워</StatName>
-                            <StatValue>{userDetails.follower}</StatValue>
+                            <StatValue>{formatNumber(userDetails.follower)}</StatValue>
                         </StatBox>
 
                         <StatBox>
                             <StatName>팔로잉</StatName>
-                            <StatValue>{userDetails.following}</StatValue>
+                            <StatValue>{formatNumber(userDetails.following)}</StatValue>
                         </StatBox>
 
                     </UserStatBox>
