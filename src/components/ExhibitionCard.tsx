@@ -10,6 +10,7 @@ import viewIcon from '../assets/view.png';
 import heartFillIcon from '../assets/heart-fill.png';
 import bookmarkFillIcon from '../assets/bookmark-fill.png';
 import DEFAULT from '../api/default';
+import formatNumber from '../utils/converter';
 
 
 
@@ -322,12 +323,12 @@ const ExhibitionCard: React.FC<ExhibitionCardProps> = (props) => {
 
                     <LikeBox>
                         <LikeIcon src={exhibitionData.isLiked ? heartFillIcon : heartIcon} alt='like' />
-                        <Like>{exhibitionData.likeCount}</Like>
+                        <Like>{formatNumber(exhibitionData.likeCount)}</Like>
                     </LikeBox>
 
                     <ViewBox>
                         <ViewIcon src={viewIcon} alt='view' />
-                        <View>{exhibitionData.viewCount}</View>
+                        <View>{formatNumber(exhibitionData.viewCount)}</View>
                     </ViewBox>
 
                 </HitBox>

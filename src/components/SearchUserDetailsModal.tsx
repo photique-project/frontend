@@ -6,8 +6,7 @@ import ENDPOINTS from '../api/endpoints';
 import { FetchRequestOptions } from "../types/http";
 import useFetch from "../hooks/useFetch";
 import useAuthStore from "../zustand/store";
-
-import MessageBox from "./MessageBox";
+import formatNumber from "../utils/converter";
 
 import closeIcon from '../assets/close-large.png'
 import userPlusIcon from '../assets/user-plus.png';
@@ -370,22 +369,22 @@ const SearchUserDetailsModal: React.FC<SearchUserDetailsModalProps> = (props) =>
 
                         <Stats>
                             <StatBox>
-                                <Value>{userDetails.singleWork}</Value>
+                                <Value>{formatNumber(userDetails.singleWork)}</Value>
                                 <Text>단일작품</Text>
                             </StatBox>
 
                             <StatBox>
-                                <Value>{userDetails.exhibition}</Value>
+                                <Value>{formatNumber(userDetails.exhibition)}</Value>
                                 <Text>전시회</Text>
                             </StatBox>
 
                             <StatBox>
-                                <Value>{userDetails.follower}</Value>
+                                <Value>{formatNumber(userDetails.follower)}</Value>
                                 <Text>팔로워</Text>
                             </StatBox>
 
                             <StatBox>
-                                <Value>{userDetails.following}</Value>
+                                <Value>{formatNumber(userDetails.following)}</Value>
                                 <Text>팔로잉</Text>
                             </StatBox>
                         </Stats>

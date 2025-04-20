@@ -6,11 +6,12 @@ import ENDPOINTS from "../api/endpoints";
 import useFetch from "../hooks/useFetch";
 import useAuthStore from "../zustand/store";
 import SearchUserDetailsModal from "./SearchUserDetailsModal";
+import DEFAULT from "../api/default";
+
 
 import moveIcon from '../assets/move-black.png';
 import userPlusIcon from '../assets/user-plus.png';
 import userCheckIcon from '../assets/user-check.png';
-import DEFAULT from "../api/default";
 
 
 

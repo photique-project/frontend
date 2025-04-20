@@ -8,6 +8,8 @@ import useAuthStore from '../zustand/store';
 import ENDPOINTS from '../api/endpoints';
 import useFetch from '../hooks/useFetch';
 import styled, { keyframes } from 'styled-components';
+import formatNumber from '../utils/converter';
+import Loader from '../components/Loader';
 
 import ExhibitionChatMessage from '../components/ExhibitionChatMessage';
 import ExhibitionComment from '../components/ExhibitionComment';
@@ -904,6 +906,16 @@ const DeleteBoxDeleteButton = styled.button`
     }
 `
 
+const LoadingBox = styled.div`
+    width: 100%;
+    height: 100%;
+
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-content: center;
+`
+
 const rotate = keyframes`
   from {
     transform: rotate(0deg);
@@ -1107,7 +1119,6 @@ const Exhibition = () => {
         const method = ENDPOINTS.EXHIBITION.GET_DETAILS.METHOD;
         const url = ENDPOINTS.EXHIBITION.GET_DETAILS.URL(exhibitionId, user.id ? user.id : 0);
 
-
         const options: FetchRequestOptions = {
             url: url,
             method: method,
@@ -1236,8 +1247,6 @@ const Exhibition = () => {
 
     useEffect(function requestChatConnection() {
         connectStomp();
-
-        // 여기서 웹소켓 연결 구독해제 혹은 비활성화로 연결해제확인 && 서버에서 세션끊는지 확인해야함
 
         return () => {
             if (stompWs) {
@@ -1844,7 +1853,11 @@ const Exhibition = () => {
     return (
         <>
             <Container>
-                {/* <Header display='none' /> */}
+                {exhibitionDataLoading &&
+                    <LoadingBox>
+                        <Loader fontColor='white'></Loader>
+                    </LoadingBox>
+                }
                 {exhibition && <>
                     <Image src={exhibition.works[curIndex].image} />
 
@@ -1864,7 +1877,7 @@ const Exhibition = () => {
                         <HeaderRightBox>
                             <ActiveUserBox>
                                 <ActiveUserIcon src={userIcon} />
-                                <ActiveUser>{activeUsers}명 관람중</ActiveUser>
+                                <ActiveUser>{formatNumber(activeUsers)}명 관람중</ActiveUser>
                             </ActiveUserBox>
 
                             <IconBox onClick={handleLikeRequest}>

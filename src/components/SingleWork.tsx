@@ -9,6 +9,8 @@ import useFetch from '../hooks/useFetch';
 import ToastMessage from './ToastMessage';
 import Comment from './Comment';
 import Loader from './Loader';
+import formatNumber from '../utils/converter';
+import DEFAULT from '../api/default';
 
 import closeIcon from '../assets/white-close.png';
 import viewIcon from '../assets/view.png';
@@ -30,7 +32,6 @@ import heartFillIcon from '../assets/heart-fill.png';
 import leftBlackIcon from '../assets/left-black.png';
 import rightBlackIcon from '../assets/right-black.png';
 import categoryGrayIcon from '../assets/category-gray.png';
-import DEFAULT from '../api/default';
 
 
 
@@ -2078,12 +2079,12 @@ const SingleWork: React.FC<SingleWorkProps> = (props) => {
                                 <ImageHitBox>
                                     <ImageLikeBox>
                                         <ImageLikeIcon src={singleWork.isLiked ? heartFillIcon : heartIcon} onClick={handleLikeRequest} />
-                                        <ImageLikeValue>{singleWork.likeCount}</ImageLikeValue>
+                                        <ImageLikeValue>{formatNumber(singleWork.likeCount)}</ImageLikeValue>
                                     </ImageLikeBox>
 
                                     <ImageViewBox>
                                         <ImageViewIcon src={viewIcon} />
-                                        <ImageViewValue>{singleWork.viewCount}</ImageViewValue>
+                                        <ImageViewValue>{formatNumber(singleWork.viewCount)}</ImageViewValue>
                                     </ImageViewBox>
 
                                 </ImageHitBox>
