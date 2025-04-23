@@ -1263,28 +1263,6 @@ const LoadingBox = styled.div`
 
 
 
-interface SingleWorkUpdateState {
-    writer: {
-        id: number;
-        nickname: string;
-        introduction: string;
-        profileImage: string;
-    };
-    image: string;
-    createdAt: string;
-    camera: string;
-    lens: string;
-    aperture: string;
-    shutterSpeed: string;
-    iso: string;
-    location: string;
-    category: string;
-    date: string;
-    tags: string[];
-    title: string;
-    description: string;
-}
-
 interface Tag {
     name: string;
 }
@@ -1374,7 +1352,6 @@ const SingleWork: React.FC<SingleWorkProps> = (props) => {
     const [optionModalDisplay, setOptionModalDisplay] = useState<boolean>(false);
     const [deleteModalDisplay, setDeleteModalDisplay] = useState<boolean>(false);
     const [deleteModalInput, setDeleteModalInput] = useState<string>('');
-
 
     useEffect(() => {
         function handleClickOutside(event: MouseEvent) {
@@ -1682,10 +1659,10 @@ const SingleWork: React.FC<SingleWorkProps> = (props) => {
 
     const handleSingleWorkDetailsRequest = () => {
         const method = ENDPOINTS.SINGLE_WORK.GET_DETAILS.METHOD;
-        const url = ENDPOINTS.SINGLE_WORK.GET_DETAILS.URL;
+        const url = ENDPOINTS.SINGLE_WORK.GET_DETAILS.URL(singleWorkId, user.id ? user.id : 0);
 
         const options: FetchRequestOptions = {
-            url: url(singleWorkId, user.id ? user.id : 0),
+            url: url,
             method: method,
             headers: {
                 'Content-Type': 'application/json',
@@ -1711,13 +1688,19 @@ const SingleWork: React.FC<SingleWorkProps> = (props) => {
 
     }, [singleWorkStatusCode]);
 
-    useEffect(function handleSingleWorkDetailResponse() {
-        if (singleWorkData) {
+    useEffect(function handleSingleWorkDetailsResponse() {
+        if (singleWorkStatusCode === 200 && singleWorkData) {
             singleWorkData.category = categoryMap[singleWorkData.category];
             setSingleWork(singleWorkData);
+
+            return;
         }
 
-    }, [singleWorkData]);
+        if (singleWorkStatusCode === 404) {
+            return;
+        }
+
+    }, [singleWorkStatusCode, singleWorkData]);
 
 
     // 삭제 요청
@@ -2061,40 +2044,10 @@ const SingleWork: React.FC<SingleWorkProps> = (props) => {
         }
     }, [unfollowStatusCode])
 
-
-    // 태그 객체배열을 문자열 배열로 변환
-    const transformTagsToStrings = (tags: Tag[]): string[] => {
-        return tags.map(tag => tag.name);
-    };
-
     // 수정페이지로 이동
     const navigateToUpdateSingleWorkPage = () => {
-        const singleWorkUpdateState = {
-            id: singleWork.id,
-            writer: {
-                id: singleWork.writer.id,
-                nickname: singleWork.writer.nickname,
-                introduction: singleWork.writer.introduction,
-                profileImage: singleWork.writer.profileImage,
-            },
-            image: singleWork.image,
-            createdAt: singleWork.createdAt,
-            camera: singleWork.camera,
-            lens: singleWork.lens,
-            aperture: singleWork.aperture,
-            shutterSpeed: singleWork.shutterSpeed,
-            iso: singleWork.iso,
-            location: singleWork.location,
-            category: singleWork.category,
-            date: singleWork.date,
-            tags: transformTagsToStrings(singleWork.tags),
-            title: singleWork.title,
-            description: singleWork.description,
-        }
-
-        navigate(`/singleworks/${singleWorkId}/update`, { state: { singleWorkUpdateState } });
+        navigate(`/singleworks/${singleWorkId}/update`);
     }
-
 
     return (
         <Container>
