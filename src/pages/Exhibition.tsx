@@ -1030,7 +1030,7 @@ const Exhibition = () => {
     const [deleteModalInput, setDeleteModalInput] = useState<string>('');
 
     // 관람유저
-    const [activeUsers, setActiveUsers] = useState<number | null>(null);
+    const [activeUsers, setActiveUsers] = useState<number>(0);
 
     // 토스트 메시지
     const [toastMessageDisplay, setToastMessageDisplay] = useState<boolean>(false);
