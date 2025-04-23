@@ -23,13 +23,13 @@ import upActiveIcon from '../assets/up-active.png';
 import upNonactiveIcon from '../assets/up-nonactive.png';
 import writeActiveIcon from '../assets/write-active.png';
 import writeNonactiveIcon from '../assets/write-nonactive.png'
-import helpActiveIcon from '../assets/help-active.png';
-import helpNonactiveIcon from '../assets/help-nonactive.png';
 import discordActiveIcon from '../assets/discord-active.png';
 import discordNonactiveIcon from '../assets/discord-nonactive.png';
 import singleWorkIcon from '../assets/singlework-new.png';
 import exhibitionIcon from '../assets/exhibition-new.png';
 import useAuthStore from '../zustand/store';
+
+
 
 const Container = styled.div`
     display: flex;
@@ -520,10 +520,10 @@ const Home = () => {
 
     const handleSingleWorkDataPageRequest = (page: number) => {
         const method = ENDPOINTS.SINGLE_WORK.SEARCH.METHOD;
-        const url = ENDPOINTS.SINGLE_WORK.SEARCH.URL;
+        const url = ENDPOINTS.SINGLE_WORK.SEARCH.URL(searchTarget, inputValue, categoryQueryParam, `${sortingTarget},${sortingOrder}`, page, 30, user.id ? user.id : 0);
 
         const options: FetchRequestOptions = {
-            url: `${url(searchTarget, inputValue, categoryQueryParam, `${sortingTarget},${sortingOrder}`, page, 30, user.id ? user.id : 0)}`,
+            url: url,
             method: method,
             headers: {
                 'Content-Type': 'application/json',
@@ -560,10 +560,10 @@ const Home = () => {
 
     const handleExhibitionDataPageRequest = (page: number) => {
         const method = ENDPOINTS.EXHIBITION.SEARCH.METHOD;
-        const url = ENDPOINTS.EXHIBITION.SEARCH.URL;
+        const url = ENDPOINTS.EXHIBITION.SEARCH.URL(searchTarget, inputValue, `${sortingTarget},${sortingOrder}`, page, 30, user.id ? user.id : 0);
 
         const options: FetchRequestOptions = {
-            url: `${url(searchTarget, inputValue, `${sortingTarget},${sortingOrder}`, page, 30, user.id ? user.id : 0)}`,
+            url: url,
             method: method,
             headers: {
                 'Content-Type': 'application/json',
@@ -636,8 +636,7 @@ const Home = () => {
     };
     // 선택한 카테고리를 쿼리파라미터형태로 변환 useEffect
     useEffect(function convertToQueryParam() {
-        const array = categories.map((category) => categoryMap[category]);
-        setCategoryQueryParam(array.join(','));
+        setCategoryQueryParam(categories.join(','));
     }, [categories]);
 
     // 검색 조건 초기화 함수
@@ -739,6 +738,7 @@ const Home = () => {
     }, []);
 
     const handleSearch = () => {
+
         if (singleWorkView) {
             handleSingleWorkDataPageRequest(0);
         } else {
