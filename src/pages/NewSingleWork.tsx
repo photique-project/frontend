@@ -525,6 +525,10 @@ interface Writer {
     profileImage: string;
 }
 
+interface Tag {
+    name: string;
+}
+
 interface SingleWork {
     writer: Writer;
     image: string;

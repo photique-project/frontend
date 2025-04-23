@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { format } from "date-fns";
-import { useNavigate, useLocation } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import styled, { keyframes } from 'styled-components';
 import DatePicker from "react-datepicker";
 import { parse } from 'date-fns';
@@ -13,7 +13,7 @@ import useFetch from '../hooks/useFetch';
 
 import ToastMessage from '../components/ToastMessage';
 import Header from '../components/Header';
-import ImageInput from '../components/input/ImageInput';
+import Loader from '../components/Loader';
 import ScrollInput from '../components/input/ScrollInput';
 import ShortButton from '../components/button/ShortButton';
 import Tag from '../components/Tag';
@@ -30,7 +30,7 @@ import locationIcon from '../assets/input-location.png';
 import calendarIcon from '../assets/input-calendar.png';
 import tagIcon from '../assets/input-tag.png';
 import categoryIcon from '../assets/category.png';
-import loadingIcon from '../assets/loading-large.png';
+import loadingIcon from '../assets/loading-white.png';
 
 
 
@@ -227,6 +227,19 @@ const WriteViewContainer = styled.div`
     @media (max-width: 480px) {
         margin-top: 30px;
     }
+`
+
+const Image = styled.img`
+    width: 100%;
+    aspect-ratio: 16 / 9;
+
+    border-radius: 10px;
+    object-fit: contain; 
+
+    border-radius: 10px;
+
+    background-color: white;
+    border: 1px solid rgba(0, 0, 0, 0.2);
 `
 
 const ImageInputTitleBox = styled.div`
@@ -518,6 +531,18 @@ const LoadingIcon = styled.img`
     animation: ${rotate} 1.2s ease-in-out infinite;
 `
 
+const LoadingBox = styled.div`
+    width: 100%;
+    aspect-ratio: 2/1;
+
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+`
+
+
+
 interface SingleWork {
     id: number,
     writer: {
@@ -527,8 +552,8 @@ interface SingleWork {
         profileImage: string;
     };
     image: string;
-    createdAt: string;
     camera: string;
+    createdAt: string;
     lens: string;
     aperture: string;
     shutterSpeed: string;
@@ -540,6 +565,35 @@ interface SingleWork {
     title: string;
     description: string;
 }
+
+interface Tag {
+    name: string;
+}
+
+interface SingleWorkData {
+    id: number,
+    writer: {
+        id: number;
+        nickname: string;
+        introduction: string;
+        profileImage: string;
+    };
+    image: string;
+    camera: string;
+    createdAt: string;
+    lens: string;
+    aperture: string;
+    shutterSpeed: string;
+    iso: string;
+    location: string;
+    category: string;
+    date: string;
+    tags: Tag[];
+    title: string;
+    description: string;
+}
+
+
 
 const SingleWorkUpdate = () => {
     const apertureOptions = ["미입력", "f/0.7", "f/0.8", "f/0.85", "f/0.95", "f/1", "f/1.2", "f/1.4", "f/1.8", "f/2", "f/2.8", "f/3.2", "f/3.5", "f/4", "f/4.5", "f/5", "f/5.6", "f/6.3", "f/7.1", "f/8", "f/9", "f/10", "f/11", "f/13", "f/14", "f/16", "f/22", "f/32", "f/40", "f/45", "f/64"];
@@ -562,8 +616,12 @@ const SingleWorkUpdate = () => {
         "이벤트": "event",
         "패션": "fashion"
     };
+    const reverseCategoryMap: { [key: string]: string } = Object.fromEntries(
+        Object.entries(categoryMap).map(([ko, en]) => [en, ko])
+    );
+
     const user = useAuthStore.getState().user;
-    const location = useLocation();
+    const { singleWorkId } = useParams();
 
     const navigate = useNavigate();
 
@@ -572,13 +630,69 @@ const SingleWorkUpdate = () => {
     const [preview, setPreview] = useState<boolean>(false);
 
     // 단일작품 입력 데이터 상태관리
-    const [singleWork, setSingleWork] = useState<SingleWork>(
-        location.state?.singleWorkUpdateState
-    );
+    const [singleWork, setSingleWork] = useState<SingleWork>(null);
 
-    // 이미지 입력값 상태관리 변수
-    const [validImage, setValidImage] = useState<boolean | null>(true);
-    const [image, setImage] = useState<File | undefined>(undefined);
+    const {
+        loading: singleWorkLoading,
+        statusCode: singleWorkStatusCode,
+        data: singleWorkData,
+        fetchRequest: singleWorkRequest
+    } = useFetch<SingleWorkData>();
+
+    const handleSingleWorkDetailsRequest = () => {
+        const method = ENDPOINTS.SINGLE_WORK.GET_DETAILS.METHOD;
+        const url = ENDPOINTS.SINGLE_WORK.GET_DETAILS.URL(singleWorkId, 0);
+
+        const options: FetchRequestOptions = {
+            url: url,
+            method: method,
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            credentials: 'include',
+            contentType: 'application/json',
+        }
+
+        singleWorkRequest(options);
+    }
+
+    useEffect(function handleInitSingleWorkDetailsRequest() {
+        handleSingleWorkDetailsRequest();
+    }, []);
+
+    useEffect(function handleSingleWorkDetailsResponse() {
+        if (singleWorkStatusCode === 200 && singleWorkData) {
+            const tagNames: string[] = singleWorkData.tags.map(tag => tag.name);
+
+            const mappedSingleWork: SingleWork = {
+                id: singleWorkData.id,
+                writer: singleWorkData.writer,
+                image: singleWorkData.image,
+                camera: singleWorkData.camera,
+                createdAt: singleWorkData.createdAt,
+                lens: singleWorkData.lens,
+                aperture: singleWorkData.aperture,
+                shutterSpeed: singleWorkData.shutterSpeed,
+                iso: singleWorkData.iso,
+                location: singleWorkData.location,
+                category: reverseCategoryMap[singleWorkData.category],
+                date: singleWorkData.date,
+                tags: tagNames,
+                title: singleWorkData.title,
+                description: singleWorkData.description,
+            };
+
+            setSingleWork(mappedSingleWork);
+            setSelectedDate(parse(singleWorkData.date, 'yyyy-MM-dd', new Date()));
+            return;
+        }
+
+        if (singleWorkStatusCode === 404) {
+
+        }
+
+    }, [singleWorkStatusCode, singleWorkData]);
+
     const [imageHelperText, setImageHelperText] = useState<string>('사진*');
     const [imageHelperTextColor, setImageHelperTextColor] = useState<'black' | 'red'>('black');
 
@@ -600,7 +714,7 @@ const SingleWorkUpdate = () => {
     const [validDateInput, setValidDateInput] = useState<boolean | null>(true);
     const [dateHelperText, setDateHelperText] = useState<string>('날짜*');
     const [dateHelperTextColor, setDateHelperTextColor] = useState<'black' | 'red'>('black');
-    const [selectedDate, setSelectedDate] = useState<Date | null>(parseDate(singleWork.date));
+    const [selectedDate, setSelectedDate] = useState<Date | null>(null);
 
     // 태그 입력값 상태관리 변수
     const [tagInput, setTagInput] = useState<string>('');
@@ -627,37 +741,6 @@ const SingleWorkUpdate = () => {
 
     // 로딩 배경 상태관리
     const [loadingDisplay, setLoadingDisplay] = useState<boolean>(false);
-
-    // URL로 만든 src로 로딩할 수 있는 preview이미지를 imageInput컴포넌트에서 관리하기 때문에 
-    // preview 화면에서 보여줄 src를 위해 URL만드는 과정필요함
-    // 이미지가 수정됐을 때마다 preview를 새로 만들어줘야 하므로 해당 useEffect사용
-    useEffect(function convertToPreviewURL() {
-        if (image) {
-            const previewURL = URL.createObjectURL(image);
-            setSingleWork(prevState => ({
-                ...prevState,
-                image: previewURL
-            }));
-
-            return () => URL.revokeObjectURL(previewURL);
-        }
-    }, [image])
-
-    // 입력받은 이미지 유효성검사
-    useEffect(function validateImage() {
-        if (validImage != null) {
-
-            if (validImage) {
-                setImageHelperText('사진*')
-                setImageHelperTextColor('black');
-
-                return;
-            }
-
-            setImageHelperText('사진* - PNG, JPG 파일만 가능하며, 최대 크기는 5MB입니다')
-            setImageHelperTextColor('red');
-        }
-    }, [validImage])
 
     // 카메라 입력
     const handleCameraInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -880,18 +963,7 @@ const SingleWorkUpdate = () => {
         fetchRequest: singleWorkUpdateRequest
     } = useFetch<void>();
 
-    // 단일작품 게시하기
     const handleSingleWorkUpdate = () => {
-        // 이미지 입력값 확인
-        if (!validImage) {
-            if (validImage == null) {
-                setImageHelperTextColor('red');
-                setImageHelperText('사진* - 필수값입니다')
-            }
-
-            return;
-        }
-
         // 카메라 입력값 확인
         // 앞뒤공백제거하고 1글자 이상 50글자 이하
         if (!validCameraInput) {
@@ -953,33 +1025,32 @@ const SingleWorkUpdate = () => {
             });
         });
 
-
-        const formData = new FormData();
-        formData.append('writerId', user.id.toString());
-        if (image !== undefined) {
-            formData.append('image', image);
-        }
-        formData.append('camera', singleWork.camera.trim());
-        formData.append('lens', singleWork.lens.trim());
-        formData.append('aperture', singleWork.aperture === '' ? '미입력' : singleWork.aperture);
-        formData.append('shutterSpeed', singleWork.shutterSpeed === '' ? '미입력' : singleWork.shutterSpeed);
-        formData.append('iso', singleWork.iso === '' ? '미입력' : singleWork.iso);
-        formData.append('location', singleWork.location.trim());
-        formData.append('category', categoryMap[singleWork.category]);
-        formData.append('date', singleWork.date);
-        formData.append('tags', JSON.stringify(requestTags));
-        formData.append('title', singleWork.title.trim());
-        formData.append('description', singleWork.description.trim());
-
         const method = ENDPOINTS.SINGLE_WORK.UPDATE.METHOD;
-        const url = ENDPOINTS.SINGLE_WORK.UPDATE.URL;
+        const url = ENDPOINTS.SINGLE_WORK.UPDATE.URL(singleWork.id);
+        const body = {
+            writerId: user.id,
+            camera: singleWork.camera.trim(),
+            lens: singleWork.lens.trim(),
+            aperture: singleWork.aperture === '' ? '미입력' : singleWork.aperture,
+            shutterSpeed: singleWork.shutterSpeed === '' ? '미입력' : singleWork.shutterSpeed,
+            iso: singleWork.iso === '' ? '미입력' : singleWork.iso,
+            location: singleWork.location.trim(),
+            category: categoryMap[singleWork.category],
+            date: singleWork.date,
+            tags: requestTags,
+            title: singleWork.title.trim(),
+            description: singleWork.description.trim()
+        }
 
         const options: FetchRequestOptions = {
-            url: url(singleWork.id),
+            url: url,
             method: method,
+            headers: {
+                'Content-Type': 'application/json',
+            },
             credentials: 'include',
-            contentType: 'multipart/form-data',
-            body: formData
+            contentType: 'application/json',
+            body: body
         }
 
         singleWorkUpdateRequest(options);
@@ -1070,14 +1141,14 @@ const SingleWorkUpdate = () => {
             <BodyBox>
                 <FormBox>
                     <TitleBox>
-                        <Title>게시글 작성</Title>
+                        <Title>단일작품 수정</Title>
                     </TitleBox>
 
                     <TabBox>
                         <Tab>
                             <TabIconBox id='write' viewMode={writeView} onClick={handleView}>
                                 <TabIcon src={writeView ? writeWhiteIcon : writeBlackIcon}></TabIcon>
-                                <TabIconText viewMode={writeView}>작성하기</TabIconText>
+                                <TabIconText viewMode={writeView}>수정하기</TabIconText>
                             </TabIconBox>
                             <TabIconBox id='preview' viewMode={preview} onClick={handleView}>
                                 <TabIcon src={preview ? viewWhiteIcon : viewBlackIcon}></TabIcon>
@@ -1085,15 +1156,20 @@ const SingleWorkUpdate = () => {
                             </TabIconBox>
                         </Tab>
                     </TabBox>
+                    {singleWorkLoading &&
+                        <>
+                            <LoadingBox>
+                                <Loader fontColor='black' />
+                            </LoadingBox>
+                        </>}
 
-
-                    {writeView &&
+                    {!singleWorkLoading && singleWork && writeView &&
                         <WriteViewContainer>
                             <ImageInputTitleBox>
                                 <ImageInputTitle color={imageHelperTextColor}>{imageHelperText}</ImageInputTitle>
                             </ImageInputTitleBox>
 
-                            <ImageInput width={'100%'} ratio={'16/9'} marginTop={5} image={image} setImage={setImage} setValidImage={setValidImage} inputDisabled={inputDisabled} curImage={singleWork.image} />
+                            <Image src={singleWork.image} />
 
                             <InputBox>
 
@@ -1253,12 +1329,13 @@ const SingleWorkUpdate = () => {
                         </WriteViewContainer>
                     }
 
-                    {preview && <SingleWorkCreatePreview singleWork={singleWork} />}
+                    {!singleWorkLoading && singleWork && preview && <SingleWorkCreatePreview singleWork={singleWork} />}
 
                     <ButtonBox>
                         <ShortButton text={'취소'} type={'white'} action={navigateToHomePage}></ShortButton>
                         <ShortButton text={'수정완료'} type={'black'} action={handleSingleWorkUpdate}></ShortButton>
                     </ButtonBox>
+
 
 
                 </FormBox>
@@ -1271,7 +1348,7 @@ const SingleWorkUpdate = () => {
                     isSuccess={isSuccess}
                 />}
 
-            {loadingDisplay &&
+            {singleWorkUpdateLoading &&
                 <LoadingBackground>
                     <LoadingIcon src={loadingIcon} />
                 </LoadingBackground>

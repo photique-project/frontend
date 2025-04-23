@@ -70,7 +70,7 @@ const ImageInfoBar = styled.div`
 
 const Image = styled.img`
     width: 100%;
-    height: 100%;
+    aspect-ratio: 16 / 9;
 
     position: absolute;
 
@@ -720,8 +720,8 @@ interface Writer {
 interface SingleWork {
     writer: Writer;
     image: string;
-    createdAt: string;
     camera: string;
+    createdAt: string;
     lens: string;
     aperture: string;
     shutterSpeed: string;
