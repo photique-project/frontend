@@ -1030,11 +1030,11 @@ const SingleWorkUpdate = () => {
         const body = {
             writerId: user.id,
             camera: singleWork.camera.trim(),
-            lens: singleWork.lens.trim(),
+            lens: singleWork.lens === null ? singleWork.lens : singleWork.lens.trim(),
             aperture: singleWork.aperture === '' ? '미입력' : singleWork.aperture,
             shutterSpeed: singleWork.shutterSpeed === '' ? '미입력' : singleWork.shutterSpeed,
             iso: singleWork.iso === '' ? '미입력' : singleWork.iso,
-            location: singleWork.location.trim(),
+            location: singleWork.location === null ? singleWork.location : singleWork.location.trim(),
             category: categoryMap[singleWork.category],
             date: singleWork.date,
             tags: requestTags,
