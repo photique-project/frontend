@@ -654,9 +654,6 @@ const NewSingleWork = () => {
     const [secondText, setSecondText] = useState<string>('');
     const [isSuccess, setIsSuccess] = useState<boolean>(null);
 
-    // 로딩 배경 상태관리
-    const [loadingDisplay, setLoadingDisplay] = useState<boolean>(false);
-
     // URL로 만든 src로 로딩할 수 있는 preview이미지를 imageInput컴포넌트에서 관리하기 때문에 
     // preview 화면에서 보여줄 src를 위해 URL만드는 과정필요함
     // 이미지가 수정됐을 때마다 preview를 새로 만들어줘야 하므로 해당 useEffect사용
@@ -1013,9 +1010,7 @@ const NewSingleWork = () => {
         singleWorkCreateRequest(options);
     }
 
-    useEffect(function handleSingleWorkCreateResult() {
-        setLoadingDisplay(false);
-
+    useEffect(function handleSingleWorkCreateResponse() {
         if (singleWorkCreateStatusCode === 201) {
             setToastMessageDisplay(true);
             setFirstText('단일작품 게시완료!');
@@ -1299,7 +1294,7 @@ const NewSingleWork = () => {
                     isSuccess={isSuccess}
                 />}
 
-            {loadingDisplay &&
+            {singleWorkCreateLoading &&
                 <LoadingBackground>
                     <LoadingIcon src={loadingIcon} />
                 </LoadingBackground>
