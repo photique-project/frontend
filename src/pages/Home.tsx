@@ -724,6 +724,7 @@ const Home = () => {
         if (id === 'single-work') {
             setSingleWorkView(true);
             setExhibitionView(false);
+            setSingleWorks([]);
             handleSingleWorkPageRequest();
 
             return;
@@ -732,6 +733,7 @@ const Home = () => {
         if (id === 'exhibition') {
             setExhibitionView(true);
             setSingleWorkView(false);
+            setExhibitions([])
             handleExhibitionPageRequest();
 
             return;
@@ -794,8 +796,10 @@ const Home = () => {
         nextPageRef.current = 0;
 
         if (singleWorkView) {
+            setSingleWorks([]);
             handleSingleWorkPageRequest();
         } else {
+            setExhibitions([]);
             handleExhibitionPageRequest();
         }
     }
@@ -869,11 +873,12 @@ const Home = () => {
                     </TabIconBox>
                 </Tab>
 
-                {notFound &&
+                {/* 현재 초기 검색말고 탭으로 옮겼을 때 검색 로딩이 안뜸? 어떻게 동작할지 정의, 검색했을 떄도 로딩이 안뜸, 뜰때도 있고 안뜰대도 있음 not found뜨고 검색하면 또 로딩안뜸 */}
+                {!singleWorkPageLoading && !exhibitionPageLoading && notFound &&
                     <NotFoundBox>검색결과가 없습니다</NotFoundBox>
                 }
 
-                {!notFound && singleWorkView &&
+                {singleWorkView &&
                     <SingleWorkView
                         handleOpenSingleWorkDetail={handleOpenSingleWorkDetails}
                         singleWorkDataPageLoading={singleWorkPageLoading}
@@ -883,7 +888,7 @@ const Home = () => {
                     />
                 }
 
-                {!notFound && exhibitionView &&
+                {exhibitionView &&
                     <ExhibitionView
                         exhibitionDataPageLoading={exhibitionPageLoading}
                         exhibitions={exhibitions}
