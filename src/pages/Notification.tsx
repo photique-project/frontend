@@ -62,6 +62,10 @@ const NotificationPageBox = styled.div`
 
     gap: 15px;
     
+
+    @media (max-width: 1300px) {
+        width: 90%;
+    }
 `
 
 const PageBoxHeader = styled.div`

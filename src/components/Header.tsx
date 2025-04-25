@@ -414,6 +414,10 @@ const Header: React.FC<HeaderProps> = (props) => {
         setLoginModalDisplay(true);
     }
 
+    const handleNavigateToMyPage = (menu: string) => {
+        navigate("/mypage", { state: { menu: menu } });
+    }
+
     // TODO: 이후에 로그아웃 api호출을 authStore로 옮기기
     const handleLogout = () => {
         const method = ENDPOINTS.AUTH.LOGOUT.METHOD;
@@ -496,8 +500,7 @@ const Header: React.FC<HeaderProps> = (props) => {
             <HeaderMenu isOpen={isMenuOpen}>
                 {!isLoggedIn && <MenuButton onClick={showLoginModal}>로그인</MenuButton>}
                 {!isLoggedIn && <MenuButton onClick={navigateToJoinPage}>회원가입</MenuButton>}
-                {isLoggedIn && <MenuButton onClick={showLoginModal}>내 정보</MenuButton>}
-                {isLoggedIn && <MenuButton onClick={handleLogout}>히스토리</MenuButton>}
+                {isLoggedIn && <MenuButton onClick={() => handleNavigateToMyPage('my')}>내 정보</MenuButton>}
                 {isLoggedIn && <MenuButton onClick={handleLogout}>로그아웃</MenuButton>}
                 <MenuButton onClick={navigateToIntroPage}>About</MenuButton>
             </HeaderMenu>

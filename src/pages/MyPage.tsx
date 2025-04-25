@@ -6,6 +6,11 @@ import useAuthStore from '../zustand/store';
 
 import Header from '../components/Header';
 import UserDetailsView from '../components/UserDetailsView';
+import FollowView from '../components/FollowView';
+import BookmarkView from '../components/BookmarkView';
+import LikeView from '../components/LikeView';
+import MyPostView from '../components/MyPostView';
+import DEFAULT from '../api/default';
 
 import imageIcon from '../assets/image.png';
 import bookmarkIcon from '../assets/bookmark-small.png';
@@ -17,11 +22,6 @@ import bookmarkWhiteIcon from '../assets/bookmark-w.png';
 import userWhiteIcon from '../assets/user-w.png';
 import settingsWhiteIcon from '../assets/settings-w.png';
 import likeImageWhiteIcon from '../assets/like-w.png';
-import FollowView from '../components/FollowView';
-import BookmarkView from '../components/BookmarkView';
-import LikeView from '../components/LikeView';
-import MyPostView from '../components/MyPostView';
-import DEFAULT from '../api/default';
 
 const Container = styled.div`
     display: flex;
@@ -55,6 +55,10 @@ const SideBar = styled.div`
     box-shadow: 1px 2px 4px -1px rgba(0, 0, 0, 0.25);
 
     background-color: white;
+
+    @media (max-width: 1300px) {
+        width: 230px;
+    }
 `
 
 const UserDetailsBox = styled.div`
@@ -160,6 +164,10 @@ const MainBox = styled.div`
     
     &::-webkit-scrollbar-track {
         background: transparent;
+    }
+
+    @media (max-width: 1300px) {
+        width: calc(100% - 230px);
     }
 `
 

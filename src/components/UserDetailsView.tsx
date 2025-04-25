@@ -18,7 +18,7 @@ import alertIcon from '../assets/alert.png';
 
 
 const Container = styled.div`
-    width: 880px;
+    width: 80%;
     height: 100%;
 
     position: relative;
@@ -73,6 +73,12 @@ const ImageBox = styled.div`
     flex-direction: row;
 
     gap: 20px;
+
+    @media (max-width: 760px) {
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+    }
 `
 
 const ImageInputBox = styled.label<{ isDragging: boolean }>`
@@ -94,6 +100,10 @@ const ImageInputBox = styled.label<{ isDragging: boolean }>`
 
     &:hover {
         background-color: rgba(0, 0, 0, 0.07);
+    }
+
+    @media (max-width: 760px) {
+        width: 100%;
     }
 `;
 
@@ -125,6 +135,11 @@ const ImageInputSettingBox = styled.div`
     justify-content: center;
 
     position: relative;
+
+    @media (max-width: 760px) {
+    width: 100%;   
+        
+    }
 `
 
 const ImageInputSettingBoxText = styled.div`
@@ -143,6 +158,12 @@ const ImageInputButtonBox = styled.div`
 
     position: absolute;
     bottom: 0;
+
+    @media (max-width: 760px) {
+        margin-top: 10px;
+        position: initial;
+        bottom: auto;
+    }
 `
 
 const ImageInputInitButton = styled.button`
