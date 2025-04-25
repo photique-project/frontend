@@ -612,10 +612,6 @@ const Home = () => {
         exhibitionPageRequest(options);
     }
 
-    useEffect(function handleExhibitionPageInitRequest() {
-        handleExhibitionPageRequest();
-    }, []);
-
     useEffect(function handleSingleWorkPageResponse() {
         // 이전 요청에 대한 값이 남아있을 수 있으므로 loading으로 상태변화 체크
         if (!exhibitionPageLoading) {
