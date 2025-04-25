@@ -46,7 +46,7 @@ const Container = styled.div`
         scale: 1.05;
     }
 
-    animation: ${slideFadeIn} 0.5s ease;
+    animation: ${slideFadeIn} 0.7s ease;
 `
 
 const ExhibitionCardColor = styled.div`

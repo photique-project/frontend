@@ -1,5 +1,16 @@
-import styled from 'styled-components';
+import styled, { keyframes } from "styled-components";
 
+
+const slideFadeIn = keyframes`
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+`;
 
 const Container = styled.div`
     width: 500px;
@@ -25,6 +36,8 @@ const Container = styled.div`
         width: 80%;
         height: auto;
     }
+
+    animation: ${slideFadeIn} 1s ease;
 `;
 
 const IconBox = styled.div`
