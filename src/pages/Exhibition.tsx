@@ -1160,6 +1160,8 @@ const Exhibition = () => {
         }
 
         if (exhibitionDataStatusCode === 401) {
+            alert('로그인 상태를 확인해주세요')
+            window.close();
             return;
         }
 
@@ -1172,7 +1174,7 @@ const Exhibition = () => {
             return;
         }
 
-    }, [exhibitionData]);
+    }, [exhibitionDataStatusCode, exhibitionData]);
 
 
     const handleMessage = (message: Message) => {
@@ -1309,6 +1311,10 @@ const Exhibition = () => {
     } = useFetch<void>();
 
     const handleLikeRequest = () => {
+        if (likeLoading || dislikeLoading) {
+            return;
+        }
+
         const method = exhibition.isLiked ? 'DELETE' : 'POST';
         const request = exhibition.isLiked ? dislikeRequest : likeRequest;
 
@@ -1426,6 +1432,10 @@ const Exhibition = () => {
     } = useFetch<void>();
 
     const handleBookmarkRequest = () => {
+        if (bookmarkLoading || unbookmarkLoading) {
+            return;
+        }
+
         const method = exhibition.isBookmarked ? 'DELETE' : 'POST';
         const request = exhibition.isBookmarked ? unbookmarkRequest : bookmarkRequest;
 
