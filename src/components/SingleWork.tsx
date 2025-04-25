@@ -31,6 +31,8 @@ import heartFillIcon from '../assets/heart-fill.png';
 import leftBlackIcon from '../assets/left-black.png';
 import rightBlackIcon from '../assets/right-black.png';
 import categoryGrayIcon from '../assets/category-gray.png';
+import userPlusIcon from '../assets/user-plus.png';
+import userCheckIcon from '../assets/user-check.png';
 
 
 
@@ -463,7 +465,13 @@ const FollowButton = styled.button<{ isFollowing: boolean }>`
     padding-right: 10px;
     height: 45px;
 
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 5px;
+
     font-size: 16px;
+    line-height: 20px;
 
     position: relative;
 
@@ -475,6 +483,8 @@ const FollowButton = styled.button<{ isFollowing: boolean }>`
     &:hover {
         background-color: ${({ isFollowing }) => isFollowing ? "rgba(0, 0, 0, 0.1)" : "rgba(0, 0, 0, 0.7)"};
     }
+
+    transition: background-color 0.4s ease, color 0.4s ease;
 
     @media (max-width: 768px) {
         width: 60px;
@@ -1247,6 +1257,10 @@ const LoadingBox = styled.div`
     z-index: 999;
 `
 
+const FollowIcon = styled.img`
+    width: 20px;
+    height: 20px;
+`
 
 
 interface Tag {
@@ -1919,6 +1933,14 @@ const SingleWork: React.FC<SingleWorkProps> = (props) => {
     } = useFetch<void>();
 
     const handleFollowRequest = () => {
+        if (user.id === singleWork.writer.id) {
+            return;
+        }
+
+        if (followLoading || unfollowLoading) {
+            return;
+        }
+
         const method = singleWork.isFollowing ? 'DELETE' : 'POST';
         const request = singleWork.isFollowing ? unfollowRequest : followRequest;
 
@@ -1952,7 +1974,7 @@ const SingleWork: React.FC<SingleWorkProps> = (props) => {
                 return;
             }
 
-            if (followStatusCode == 401) {
+            if (followStatusCode === 401) {
                 setToastMessageDisplay(true);
                 setFirstText('팔로우 요청 실패 !');
                 setSecondText('로그인 상태를 확인해주세요');
@@ -1971,15 +1993,15 @@ const SingleWork: React.FC<SingleWorkProps> = (props) => {
                 return;
             }
 
-            if (followStatusCode == 404) {
+            if (followStatusCode === 404) {
                 return;
             }
 
-            if (followStatusCode == 409) {
+            if (followStatusCode === 409) {
                 return;
             }
 
-            if (followStatusCode == 500) {
+            if (followStatusCode === 500) {
                 return;
             }
         }
@@ -1988,7 +2010,7 @@ const SingleWork: React.FC<SingleWorkProps> = (props) => {
 
     useEffect(function handleUnfollowResponse() {
         if (unfollowStatusCode) {
-            if (unfollowStatusCode == 204) {
+            if (unfollowStatusCode === 204) {
                 setSingleWork(prevState => ({
                     ...prevState,
                     isFollowing: false,
@@ -1996,7 +2018,7 @@ const SingleWork: React.FC<SingleWorkProps> = (props) => {
                 return;
             }
 
-            if (unfollowStatusCode == 401) {
+            if (unfollowStatusCode === 401) {
                 // 모달 띄우고 홈페이지로 리다이렉트
                 setToastMessageDisplay(true);
                 setFirstText('언팔로우 요청 실패 !');
@@ -2105,10 +2127,11 @@ const SingleWork: React.FC<SingleWorkProps> = (props) => {
                                     onClick={handleFollowRequest}
                                     isFollowing={singleWork.isFollowing}
                                 >
+                                    <FollowIcon src={singleWork.isFollowing ? userCheckIcon : userPlusIcon} alt='follow' />
                                     {singleWork.isFollowing ? '팔로잉' : '팔로우'}
 
                                     <FollowMessageBox>
-                                        {singleWork.isFollowing ? '현재 팔로우하고 있는 작가입니다' : '팔로우 요청하고 작가의 소식을 받아보세요 !'}
+                                        {user.id === singleWork.writer.id ? '본인을 팔로우할 수는 없습니다' : singleWork.isFollowing ? '현재 팔로우하고 있는 작가입니다' : '팔로우 요청하고 작가의 소식을 받아보세요 !'}
                                     </FollowMessageBox>
                                 </FollowButton>
                             </PhotographerInfoBox>
@@ -2285,7 +2308,7 @@ const SingleWork: React.FC<SingleWorkProps> = (props) => {
                                                         {commentPageGroup === Math.floor(index / 5) &&
                                                             <CommentPage
                                                                 key={index + 1}
-                                                                isSelected={index + 1 == commentCurrentPage + 1}
+                                                                isSelected={index + 1 === commentCurrentPage + 1}
                                                                 onClick={() => handleCommentPageRequest(index)}
                                                             >
                                                                 {index + 1}

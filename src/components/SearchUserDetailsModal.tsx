@@ -135,8 +135,36 @@ const FollowButton = styled.button<{ isFollowing: boolean }>`
     background-color: ${({ isFollowing }) => isFollowing ? "white" : "black"};
     color: ${({ isFollowing }) => isFollowing ? "black" : "white"};
 
+    transition: background-color 0.4s ease, color 0.4s ease;
+
     &:hover {
         background-color: ${({ isFollowing }) => isFollowing ? "rgba(0, 0, 0, 0.1)" : "rgba(0, 0, 0, 0.7)"};
+    }
+`
+
+const FollowMessageBox = styled.div`
+    padding: 10px;
+
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    white-space: nowrap;
+
+    border-radius: 10px;
+    color: white;
+
+    position: absolute;
+    bottom: 100%;
+    left: 100%;
+
+    background-color: rgba(0, 0, 0, 0.3);
+
+    opacity: 0;
+    transition: opacity 0.3s ease-in-out;
+
+    ${FollowButton}:hover & {
+        opacity: 1;
     }
 `
 
@@ -396,7 +424,9 @@ const SearchUserDetailsModal: React.FC<SearchUserDetailsModalProps> = (props) =>
                             <FollowIcon src={userDetails.isFollowing ? userCheckIcon : userPlusIcon} alt='follow' />
 
                             {userDetails.isFollowing ? '팔로잉' : '팔로우'}
-
+                            <FollowMessageBox>
+                                {user.id === userDetails.id ? '본인을 팔로우할 수는 없습니다' : userDetails.isFollowing ? '현재 팔로우하고 있는 작가입니다' : '팔로우 요청하고 작가의 소식을 받아보세요 !'}
+                            </FollowMessageBox>
                         </FollowButton>
 
                     </>
