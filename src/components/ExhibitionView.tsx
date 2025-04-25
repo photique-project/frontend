@@ -29,6 +29,7 @@ const Container = styled.div`
 `
 
 const LoadingBox = styled.div`
+margin-bottom: 100px;
     width: 100%;
     height: 100vh;
     display: flex;
@@ -65,65 +66,20 @@ interface ExhibitionData {
     isBookmarked: boolean;
 }
 
-interface ExhibitionDataPage {
-    content: ExhibitionData[];
-    number: number;
-    last: boolean;
-}
-
 interface ExhibitionViewProps {
     exhibitionDataPageLoading: boolean;
-    exhibitionDataPage: ExhibitionDataPage;
+    exhibitions: ExhibitionData[];
     exhibitionDataPageStatusCode: number;
 }
 
 
 
 const ExhibitionView: React.FC<ExhibitionViewProps> = (props) => {
-    const { exhibitionDataPageLoading, exhibitionDataPage, exhibitionDataPageStatusCode } = props;
-
-    const [exhibitions, setExhibitions] = useState<ExhibitionData[]>([]);
-    const [notFound, setNotFound] = useState<boolean>(false);
-
-    // 검색한 전시회 배열 할당
-    useEffect(function isCompletedLoading() {
-        if (!exhibitionDataPageLoading && exhibitionDataPage) {
-            if (exhibitionDataPage.number === 0) {
-                setExhibitions(exhibitionDataPage.content)
-            } else {
-                setExhibitions((prev) => [...prev, ...exhibitionDataPage.content])
-            }
-        }
-    }, [exhibitionDataPageLoading])
-
-    // 404가 나왔다면 검색결과가 아예 없으므로 검색결과 없다는 표시필요
-    useEffect(function isNotFound() {
-        if (exhibitionDataPageStatusCode == 200) {
-            setNotFound(false);
-        }
-
-        if (exhibitionDataPageStatusCode == 404) {
-            setNotFound(true);
-        }
-
-    }, [exhibitionDataPageStatusCode])
-
+    const { exhibitionDataPageLoading, exhibitions, exhibitionDataPageStatusCode } = props;
 
     return (
         <>
-            {exhibitionDataPageLoading &&
-                <LoadingBox>
-                    <Loader fontColor='black' />
-                </LoadingBox>
-            }
-            {!exhibitionDataPageLoading && notFound &&
-                <>
-                    <LoadingBox>
-                        검색결과가 없습니다
-                    </LoadingBox>
-                </>
-            }
-            {!exhibitionDataPageLoading && !notFound &&
+            {exhibitions &&
                 <Container>
                     {exhibitions.map((exhibition, index) => (
                         <ExhibitionCard
@@ -134,6 +90,11 @@ const ExhibitionView: React.FC<ExhibitionViewProps> = (props) => {
                     ))}
 
                 </Container>
+            }
+            {exhibitionDataPageLoading &&
+                <LoadingBox>
+                    <Loader fontColor='black' />
+                </LoadingBox>
             }
         </>
     )
