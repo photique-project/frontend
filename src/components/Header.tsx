@@ -434,7 +434,7 @@ const Header: React.FC<HeaderProps> = (props) => {
         logout();
     }
 
-    useEffect(function getLogoutResult() {
+    useEffect(function handleLogoutResponse() {
         if (logoutStatusCode) {
             if (logoutStatusCode === 204) {
                 window.location.reload();
