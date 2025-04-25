@@ -35,7 +35,7 @@ const Container = styled.div`
         opacity: 1; 
     }
 
-    animation: ${slideFadeIn} 0.5s ease;
+    animation: ${slideFadeIn} 0.7s ease;
 `;
 
 const SingleWork = styled.img`

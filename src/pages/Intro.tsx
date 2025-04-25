@@ -244,7 +244,7 @@ const Intro = () => {
                     <SecondIntroBoxCardBox>
                         <IntroCard icon={cameraIcon} mainText="작품 업로드" subText="사진을 쉽게 업로드하고 다른 작가의 사진을 감상할 수 있어요" />
                         <IntroCard icon={exhibitionIcon} mainText="전시회 개최" subText="작품을 모아 하나의 주제로 전시회를 개최할 수 있어요" />
-                        <IntroCard icon={personIcon} mainText="작가 팔로우" subText={<>다른 작가의 팔로우를 통해 소식을 받아볼 수 있어요<br />또한 직접 메시지를 주고 받을 수도 있어요</>} />
+                        <IntroCard icon={personIcon} mainText="작가 팔로우" subText={<>다른 작가의 팔로우를 통해 소식을 받아볼 수 있어요</>} />
                         <IntroCard icon={searchIcon} mainText="작품 검색" subText={<>원하는 작품을 빠르고 쉽게 찾아보세요<br />여러 카테고리와 더불어 해시태그를 기반으로 검색할 수 있어요</>} />
                     </SecondIntroBoxCardBox>
                 </SecondIntroBox>
