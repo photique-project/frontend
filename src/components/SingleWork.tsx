@@ -26,7 +26,6 @@ import tagGrayIcon from '../assets/tag-gray.png';
 import pencilIcon from '../assets/pencil.png'
 import trashIcon from '../assets/trash-red.png';
 import alertIcon from '../assets/alert.png';
-import loadingIcon from '../assets/loading-large.png';
 import heartIcon from '../assets/heart.png';
 import heartFillIcon from '../assets/heart-fill.png';
 import leftBlackIcon from '../assets/left-black.png';
@@ -206,11 +205,11 @@ const ImageLikeBox = styled.div`
 `;
 
 const swing = keyframes`
-  0% { transform: rotate(0deg) scale(1.2); }
-  25% { transform: rotate(-15deg) scale(1.2); }
-  50% { transform: rotate(15deg) scale(1.2); }
-  75% { transform: rotate(-10deg) scale(1.2); }
-  100% { transform: rotate(0deg) scale(1.2); }
+    0% { transform: rotate(0deg) scale(1.2); }
+    25% { transform: rotate(-15deg) scale(1.2); }
+    50% { transform: rotate(15deg) scale(1.2); }
+    75% { transform: rotate(-10deg) scale(1.2); }
+    100% { transform: rotate(0deg) scale(1.2); }
 `;
 
 const ImageLikeIcon = styled.img`
@@ -225,9 +224,9 @@ const ImageLikeIcon = styled.img`
     cursor: pointer;
 
     &:hover {
-    transform: scale(1.2);
-    animation: ${swing} 0.5s ease-in-out infinite;
-  }
+        transform: scale(1.2);
+        animation: ${swing} 0.5s ease-in-out infinite;
+    }
 `;
 
 
@@ -1235,22 +1234,6 @@ const DeleteBoxDeleteButton = styled.button`
     }
 `
 
-const rotate = keyframes`
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
-`;
-
-const LoadingIcon = styled.img`
-    width: 50px;
-    height: 50px;
-
-    animation: ${rotate} 1.2s ease-in-out infinite;
-`
-
 const LoadingBox = styled.div`
     width: 100%;
     height: 100vh;
@@ -1270,7 +1253,7 @@ interface Tag {
     name: string;
 }
 
-interface SingleWork {
+interface SingleWorkData {
     id: number;
     writer: {
         id: number,
@@ -1379,7 +1362,7 @@ const SingleWork: React.FC<SingleWorkProps> = (props) => {
     const [isSucess, setIsSucess] = useState<boolean>(null);
 
     // 단일작품 조회 상태관리
-    const [singleWork, setSingleWork] = useState<SingleWork>(null);
+    const [singleWork, setSingleWork] = useState<SingleWorkData>(null);
 
     // 댓글 상태관리변수
     const [commentCurrentPage, setCommentCurrentPage] = useState<number>(0);
@@ -1581,13 +1564,13 @@ const SingleWork: React.FC<SingleWorkProps> = (props) => {
 
     useEffect(function commentCreateResponse() {
         if (commentCreateStatusCode) {
-            if (commentCreateStatusCode == 201) {
+            if (commentCreateStatusCode === 201) {
                 handleCommentPageRequest();
                 setCommentInput('')
                 return;
             }
 
-            if (commentCreateStatusCode == 400) {
+            if (commentCreateStatusCode === 400) {
                 setToastMessageDisplay(true);
                 setFirstText('댓글작성 실패 !');
                 setSecondText('입력값을 확인해주세요');
@@ -1600,7 +1583,7 @@ const SingleWork: React.FC<SingleWorkProps> = (props) => {
                 return;
             }
 
-            if (commentCreateStatusCode == 401) {
+            if (commentCreateStatusCode === 401) {
                 setToastMessageDisplay(true);
                 setFirstText('댓글작성 실패 !');
                 setSecondText('로그인 상태를 확인해주세요');
@@ -1613,15 +1596,15 @@ const SingleWork: React.FC<SingleWorkProps> = (props) => {
                 return;
             }
 
-            if (commentCreateStatusCode == 403) {
+            if (commentCreateStatusCode === 403) {
                 return;
             }
 
-            if (commentCreateStatusCode == 404) {
+            if (commentCreateStatusCode === 404) {
                 return;
             }
 
-            if (commentCreateStatusCode == 500) {
+            if (commentCreateStatusCode === 500) {
                 return;
             }
 
@@ -1658,7 +1641,7 @@ const SingleWork: React.FC<SingleWorkProps> = (props) => {
         statusCode: singleWorkStatusCode,
         data: singleWorkData,
         fetchRequest: singleWorkRequest
-    } = useFetch<SingleWork>();
+    } = useFetch<SingleWorkData>();
 
     const handleSingleWorkDetailsRequest = () => {
         const method = ENDPOINTS.SINGLE_WORK.GET_DETAILS.METHOD;
@@ -1680,16 +1663,6 @@ const SingleWork: React.FC<SingleWorkProps> = (props) => {
     useEffect(function handleInitSingleWorkDetailsRequest() {
         handleSingleWorkDetailsRequest();
     }, []);
-
-    useEffect(function handleSingleWorkDetailResponse() {
-        if (singleWorkStatusCode) {
-            if (singleWorkStatusCode === 200) {
-
-                return;
-            }
-        }
-
-    }, [singleWorkStatusCode]);
 
     useEffect(function handleSingleWorkDetailsResponse() {
         if (singleWorkStatusCode === 200 && singleWorkData) {
@@ -1820,6 +1793,10 @@ const SingleWork: React.FC<SingleWorkProps> = (props) => {
     } = useFetch<void>();
 
     const handleLikeRequest = () => {
+        if (likeLoading || dislikeLoading) {
+            return;
+        }
+
         const method = singleWork.isLiked ? 'DELETE' : 'POST';
         const request = singleWork.isLiked ? dislikeRequest : likeRequest;
 
@@ -1845,7 +1822,7 @@ const SingleWork: React.FC<SingleWorkProps> = (props) => {
 
     useEffect(function handleLikeResponse() {
         if (likeStatusCode) {
-            if (likeStatusCode == 201) {
+            if (likeStatusCode === 201) {
                 setSingleWork(prevState => ({
                     ...prevState,
                     isLiked: true,
@@ -1854,7 +1831,7 @@ const SingleWork: React.FC<SingleWorkProps> = (props) => {
                 return;
             }
 
-            if (likeStatusCode == 401) {
+            if (likeStatusCode === 401) {
                 setToastMessageDisplay(true);
                 setFirstText('좋아요 추가실패 !');
                 setSecondText('로그인 상태를 확인해주세요');
@@ -1869,19 +1846,19 @@ const SingleWork: React.FC<SingleWorkProps> = (props) => {
 
             }
 
-            if (likeStatusCode == 403) {
+            if (likeStatusCode === 403) {
                 return;
             }
 
-            if (likeStatusCode == 404) {
+            if (likeStatusCode === 404) {
                 return;
             }
 
-            if (likeStatusCode == 409) {
+            if (likeStatusCode === 409) {
                 return;
             }
 
-            if (likeStatusCode == 500) {
+            if (likeStatusCode === 500) {
                 return;
             }
         }
@@ -1890,7 +1867,7 @@ const SingleWork: React.FC<SingleWorkProps> = (props) => {
 
     useEffect(function handleDislikeResponse() {
         if (dislikeStatusCode) {
-            if (dislikeStatusCode == 204) {
+            if (dislikeStatusCode === 204) {
                 setSingleWork(prevState => ({
                     ...prevState,
                     isLiked: false,
@@ -1899,7 +1876,7 @@ const SingleWork: React.FC<SingleWorkProps> = (props) => {
                 return;
             }
 
-            if (dislikeStatusCode == 401) {
+            if (dislikeStatusCode === 401) {
                 // 모달 띄우고 홈페이지로 리다이렉트
                 setToastMessageDisplay(true);
                 setFirstText('좋아요 삭제 실패 !');
@@ -1913,15 +1890,15 @@ const SingleWork: React.FC<SingleWorkProps> = (props) => {
                 return;
             }
 
-            if (dislikeStatusCode == 403) {
+            if (dislikeStatusCode === 403) {
                 return;
             }
 
-            if (dislikeStatusCode == 404) {
+            if (dislikeStatusCode === 404) {
                 return;
             }
 
-            if (dislikeStatusCode == 500) {
+            if (dislikeStatusCode === 500) {
                 return;
             }
         }
@@ -1967,7 +1944,7 @@ const SingleWork: React.FC<SingleWorkProps> = (props) => {
 
     useEffect(function handleFollowResponse() {
         if (followStatusCode) {
-            if (followStatusCode == 201) {
+            if (followStatusCode === 201) {
                 setSingleWork(prevState => ({
                     ...prevState,
                     isFollowing: true,
@@ -1990,7 +1967,7 @@ const SingleWork: React.FC<SingleWorkProps> = (props) => {
 
             }
 
-            if (followStatusCode == 403) {
+            if (followStatusCode === 403) {
                 return;
             }
 
@@ -2033,15 +2010,15 @@ const SingleWork: React.FC<SingleWorkProps> = (props) => {
                 return;
             }
 
-            if (unfollowStatusCode == 403) {
+            if (unfollowStatusCode === 403) {
                 return;
             }
 
-            if (unfollowStatusCode == 404) {
+            if (unfollowStatusCode === 404) {
                 return;
             }
 
-            if (unfollowStatusCode == 500) {
+            if (unfollowStatusCode === 500) {
                 return;
             }
         }
