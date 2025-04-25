@@ -1,4 +1,4 @@
-import styled from 'styled-components';
+import styled, { keyframes } from "styled-components";
 
 import heartIcon from '../assets/heart.png';
 import viewIcon from '../assets/view.png';
@@ -6,7 +6,16 @@ import heartFillIcon from '../assets/heart-fill.png';
 import DEFAULT from '../api/default';
 import formatNumber from '../utils/converter';
 
-
+const slideFadeIn = keyframes`
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+`;
 
 const Container = styled.div`
     width: 100%;
@@ -26,6 +35,7 @@ const Container = styled.div`
         opacity: 1; 
     }
 
+    animation: ${slideFadeIn} 0.5s ease;
 `;
 
 const SingleWork = styled.img`

@@ -14,6 +14,17 @@ import formatNumber from '../utils/converter';
 
 
 
+const slideFadeIn = keyframes`
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+`;
+
 const Container = styled.div`
     width: 380px;
 
@@ -34,6 +45,8 @@ const Container = styled.div`
     &:hover {
         scale: 1.05;
     }
+
+    animation: ${slideFadeIn} 0.5s ease;
 `
 
 const ExhibitionCardColor = styled.div`

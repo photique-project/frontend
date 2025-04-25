@@ -837,7 +837,6 @@ const Home = () => {
                         onChange={handleInputChange}
                         onKeyDown={(e) => {
                             if (e.key === 'Enter') {
-                                alert('검색')
                                 handleSearch();
                             }
                         }}
