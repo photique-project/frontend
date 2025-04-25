@@ -8,7 +8,6 @@ import useAuthStore from "../zustand/store";
 import SearchUserDetailsModal from "./SearchUserDetailsModal";
 import DEFAULT from "../api/default";
 
-
 import moveIcon from '../assets/move-black.png';
 import userPlusIcon from '../assets/user-plus.png';
 import userCheckIcon from '../assets/user-check.png';
@@ -109,6 +108,8 @@ const FollowButton = styled.button<{ isFollowing: boolean }>`
     align-items: center;
     gap: 10px;
 
+    position: relative;
+
     font-size: 16px;
     font-weight: 700;
 
@@ -116,6 +117,8 @@ const FollowButton = styled.button<{ isFollowing: boolean }>`
     border-radius: 10px;
     background-color: ${({ isFollowing }) => isFollowing ? "white" : "black"};
     color: ${({ isFollowing }) => isFollowing ? "black" : "white"};
+
+    transition: background-color 0.4s ease, color 0.4s ease;
 
     &:hover {
         background-color: ${({ isFollowing }) => isFollowing ? "rgba(0, 0, 0, 0.1)" : "rgba(0, 0, 0, 0.7)"};
@@ -143,6 +146,32 @@ const ModalBackground = styled.div`
     z-index: 999;
 
     background-color: rgba(0, 0, 0, 0.7);
+`
+
+const FollowMessageBox = styled.div`
+    padding: 10px;
+
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    white-space: nowrap;
+
+    border-radius: 10px;
+    color: white;
+
+    position: absolute;
+    bottom: 100%;
+    left: 100%;
+
+    background-color: rgba(0, 0, 0, 0.3);
+
+    opacity: 0;
+    transition: opacity 0.3s ease-in-out;
+
+    ${FollowButton}:hover & {
+        opacity: 1;
+    }
 `
 
 
@@ -192,6 +221,10 @@ const SearchUserCard: React.FC<SearchUserCardProps> = (props) => {
     } = useFetch<void>();
 
     const handleFollowRequest = () => {
+        if (followLoading || unfollowLoading) {
+            return;
+        }
+
         const method = searchUser.isFollowing ? 'DELETE' : 'POST';
         const request = searchUser.isFollowing ? unfollowRequest : followRequest;
 
@@ -227,7 +260,6 @@ const SearchUserCard: React.FC<SearchUserCardProps> = (props) => {
 
             if (followStatusCode == 401) {
                 return;
-
             }
 
             if (followStatusCode == 403) {
@@ -308,7 +340,11 @@ const SearchUserCard: React.FC<SearchUserCardProps> = (props) => {
                     isFollowing={searchUser.isFollowing}
                 >
                     <FollowIcon src={searchUser.isFollowing ? userCheckIcon : userPlusIcon} alt='follow' />
-                    팔로우
+                    {searchUser.isFollowing ? '팔로잉' : '팔로우'}
+
+                    <FollowMessageBox>
+                        {user.id === searchUser.id ? '본인을 팔로우할 수는 없습니다' : searchUser.isFollowing ? '현재 팔로우하고 있는 작가입니다' : '팔로우 요청하고 작가의 소식을 받아보세요 !'}
+                    </FollowMessageBox>
                 </FollowButton>
 
             </SearchUserButtonBox>
