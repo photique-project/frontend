@@ -525,8 +525,8 @@ const rotate = keyframes`
 `;
 
 const LoadingIcon = styled.img`
-    width: 50px;
-    height: 50px;
+    width: 70px;
+    height: 70px;
 
     animation: ${rotate} 1.2s ease-in-out infinite;
 `
@@ -688,7 +688,11 @@ const SingleWorkUpdate = () => {
         }
 
         if (singleWorkStatusCode === 404) {
+            return;
+        }
 
+        if (singleWorkStatusCode === 500) {
+            return;
         }
 
     }, [singleWorkStatusCode, singleWorkData]);
@@ -738,9 +742,6 @@ const SingleWorkUpdate = () => {
     const [firstText, setFirstText] = useState<string>('');
     const [secondText, setSecondText] = useState<string>('');
     const [isSuccess, setIsSuccess] = useState<boolean>(null);
-
-    // 로딩 배경 상태관리
-    const [loadingDisplay, setLoadingDisplay] = useState<boolean>(false);
 
     // 카메라 입력
     const handleCameraInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -1056,13 +1057,11 @@ const SingleWorkUpdate = () => {
         singleWorkUpdateRequest(options);
     }
 
-    useEffect(function handleSingleWorkCreateResult() {
-        setLoadingDisplay(false);
-
+    useEffect(function handleSingleWorkUpdateResponse() {
         if (singleWorkUpdateStatusCode === 204) {
             setToastMessageDisplay(true);
             setFirstText('단일작품 수정완료!');
-            setSecondText('홈페이지로 돌아갑니다'); // 여기서 useLocation으로 단일작품 값 전달해야함
+            setSecondText('홈페이지로 돌아갑니다');
             setIsSuccess(true);
 
             setTimeout(() => {
@@ -1348,7 +1347,7 @@ const SingleWorkUpdate = () => {
                     isSuccess={isSuccess}
                 />}
 
-            {singleWorkUpdateLoading &&
+            {(singleWorkLoading || singleWorkUpdateLoading) &&
                 <LoadingBackground>
                     <LoadingIcon src={loadingIcon} />
                 </LoadingBackground>

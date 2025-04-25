@@ -1259,6 +1259,9 @@ const LoadingBox = styled.div`
     flex-direction: column;
     justify-content: center;
     align-items: center;
+    position: absolute;
+
+    z-index: 999;
 `
 
 
@@ -2056,7 +2059,7 @@ const SingleWork: React.FC<SingleWorkProps> = (props) => {
 
             <BodyBox>
                 <SideBarBox />
-                {singleWorkLoading &&
+                {(singleWorkLoading || singleWorkDeleteLoading) &&
                     <LoadingBox>
                         <Loader fontColor={'white'} />
                     </LoadingBox>
@@ -2363,9 +2366,6 @@ const SingleWork: React.FC<SingleWorkProps> = (props) => {
 
             {deleteModalDisplay &&
                 <DeleteBackground>
-                    {singleWorkDeleteLoading &&
-                        <LoadingIcon src={loadingIcon} />
-                    }
                     {!singleWorkDeleteLoading &&
                         <DeleteBox>
                             <DeleteBoxTitleBox>
@@ -2397,7 +2397,9 @@ const SingleWork: React.FC<SingleWorkProps> = (props) => {
                     firstText={firstText}
                     secondText={secondText}
                     isSuccess={isSucess}
-                />}
+                />
+            }
+
         </Container>
     )
 }

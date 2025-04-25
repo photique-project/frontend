@@ -906,6 +906,23 @@ const DeleteBoxDeleteButton = styled.button`
     }
 `
 
+
+const LoadingBackground = styled.div`
+    width: 100%;
+    height: 100%;
+
+    position: absolute;
+    
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+
+    z-index: 999;
+
+    background-color: rgba(0, 0, 0, 0.2);
+`
+
 const LoadingBox = styled.div`
     width: 100%;
     height: 100%;
@@ -1858,6 +1875,11 @@ const Exhibition = () => {
                         <Loader fontColor='white'></Loader>
                     </LoadingBox>
                 }
+                {exhibitionDeleteLoading &&
+                    <LoadingBackground>
+                        <LoadingIcon src={loadingIcon} />
+                    </LoadingBackground>
+                }
                 {exhibition && <>
                     <Image src={exhibition.works[curIndex].image} />
 
@@ -2143,6 +2165,3 @@ const Exhibition = () => {
 }
 
 export default Exhibition;
-// 채팅창 헤더높이 맞추고
-// 방명록 레이아웃 만들고 편지작성하고 
-// 내일 네트워크공부 ㄱ
