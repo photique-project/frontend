@@ -386,6 +386,22 @@ const ActionIcon = styled.img<{ activeSrc?: string }>`
     }
 `
 
+const NotFoundBox = styled.div`
+    margin-top: 10%;
+    width: 100%;
+    
+
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+
+    font-size: 16px;
+    font-weight: 700;
+
+    color: black;
+`
+
 
 
 type SearchTarget = 'work' | 'writer';
@@ -441,38 +457,24 @@ interface ExhibitionDataPage {
     last: boolean;
 }
 
+
+
 const Home = () => {
-
     const user = useAuthStore.getState().user;
-    const categoryMap: { [key: string]: string } = {
-        "풍경": "landscape",
-        "인물": "portrait",
-        "동물": "animal",
-        "식물": "plant",
-        "건축": "architecture",
-        "여행": "travel",
-        "음식": "food",
-        "스포츠": "sports",
-        "흑백": "blackAndWhite",
-        "야경": "nightscape",
-        "길거리": "street",
-        "추상": "abstract",
-        "이벤트": "event",
-        "패션": "fashion"
-    };
+    const navigate = useNavigate();
+    const location = useLocation();
+    const isLoggedIn = useAuthStore.getState().isLoggedIn;
 
+    // 단일작품 업데이트 페이지에서 업데이트 완료 후 넘어왔을 때,
+    // useLocation을 통해 state로 singleWorkId를 넘겨받고 바로 모달을 보여주는 동작을 함
+    // 해당 state가 새로고침해도 유지되는 것을 방지하기 위한 이펙트
     useEffect(function clearLocationState() {
-        // 업데이트 페이지에서 홈으로 넘어왔을 떄 useLocation을 활용해서 state를 넘기는데
-        // 새로고침하면 해당 state가 유지되는 문제가 발생하여 추가한 useEffect
         if (location.state) {
             navigate(location.pathname, { replace: true, state: null });
         }
     }, []);
 
-    const navigate = useNavigate();
-    const location = useLocation();
-    const isLoggedIn = useAuthStore.getState().isLoggedIn;
-
+    // 로그인 필요 메시지 박스
     const [authMessageDisplay, setAuthMessageDisplay] = useState<boolean>(false);
 
     // 새 게시글 옵션 모달 display
@@ -489,7 +491,8 @@ const Home = () => {
     const [isScrolled, setIsScrolled] = useState(false);
 
     // 단일작품 상세패널 
-    const [openSingleWorkDetail, setOpenSingleWorkDetail] = useState<boolean>(location.state?.singleWorkId !== undefined ? true : false);
+    const [openSingleWorkDetails, setOpenSingleWorkDetails] = useState<boolean>(location.state?.singleWorkId !== undefined ? true : false);
+
     // 선택한 단일작품 상세 패널 아이디
     const [selectedSingleWorkId, setSelectedSingleWorkId] = useState<number | null>(location.state?.singleWorkId !== undefined ? location.state?.singleWorkId : null);
 
@@ -503,24 +506,31 @@ const Home = () => {
     // 입력 조건 설정 패널 display
     const [filterPanelDisplay, setFilterPanelDisplay] = useState<'flex' | null>(null);
 
-    // 세 가지 뷰
+    // 단일작품 페이지 뷰
     const [singleWorkView, setSingleWorkView] = useState<boolean>(true);
-    const [exhibitionView, setExhibitionView] = useState<boolean>(false);
+    const [singleWorks, setSingleWorks] = useState<SingleWorkData[]>([]);
 
-    // 현재 검색페이지
-    const [page, setPage] = useState<number>(0);
+
+    const [exhibitionView, setExhibitionView] = useState<boolean>(false);
+    const [exhibitions, setExhibitions] = useState<ExhibitionData[]>([]);
+
+    // 현재 검색페이지 (0부터 시작
+    const nextPageRef = useRef<number>(0);
+
+    // 검색 데이터 없음 변수
+    const [notFound, setNotFound] = useState<boolean>(false);
 
     // 단일작품 페이지 useFetch
     const {
-        loading: singleWorkDataPageLoading,
-        statusCode: singleWorkDataPageStatusCode,
-        data: singleWorkDataPage,
-        fetchRequest: singleWorkDataPageRequest
+        loading: singleWorkPageLoading,
+        statusCode: singleWorkPageStatusCode,
+        data: singleWorkPage,
+        fetchRequest: singleWorkPageRequest
     } = useFetch<SingleWorkDataPage>();
 
-    const handleSingleWorkDataPageRequest = (page: number) => {
+    const handleSingleWorkPageRequest = () => {
         const method = ENDPOINTS.SINGLE_WORK.SEARCH.METHOD;
-        const url = ENDPOINTS.SINGLE_WORK.SEARCH.URL(searchTarget, inputValue, categoryQueryParam, `${sortingTarget},${sortingOrder}`, page, 30, user.id ? user.id : 0);
+        const url = ENDPOINTS.SINGLE_WORK.SEARCH.URL(searchTarget, inputValue, categoryQueryParam, `${sortingTarget},${sortingOrder}`, nextPageRef.current, 30, user.id ? user.id : 0);
 
         const options: FetchRequestOptions = {
             url: url,
@@ -532,16 +542,43 @@ const Home = () => {
             contentType: 'application/json',
         }
 
-        singleWorkDataPageRequest(options);
+        singleWorkPageRequest(options);
     }
 
     // 홈페이지 마운트하면 단일작품 첫 페이지 요청
-    useEffect(function requestSearchSingleWork() {
-        handleSingleWorkDataPageRequest(0);
+    useEffect(function handleSingleWorkPageInitRequest() {
+        handleSingleWorkPageRequest();
     }, []);
 
+    useEffect(function handleSingleWorkPageResponse() {
+        // 이전 요청에 대한 값이 남아있을 수 있으므로 loading으로 상태변화 체크
+        if (!singleWorkPageLoading) {
+            if (singleWorkPageStatusCode === 200 && singleWorkPage) {
+                setNotFound(false);
+                if (nextPageRef.current === 0) { // 첫 페이지 요청이면 append가 아닌 재할당
+                    setSingleWorks(singleWorkPage.content)
+                } else {
+                    setSingleWorks((prev) => [...prev, ...singleWorkPage.content])
+                }
 
+                // 다음 페이지 번호 갱신
+                nextPageRef.current++;
 
+                return;
+            }
+
+            if (singleWorkPageStatusCode === 404) {
+                setSingleWorks([]);
+                setNotFound(true);
+                return;
+            }
+
+            if (singleWorkPageStatusCode === 500) {
+                return;
+            }
+        }
+
+    }, [singleWorkPageStatusCode, singleWorkPage, singleWorkPageLoading]);
 
     // 스크롤 상단으로 이동 함수
     const scrollToTop = () => {
@@ -552,15 +589,15 @@ const Home = () => {
 
     // 전시회 페이지 useFetch
     const {
-        loading: exhibitionDataPageLoading,
-        statusCode: exhibitionDataPageStatusCode,
-        data: exhibitionDataPage,
-        fetchRequest: exhibitionDataPageRequest
+        loading: exhibitionPageLoading,
+        statusCode: exhibitionPageStatusCode,
+        data: exhibitionPage,
+        fetchRequest: exhibitionPageRequest
     } = useFetch<ExhibitionDataPage>();
 
-    const handleExhibitionDataPageRequest = (page: number) => {
+    const handleExhibitionPageRequest = () => {
         const method = ENDPOINTS.EXHIBITION.SEARCH.METHOD;
-        const url = ENDPOINTS.EXHIBITION.SEARCH.URL(searchTarget, inputValue, `${sortingTarget},${sortingOrder}`, page, 30, user.id ? user.id : 0);
+        const url = ENDPOINTS.EXHIBITION.SEARCH.URL(searchTarget, inputValue, `${sortingTarget},${sortingOrder}`, nextPageRef.current, 30, user.id ? user.id : 0);
 
         const options: FetchRequestOptions = {
             url: url,
@@ -572,48 +609,66 @@ const Home = () => {
             contentType: 'application/json',
         }
 
-        exhibitionDataPageRequest(options);
+        exhibitionPageRequest(options);
     }
 
-    // 정상응답이 왔다면 현재 페이지 값으로 할당
-    useEffect(function incrementSingleWorkPage() {
-        if (singleWorkDataPage) {
-            setPage(singleWorkDataPage.number);
+    useEffect(function handleExhibitionPageInitRequest() {
+        handleExhibitionPageRequest();
+    }, []);
+
+    useEffect(function handleSingleWorkPageResponse() {
+        // 이전 요청에 대한 값이 남아있을 수 있으므로 loading으로 상태변화 체크
+        if (!exhibitionPageLoading) {
+            if (exhibitionPageStatusCode === 200 && exhibitionPage) {
+                setNotFound(false);
+                if (nextPageRef.current === 0) { // 첫 페이지 요청이면 append가 아닌 재할당
+                    setExhibitions(exhibitionPage.content)
+                } else {
+                    setExhibitions((prev) => [...prev, ...exhibitionPage.content])
+                }
+
+                // 다음 페이지 번호 갱신
+                nextPageRef.current++;
+
+                return;
+            }
+
+            if (exhibitionPageStatusCode === 404) {
+                setExhibitions([]);
+                setNotFound(true);
+                return;
+            }
+
+            if (exhibitionPageStatusCode === 500) {
+                return;
+            }
         }
 
-        if (exhibitionDataPage) {
-            setPage(exhibitionDataPage.number);
-        }
+    }, [exhibitionPageStatusCode, exhibitionPage, exhibitionPageLoading]);
 
-    }, [singleWorkDataPage, exhibitionDataPage]);
+
 
     // 스크롤 상태감지 함수
     const handleScroll = (e: React.UIEvent<HTMLDivElement>) => {
         const scrollBox = e.currentTarget;
         const { scrollTop, scrollHeight, clientHeight } = scrollBox;
-        const threshold = (scrollHeight - clientHeight) * (4 / 5);
+        const isBottom = scrollTop + clientHeight >= scrollHeight - 1;
 
-        // 스크롤 페이지를 2/3 이상 넘었고 마지막페이지가 아니라면 다음 페이지 요청
+        // 스크롤이 바닥에 닿았을 때 다음 페이지 요청
         if (singleWorkView) {
-            if (scrollTop >= threshold && !singleWorkDataPageLoading && singleWorkDataPage && !singleWorkDataPage.last) {
-                handleSingleWorkDataPageRequest(page + 1);
+            if (isBottom && !singleWorkPageLoading && singleWorkPage && !singleWorkPage.last) {
+                handleSingleWorkPageRequest();
             }
 
             setIsScrolled(scrollTop > 0);
         } else {
-            if (scrollTop >= threshold && !exhibitionDataPageLoading && exhibitionDataPage && !exhibitionDataPage.last) {
-                handleExhibitionDataPageRequest(page + 1);
+            if (isBottom && !exhibitionPageLoading && exhibitionPage && !exhibitionPage.last) {
+                handleExhibitionPageRequest();
             }
 
             setIsScrolled(scrollTop > 0);
         }
     };
-
-
-
-
-
-
 
     // 검색 타겟 설정 함수
     const handleSearchTarget = (searchTarget: SearchTarget) => {
@@ -669,10 +724,11 @@ const Home = () => {
     const handleView = (event: React.MouseEvent<HTMLDivElement>) => {
         const id = (event.currentTarget as HTMLElement).id;
 
+        nextPageRef.current = 0;
         if (id === 'single-work') {
             setSingleWorkView(true);
             setExhibitionView(false);
-            handleSingleWorkDataPageRequest(0);
+            handleSingleWorkPageRequest();
 
             return;
         }
@@ -680,7 +736,7 @@ const Home = () => {
         if (id === 'exhibition') {
             setExhibitionView(true);
             setSingleWorkView(false);
-            handleExhibitionDataPageRequest(0);
+            handleExhibitionPageRequest();
 
             return;
         }
@@ -710,15 +766,15 @@ const Home = () => {
     }
 
     // single work 상세조회
-    const handleOpenSingleWorkDetail = (singleWorkId?: number) => {
+    const handleOpenSingleWorkDetails = (singleWorkId?: number) => {
         // 받은 아이디로 열기
-        if (openSingleWorkDetail) {
-            setOpenSingleWorkDetail(false);
+        if (openSingleWorkDetails) {
+            setOpenSingleWorkDetails(false);
 
             return;
         }
 
-        setOpenSingleWorkDetail(true);
+        setOpenSingleWorkDetails(true);
         setSelectedSingleWorkId(singleWorkId);
     };
 
@@ -738,11 +794,13 @@ const Home = () => {
     }, []);
 
     const handleSearch = () => {
+        scrollToTop();
+        nextPageRef.current = 0;
 
         if (singleWorkView) {
-            handleSingleWorkDataPageRequest(0);
+            handleSingleWorkPageRequest();
         } else {
-            handleExhibitionDataPageRequest(0);
+            handleExhibitionPageRequest();
         }
     }
 
@@ -758,7 +816,6 @@ const Home = () => {
             '_blank',
             `width=${width},height=${height},left=${left},top=${top},resizable=yes,scrollbars=yes`
         );
-
     }
 
 
@@ -778,6 +835,12 @@ const Home = () => {
                     <SearchInput
                         value={inputValue}
                         onChange={handleInputChange}
+                        onKeyDown={(e) => {
+                            if (e.key === 'Enter') {
+                                alert('검색')
+                                handleSearch();
+                            }
+                        }}
                         placeholder="검색어를 입력하세요"
                     />
 
@@ -797,7 +860,10 @@ const Home = () => {
             </SearchBox>
 
 
-            <ScrollBox ref={scrollBoxRef} onScroll={handleScroll}>
+            <ScrollBox
+                ref={scrollBoxRef}
+                onScroll={handleScroll}
+            >
 
                 <Tab>
                     <TabIconBox id='single-work' viewMode={singleWorkView} onClick={handleView}>
@@ -808,20 +874,26 @@ const Home = () => {
                     </TabIconBox>
                 </Tab>
 
-                {singleWorkView &&
+                {notFound &&
+                    <NotFoundBox>검색결과가 없습니다</NotFoundBox>
+                }
+
+                {!notFound && singleWorkView &&
                     <SingleWorkView
-                        handleOpenSingleWorkDetail={handleOpenSingleWorkDetail}
-                        singleWorkDataPageLoading={singleWorkDataPageLoading}
-                        singleWorkDataPage={singleWorkDataPage}
-                        singleWorkDataStatusCode={singleWorkDataPageStatusCode}
+                        handleOpenSingleWorkDetail={handleOpenSingleWorkDetails}
+                        singleWorkDataPageLoading={singleWorkPageLoading}
+                        singleWorks={singleWorks}
+                        singleWorkDataStatusCode={singleWorkPageStatusCode}
+
                     />
                 }
 
-                {exhibitionView && <ExhibitionView
-                    exhibitionDataPageLoading={exhibitionDataPageLoading}
-                    exhibitionDataPage={exhibitionDataPage}
-                    exhibitionDataPageStatusCode={exhibitionDataPageStatusCode}
-                />}
+                {!notFound && exhibitionView &&
+                    <ExhibitionView
+                        exhibitionDataPageLoading={exhibitionPageLoading}
+                        exhibitions={exhibitions}
+                        exhibitionDataPageStatusCode={exhibitionPageStatusCode}
+                    />}
 
             </ScrollBox>
 
@@ -860,7 +932,7 @@ const Home = () => {
                 </ActionIconBox>
             </ActionBox>
 
-            {openSingleWorkDetail && <SingleWork singleWorkId={selectedSingleWorkId} close={handleOpenSingleWorkDetail}></SingleWork>}
+            {openSingleWorkDetails && <SingleWork singleWorkId={selectedSingleWorkId} close={handleOpenSingleWorkDetails}></SingleWork>}
 
         </Container>
     )
