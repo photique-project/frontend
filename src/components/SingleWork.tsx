@@ -1262,6 +1262,31 @@ const FollowIcon = styled.img`
     height: 20px;
 `
 
+const AlreadyDeletedMessageBoxBackground = styled.div`
+    width: 100%;
+    height: 100%;
+
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+`
+
+const AlreadyDeletedMessageBox = styled.div`
+    width: 300px;
+    height: 100px;
+
+    border-radius: 15px;
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+    background-color: white;
+
+    font-size: 20px;
+    font-weight: 700;
+`
+
 
 interface Tag {
     name: string;
@@ -1687,6 +1712,7 @@ const SingleWork: React.FC<SingleWorkProps> = (props) => {
         }
 
         if (singleWorkStatusCode === 404) {
+
             return;
         }
 
@@ -2062,6 +2088,15 @@ const SingleWork: React.FC<SingleWorkProps> = (props) => {
                     <LoadingBox>
                         <Loader fontColor={'white'} />
                     </LoadingBox>
+                }
+
+                {singleWorkStatusCode === 404 &&
+                    <AlreadyDeletedMessageBoxBackground>
+                        <AlreadyDeletedMessageBox>
+                            <span style={{ color: 'red' }}>삭제 </span> 된 단일작품입니다
+                        </AlreadyDeletedMessageBox>
+                    </AlreadyDeletedMessageBoxBackground>
+
                 }
 
 
