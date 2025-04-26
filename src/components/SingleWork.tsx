@@ -1528,10 +1528,10 @@ const SingleWork: React.FC<SingleWorkProps> = (props) => {
 
     const handleCommentPageRequest = (page = 0) => {
         const method = ENDPOINTS.SINGLE_WORK.GET_COMMENT_PAGE.METHOD;
-        const url = ENDPOINTS.SINGLE_WORK.GET_COMMENT_PAGE.URL;
+        const url = ENDPOINTS.SINGLE_WORK.GET_COMMENT_PAGE.URL(singleWorkId, 'createdAt,desc', page, 5);
 
         const options: FetchRequestOptions = {
-            url: url(singleWorkId, 'createdAt,desc', page, 5),
+            url: url,
             method: method,
             headers: {
                 'Content-Type': 'application/json',
@@ -1548,14 +1548,14 @@ const SingleWork: React.FC<SingleWorkProps> = (props) => {
     }, []);
 
     useEffect(function handleCommentPageResponse() {
-        if (commentPageData) {
+        if (commentPageStatusCode === 200 && commentPageData) {
             setCommentCurrentPage(commentPageData.pageable.pageNumber);
             setCommentPageGroup(Math.floor(commentPageData.pageable.pageNumber / 5)); // 5로 나눴을 때 몫이 해당 그룹
             setCommentTotalPage(commentPageData.totalPages);
             setComments(commentPageData.content)
         }
 
-    }, [commentPageData]);
+    }, [commentPageStatusCode, commentPageData]);
 
     const {
         loading: commentCreateLoading,
