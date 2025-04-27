@@ -38,7 +38,7 @@ const Container = styled.div`
     border: 1px solid rgba(0, 0, 0, 0.3);
     box-shadow: 0 2px 4px -1px rgba(0, 0, 0, 0.25);
 
-    position: absolute;
+    /* position: absolute; */
 
     background-color: white;
 

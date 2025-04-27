@@ -487,10 +487,14 @@ const Header: React.FC<HeaderProps> = (props) => {
                             />
 
                             {userDetailsPanelDisplay &&
-                                <UserDetailsPanel
-                                    id={userDetails.id}
-                                    handleLogout={handleLogout}
-                                />
+                                <div
+                                    style={{ position: 'absolute', top: '50px' }}
+                                >
+                                    <UserDetailsPanel
+                                        id={userDetails.id}
+                                        handleLogout={handleLogout}
+                                    />
+                                </div>
                             }
 
 
