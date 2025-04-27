@@ -1,6 +1,6 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from "react-router-dom";
-import styled from 'styled-components';
+import styled, { keyframes } from "styled-components";
 
 import useFetch from '../hooks/useFetch';
 import { FetchRequestOptions } from '../types/http';
@@ -16,6 +16,17 @@ import ENDPOINTS from '../api/endpoints';
 import DEFAULT from '../api/default';
 import formatNumber from '../utils/converter';
 
+const slideFadeIn = keyframes`
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+`;
+
 const Container = styled.div`
     width: 300px;
     top: 50px;
@@ -27,9 +38,11 @@ const Container = styled.div`
     border: 1px solid rgba(0, 0, 0, 0.3);
     box-shadow: 0 2px 4px -1px rgba(0, 0, 0, 0.25);
 
-    position: absolute;
+    /* position: absolute; */
 
     background-color: white;
+
+    animation: ${slideFadeIn} 0.7s ease;
 `
 const UserProfileBox = styled.div`
     padding: 12px;
@@ -132,14 +145,12 @@ interface UserDetails {
 
 interface UserDetailsPanelProps {
     id: number;
-    handleDisplay: () => void;
     handleLogout: () => void;
 }
 
 const UserDetailsPanel: React.FC<UserDetailsPanelProps> = (props) => {
-    const { id, handleDisplay, handleLogout } = props;
+    const { id, handleLogout } = props;
     const navigate = useNavigate();
-    const userDetailsPanelRef = useRef<HTMLDivElement | null>(null);
 
     // 유저 상세 데이터
     const [userDetails, setUserDetails] = useState<UserDetails>();
@@ -179,6 +190,7 @@ const UserDetailsPanel: React.FC<UserDetailsPanelProps> = (props) => {
         }
 
         if (userDetailsStatusCode == 401) {
+            handleLogout();
             return;
         }
 
@@ -192,29 +204,12 @@ const UserDetailsPanel: React.FC<UserDetailsPanelProps> = (props) => {
 
     }, [userDetailsStatusCode, userDetailsData]);
 
-    // 패널 외부 클릭 감지 후 닫기
-    useEffect(() => {
-        function handleClickOutside(event: MouseEvent) {
-            if (userDetailsPanelRef.current && !userDetailsPanelRef.current.contains(event.target as Node)) {
-                handleDisplay();
-            }
-        }
-
-        // 이벤트 리스너 등록
-        document.addEventListener("mousedown", handleClickOutside);
-
-        // 클린업 함수에서 이벤트 리스너 해제
-        return () => {
-            document.removeEventListener("mousedown", handleClickOutside);
-        };
-    }, []);
-
     const handleNavigateToMyPage = (menu: string) => {
         navigate("/mypage", { state: { menu: menu } });
     }
 
     return (
-        <Container ref={userDetailsPanelRef}>
+        <Container>
             {userDetailsLoading &&
                 <Loader fontColor='black' />
             }
