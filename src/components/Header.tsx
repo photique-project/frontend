@@ -17,6 +17,8 @@ import bellIcon from '../assets/bell.png';
 import bellDotIcon from '../assets/bell-dot.png';
 import DEFAULT from '../api/default';
 
+
+
 const Container = styled.header`
     width: 100%;
     height: 80px;
@@ -312,7 +314,6 @@ const Header: React.FC<HeaderProps> = (props) => {
 
     }, [countUnreadNotificationsStatusCode, countUnreadNotificationsData]);
 
-
     const {
         loading: logoutLoading,
         statusCode: logoutStatusCode,
@@ -418,11 +419,9 @@ const Header: React.FC<HeaderProps> = (props) => {
         navigate("/mypage", { state: { menu: menu } });
     }
 
-    // TODO: 이후에 로그아웃 api호출을 authStore로 옮기기
     const handleLogout = () => {
         const method = ENDPOINTS.AUTH.LOGOUT.METHOD;
         const url = ENDPOINTS.AUTH.LOGOUT.URL;
-
 
         const options: FetchRequestOptions = {
             url: url,
@@ -456,6 +455,21 @@ const Header: React.FC<HeaderProps> = (props) => {
         setUserDetailsPanelDisplay(!userDetailsPanelDisplay);
     }
 
+    const userDetailsPanelRef = useRef<HTMLDivElement | null>(null);
+    // 패널 외부 클릭 감지 후 닫기
+    useEffect(() => {
+        function handleClickOutside(event: MouseEvent) {
+            if (userDetailsPanelRef.current && !userDetailsPanelRef.current.contains(event.target as Node)) {
+                handleUserDetailsPanelDisplay();
+            }
+        }
+
+        document.addEventListener("mousedown", handleClickOutside);
+
+        return () => {
+            document.removeEventListener("mousedown", handleClickOutside);
+        };
+    }, []);
 
     return (
         <>
@@ -466,14 +480,18 @@ const Header: React.FC<HeaderProps> = (props) => {
                     {!isLoggedIn && <ShortButton text="로그인" type="white" action={showLoginModal}></ShortButton>}
                     {!isLoggedIn && <ShortButton text="회원가입" type="black" action={navigateToJoinPage}></ShortButton>}
                     {isLoggedIn &&
-                        <UserProfileImageBox>
-                            <UserProfileImage src={userDetails.profileImage ? userDetails.profileImage : DEFAULT.profileImage} onClick={handleUserDetailsPanelDisplay} />
+                        <UserProfileImageBox ref={userDetailsPanelRef}>
+                            <UserProfileImage
+                                src={userDetails.profileImage ? userDetails.profileImage : DEFAULT.profileImage}
+                                onClick={handleUserDetailsPanelDisplay}
+                            />
 
-                            {userDetailsPanelDisplay && <UserDetailsPanel
-                                id={userDetails.id}
-                                handleDisplay={handleUserDetailsPanelDisplay}
-                                handleLogout={handleLogout}
-                            />}
+                            {userDetailsPanelDisplay &&
+                                <UserDetailsPanel
+                                    id={userDetails.id}
+                                    handleLogout={handleLogout}
+                                />
+                            }
 
 
 
