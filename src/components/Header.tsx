@@ -460,7 +460,8 @@ const Header: React.FC<HeaderProps> = (props) => {
     useEffect(() => {
         function handleClickOutside(event: MouseEvent) {
             if (userDetailsPanelRef.current && !userDetailsPanelRef.current.contains(event.target as Node)) {
-                handleUserDetailsPanelDisplay();
+                // handleUserDetailsPanelDisplay();
+                setUserDetailsPanelDisplay(false);
             }
         }
 
@@ -480,10 +481,12 @@ const Header: React.FC<HeaderProps> = (props) => {
                     {!isLoggedIn && <ShortButton text="로그인" type="white" action={showLoginModal}></ShortButton>}
                     {!isLoggedIn && <ShortButton text="회원가입" type="black" action={navigateToJoinPage}></ShortButton>}
                     {isLoggedIn &&
-                        <UserProfileImageBox ref={userDetailsPanelRef}>
+                        <UserProfileImageBox
+                            ref={userDetailsPanelRef}
+                            onClick={handleUserDetailsPanelDisplay}
+                        >
                             <UserProfileImage
                                 src={userDetails.profileImage ? userDetails.profileImage : DEFAULT.profileImage}
-                                onClick={handleUserDetailsPanelDisplay}
                             />
 
                             {userDetailsPanelDisplay &&
