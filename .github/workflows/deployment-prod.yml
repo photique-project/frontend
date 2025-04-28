@@ -1,0 +1,53 @@
+name: 프로덕트 서버 React App 배포
+
+on:
+  pull_request:
+    branches:
+      - release
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: 소스코드 체크아웃
+      uses: actions/checkout@v3
+
+    - name: Node 설치
+      uses: actions/setup-node@v3
+      with:
+        node-version: 18
+
+    - name: 환경변수 파일 생성
+      run: echo "${{ secrets.ENV_PROD }}" > ./.env
+
+    - name: 의존성 설치
+      run: npm install
+
+    - name: 앱 빌드
+      run: CI=false npm run build
+
+    - name: 빌드 파일 압축
+      run: tar -czf react.tar.gz -C build .
+
+    - name: EC2에 파일 복사
+      uses: appleboy/scp-action@master
+      with:
+        username: photique0538
+        host: ${{ secrets.HOST_PROD }}
+        key: ${{ secrets.KEY_PROD }}
+        source: ./react.tar.gz
+        target: /home/photique0538
+
+    - name: EC2 연결 압축해제 및 nginx 재시작, 압축파일 삭제
+      uses: appleboy/ssh-action@master
+      with:
+        username: photique0538
+        host: ${{ secrets.HOST_PROD }}
+        key: ${{ secrets.KEY_PROD }}
+        script: |
+            sudo rm -rf /home/photique0538/react/*
+            sudo tar -xzf /home/photique0538/react.tar.gz -C /home/photique0538/react
+            sudo rm /home/photique0538/react.tar.gz
+            docker exec nginx-prod nginx -s reload
+            
