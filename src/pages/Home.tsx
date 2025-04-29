@@ -818,6 +818,14 @@ const Home = () => {
         );
     }
 
+    const [isComposing, setIsComposing] = useState(false);
+    const handleCompositionStart = () => {
+        setIsComposing(true); // 한글 입력 시작
+    };
+
+    const handleCompositionEnd = () => {
+        setIsComposing(false); // 한글 입력 종료
+    };
 
     return (
         <Container>
@@ -835,8 +843,13 @@ const Home = () => {
                     <SearchInput
                         value={inputValue}
                         onChange={handleInputChange}
+                        onCompositionStart={handleCompositionStart}
+                        onCompositionEnd={handleCompositionEnd}
                         onKeyDown={(e) => {
                             if (e.key === 'Enter') {
+                                if (isComposing) {
+                                    return; // 한글 입력 중이면 이벤트 무시
+                                }
                                 handleSearch();
                             }
                         }}
