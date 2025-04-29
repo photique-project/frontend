@@ -368,8 +368,10 @@ const Header: React.FC<HeaderProps> = (props) => {
             };
 
             eventSource.onerror = function (event) {
-                eventSource.close();  // 기존 연결 닫기
-                setTimeout(connectSSE, 1000); // 1초 후 재연결
+                eventSource.close();
+                setTimeout(() => {
+                    connectSSE(); // 다시 연결 시도
+                }, 1000)
             }
 
             eventSourceRef.current = eventSource;
