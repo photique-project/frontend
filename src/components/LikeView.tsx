@@ -8,9 +8,8 @@ import useAuthStore from "../zustand/store";
 import ENDPOINTS from '../api/endpoints';
 import { FetchRequestOptions } from '../types/http';
 import ExhibitionCard from './ExhibitionCard';
+import Loader from './Loader';
 
-import seachIcon from '../assets/search-white.png';
-import loadingIcon from '../assets/loading-large.png';
 import leftBlackIcon from '../assets/left-black.png';
 import rightBlackIcon from '../assets/right-black.png';
 
@@ -203,7 +202,27 @@ const LastPage = styled.div`
     }
 `
 
+const LoadingBox = styled.div`
+    width: 100%;
+    height: 100%;
 
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+`
+
+const NotFound = styled.div`
+    width: 100%;
+    
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+
+    font-size: 16px;
+    font-weight: 700;
+`
 
 
 
@@ -427,56 +446,84 @@ const LikeView = () => {
 
                     {selectedTarget === 'singlework' &&
                         <>
-                            <SingleWorkColumn>
-                                {singleWorks.map((singleWork, index) => (
-                                    <>
-                                        {index % 3 == 0 &&
-                                            <SingleWorkBox
-                                                key={singleWork.id}
-                                                singleWorkData={singleWork}
-                                                handleOpenSingleWorkDetail={handleOpenSingleWorkDetail}
-                                            />
-                                        }
-                                    </>
-                                ))}
+                            {singleWorkPageLoading &&
+                                <LoadingBox>
+                                    <Loader fontColor='black' />
+                                </LoadingBox>
+                            }
+                            {!singleWorkPageLoading && singleWorks.length === 0 &&
+                                <NotFound>
+                                    나의 작품이 존재하지 않습니다
+                                </NotFound>
+                            }
+                            {!singleWorkPageLoading && singleWorks.length !== 0 &&
+                                <>
+                                    <SingleWorkColumn>
+                                        {singleWorks.map((singleWork, index) => (
+                                            <>
+                                                {index % 3 == 0 &&
+                                                    <SingleWorkBox
+                                                        key={singleWork.id}
+                                                        singleWorkData={singleWork}
+                                                        handleOpenSingleWorkDetail={handleOpenSingleWorkDetail}
+                                                    />
+                                                }
+                                            </>
+                                        ))}
 
-                            </SingleWorkColumn>
-                            <SingleWorkColumn>
-                                {singleWorks.map((singleWork, index) => (
-                                    <>
-                                        {index % 3 == 1 &&
-                                            <SingleWorkBox
-                                                key={singleWork.id}
-                                                singleWorkData={singleWork}
-                                                handleOpenSingleWorkDetail={handleOpenSingleWorkDetail}
-                                            />
-                                        }
-                                    </>
-                                ))}
-                            </SingleWorkColumn>
-                            <SingleWorkColumn>
-                                {singleWorks.map((singleWork, index) => (
-                                    <>
-                                        {index % 3 == 2 &&
-                                            <SingleWorkBox
-                                                key={singleWork.id}
-                                                singleWorkData={singleWork}
-                                                handleOpenSingleWorkDetail={handleOpenSingleWorkDetail}
-                                            />
-                                        }
-                                    </>
-                                ))}
-                            </SingleWorkColumn>
+                                    </SingleWorkColumn>
+                                    <SingleWorkColumn>
+                                        {singleWorks.map((singleWork, index) => (
+                                            <>
+                                                {index % 3 == 1 &&
+                                                    <SingleWorkBox
+                                                        key={singleWork.id}
+                                                        singleWorkData={singleWork}
+                                                        handleOpenSingleWorkDetail={handleOpenSingleWorkDetail}
+                                                    />
+                                                }
+                                            </>
+                                        ))}
+                                    </SingleWorkColumn>
+                                    <SingleWorkColumn>
+                                        {singleWorks.map((singleWork, index) => (
+                                            <>
+                                                {index % 3 == 2 &&
+                                                    <SingleWorkBox
+                                                        key={singleWork.id}
+                                                        singleWorkData={singleWork}
+                                                        handleOpenSingleWorkDetail={handleOpenSingleWorkDetail}
+                                                    />
+                                                }
+                                            </>
+                                        ))}
+                                    </SingleWorkColumn>
+                                </>
+                            }
                         </>}
 
                     {selectedTarget === 'exhibition' &&
-                        exhibitions.map((exhibition, index) => (
-                            <ExhibitionCard
-                                key={exhibition.id}
-                                exhibitionData={exhibition}
-                            />
+                        <>
+                            {exhibitionPageLoading &&
+                                <LoadingBox>
+                                    <Loader fontColor='black' />
+                                </LoadingBox>
+                            }
+                            {!exhibitionPageLoading && exhibitions.length === 0 &&
+                                <NotFound>
+                                    나의 작품이 존재하지 않습니다
+                                </NotFound>
+                            }
+                            {!exhibitionPageLoading && exhibitions.length !== 0 &&
+                                exhibitions.map((exhibition, index) => (
+                                    <ExhibitionCard
+                                        key={exhibition.id}
+                                        exhibitionData={exhibition}
+                                    />
 
-                        ))
+                                ))
+                            }
+                        </>
                     }
                 </Body>
 

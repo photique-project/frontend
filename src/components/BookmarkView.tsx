@@ -6,9 +6,8 @@ import useAuthStore from "../zustand/store";
 import ENDPOINTS from '../api/endpoints';
 import { FetchRequestOptions } from '../types/http';
 import ExhibitionCard from './ExhibitionCard';
+import Loader from './Loader';
 
-import seachIcon from '../assets/search-white.png';
-import loadingIcon from '../assets/loading-large.png';
 import leftBlackIcon from '../assets/left-black.png';
 import rightBlackIcon from '../assets/right-black.png';
 
@@ -188,6 +187,27 @@ const LastPage = styled.div`
     }
 `
 
+const LoadingBox = styled.div`
+    width: 100%;
+    height: 100%;
+
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+`
+
+const NotFound = styled.div`
+    width: 100%;
+    
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+
+    font-size: 16px;
+    font-weight: 700;
+`
 
 
 
@@ -324,13 +344,25 @@ const BookmarkView = () => {
                 </FollowViewHeader>
 
                 <Body>
-                    {exhibitions.map((exhibition, index) => (
-                        <ExhibitionCard
-                            key={exhibition.id}
-                            exhibitionData={exhibition}
-                        />
+                    {searchBookmarkDataPageLoading &&
+                        <LoadingBox>
+                            <Loader fontColor='black' />
+                        </LoadingBox>
+                    }
+                    {!searchBookmarkDataPageLoading && exhibitions.length === 0 &&
+                        <NotFound>
+                            저장한 전시회가 없습니다
+                        </NotFound>
+                    }
 
-                    ))}
+                    {!searchBookmarkDataPageLoading && exhibitions.length !== 0 &&
+                        exhibitions.map((exhibition, index) => (
+                            <ExhibitionCard
+                                key={exhibition.id}
+                                exhibitionData={exhibition}
+                            />
+
+                        ))}
                 </Body>
 
                 {exhibitionTotalPage > 0 &&

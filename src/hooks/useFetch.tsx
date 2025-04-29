@@ -50,7 +50,7 @@ const useFetch = <T = unknown>(): UseFetchReturn<T> => {
             }
 
         } catch (err) {
-            console.log((err as Error).message)
+            // console.log((err as Error).message)
         } finally {
             setLoading(false);
         }
