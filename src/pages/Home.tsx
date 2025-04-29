@@ -47,7 +47,6 @@ const Container = styled.div`
 `;
 
 const SearchBox = styled.div<{ isScrolled: boolean }>`
-    padding-bottom: ${({ isScrolled }) => (isScrolled ? '0' : '20px')};
     width: 100%;
 
     display: flex;
@@ -99,8 +98,8 @@ const SearchBoxSubText = styled.div<{ isScrolled: boolean }>`
 `;
 
 const SearchInputBox = styled.div`
-    margin-top: 15px;
-    margin-bottom: 15px;
+    margin-top: 10px;
+    margin-bottom: 10px;
     width: 800px;
     height: 40px;
 
@@ -114,6 +113,50 @@ const SearchInputBox = styled.div`
 
     @media (max-width: 900px) {
         width: 80%;
+    }
+`
+
+const OrderBoxes = styled.div`
+    width: 800px;
+    margin-bottom: 10px;
+
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+
+    @media (max-width: 900px) {
+        width: 80%;
+    }
+`
+
+const OrderBox = styled.div`
+    width: 100%;
+
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    
+    gap: 7px;
+`
+
+const OrderOption = styled.div<{ isSelected: boolean }>`
+    padding: 10px;
+    padding-top: 5px;
+    padding-bottom: 5px;
+
+    border-radius: 15px;
+    background-color: ${({ isSelected }) => (isSelected ? 'rgba(255, 255, 255, 0.9)' : 'black')}; 
+    color:${({ isSelected }) => (isSelected ? 'black' : 'white')}; 
+
+    transition: all 0.3s ease;
+
+    font-size: 14px;
+    font-weight: 600;
+
+    cursor: pointer;
+
+    &:hover {
+        background-color: ${({ isSelected }) => (isSelected ? 'rgba(255, 255, 255, 0.9)' : 'rgba(255, 255, 255, 0.3)')};
     }
 `
 
@@ -827,6 +870,11 @@ const Home = () => {
         setIsComposing(false); // 한글 입력 종료
     };
 
+    // 정렬조건 수정 시 다시 검색 이펙트
+    useEffect(function hadnleSearchAfterChangingOrderCondition() {
+        handleSearch();
+    }, [sortingTarget, sortingOrder]);
+
     return (
         <Container>
 
@@ -859,15 +907,66 @@ const Home = () => {
                     {filterPanelDisplay && <FilterPanel
                         searchTarget={searchTarget}
                         handleSearchTarget={handleSearchTarget}
-                        sortingTarget={sortingTarget}
-                        handleSortingTarget={handleSortingTarget}
-                        sortingOrder={sortingOrder}
                         categories={categories}
                         handleCategoryTarget={handleCategoryTarget}
                         handleReset={handleReset}
                         closePanel={showFilterPanel}
+                        handleSearch={handleSearch}
                     />}
                 </SearchInputBox>
+
+                <OrderBoxes>
+                    <OrderBox>
+                        <OrderOption
+                            onClick={() => handleSortingTarget('createdAt', 'desc')}
+                            isSelected={sortingTarget === 'createdAt' && sortingOrder === 'desc'}
+                        >
+                            최신순
+                        </OrderOption>
+
+                        <OrderOption
+                            onClick={() => handleSortingTarget('createdAt', 'asc')}
+                            isSelected={sortingTarget === 'createdAt' && sortingOrder === 'asc'}
+                        >
+                            오래된 순
+                        </OrderOption>
+
+                        <OrderOption
+                            onClick={() => handleSortingTarget('likeCount', 'desc')}
+                            isSelected={sortingTarget === 'likeCount' && sortingOrder === 'desc'}
+                        >
+                            좋아요 높은 순
+                        </OrderOption>
+
+                        <OrderOption
+                            onClick={() => handleSortingTarget('likeCount', 'asc')}
+                            isSelected={sortingTarget === 'likeCount' && sortingOrder === 'asc'}
+                        >
+
+                            좋아요 낮은 순
+                        </OrderOption>
+
+                        <OrderOption
+                            onClick={() => handleSortingTarget('viewCount', 'desc')}
+                            isSelected={sortingTarget === 'viewCount' && sortingOrder === 'desc'}
+                        >
+                            조회수 높은 순
+                        </OrderOption>
+
+                        <OrderOption
+                            onClick={() => handleSortingTarget('viewCount', 'asc')}
+                            isSelected={sortingTarget === 'viewCount' && sortingOrder === 'asc'}
+                        >
+                            조회수 낮은 순
+                        </OrderOption>
+                    </OrderBox>
+
+
+
+
+
+
+                </OrderBoxes>
 
             </SearchBox>
 

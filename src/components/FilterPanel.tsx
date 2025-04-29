@@ -1,9 +1,18 @@
 import { useRef, useEffect } from 'react';
-import styled from 'styled-components';
+import styled, { keyframes } from "styled-components";
 
 import ShortButton from './button/ShortButton';
 
-
+const slideFadeIn = keyframes`
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+`;
 
 const Container = styled.div`
     width: 770px;
@@ -27,6 +36,8 @@ const Container = styled.div`
     @media (max-width: 900px) {
         width: calc(100% - 30px);
     }
+
+    animation: ${slideFadeIn} 0.7s ease;
 `;
 
 const SearchTargetText = styled.div`
@@ -115,19 +126,15 @@ const ButtonBox = styled.div`
 
 
 type SearchTarget = 'work' | 'writer';
-type SortingTarget = 'createdAt' | 'likeCount' | 'viewCount' | 'commentCount';
-type SortOrder = 'asc' | 'desc'
 
 interface FilterPanelProps {
     searchTarget: SearchTarget;
     handleSearchTarget: (searchTarget: SearchTarget) => void;
-    sortingTarget: SortingTarget;
-    handleSortingTarget: (sortTarget: SortingTarget, sortOrder: SortOrder) => void;
-    sortingOrder: SortOrder;
     categories: string[];
     handleCategoryTarget: (category: string) => void;
     handleReset: () => void;
     closePanel: () => void;
+    handleSearch: () => void;
 }
 
 
@@ -136,13 +143,11 @@ const FilterPanel: React.FC<FilterPanelProps> = (props) => {
     const {
         searchTarget,
         handleSearchTarget,
-        sortingTarget,
-        handleSortingTarget,
-        sortingOrder,
         categories,
         handleCategoryTarget,
         handleReset,
-        closePanel
+        closePanel,
+        handleSearch
     } = props;
 
     const panelRef = useRef<HTMLDivElement>(null);
@@ -167,6 +172,11 @@ const FilterPanel: React.FC<FilterPanelProps> = (props) => {
         };
     }, [closePanel]);
 
+    const handleApplyAndSearch = () => {
+        handleSearch();
+        closePanel();
+    }
+
     return (
         <Container ref={panelRef}>
             <SearchTargetText>검색대상</SearchTargetText>
@@ -186,50 +196,6 @@ const FilterPanel: React.FC<FilterPanelProps> = (props) => {
                         checked={searchTarget === 'writer'}
                         onChange={() => handleSearchTarget('writer')}
                     /> 작가
-                </CheckboxLabel>
-            </CheckboxInputBox>
-
-            <SortingTargetText>정렬</SortingTargetText>
-            <CheckboxInputBox>
-                <CheckboxLabel>
-                    <CheckboxInput
-                        type="checkbox"
-                        value="createdAt"
-                        checked={sortingTarget === 'createdAt' && sortingOrder === 'desc'}
-                        onChange={() => handleSortingTarget('createdAt', 'desc')}
-                    /> 최신순
-                </CheckboxLabel>
-                <CheckboxLabel>
-                    <CheckboxInput
-                        type="checkbox"
-                        value="createdAt"
-                        checked={sortingTarget === 'createdAt' && sortingOrder === 'asc'}
-                        onChange={() => handleSortingTarget('createdAt', 'asc')}
-                    /> 과거순
-                </CheckboxLabel>
-                <CheckboxLabel>
-                    <CheckboxInput
-                        type="checkbox"
-                        value='like'
-                        checked={sortingTarget === 'likeCount'}
-                        onChange={() => handleSortingTarget('likeCount', sortingOrder === 'asc' ? 'desc' : 'asc')}
-                    /> 좋아요 {sortingOrder === 'asc' ? '⬆️' : '⬇️'}
-                </CheckboxLabel>
-                <CheckboxLabel>
-                    <CheckboxInput
-                        type="checkbox"
-                        value="view"
-                        checked={sortingTarget === 'viewCount'}
-                        onChange={() => handleSortingTarget('viewCount', sortingOrder === 'asc' ? 'desc' : 'asc')}
-                    /> 조회수 {sortingOrder === 'asc' ? '⬆️' : '⬇️'}
-                </CheckboxLabel>
-                <CheckboxLabel>
-                    <CheckboxInput
-                        type="checkbox"
-                        value="comment"
-                        checked={sortingTarget === 'commentCount'}
-                        onChange={() => handleSortingTarget('commentCount', sortingOrder === 'asc' ? 'desc' : 'asc')}
-                    /> 댓글수 {sortingOrder === 'asc' ? '⬆️' : '⬇️'}
                 </CheckboxLabel>
             </CheckboxInputBox>
 
@@ -294,7 +260,7 @@ const FilterPanel: React.FC<FilterPanelProps> = (props) => {
             </CategoryCardBox>
 
             <ButtonBox>
-                <ShortButton text={'적용하기'} type={'white'} action={closePanel} />
+                <ShortButton text={'적용하기'} type={'white'} action={handleApplyAndSearch} />
                 <ShortButton text={'초기화'} type={'black'} action={handleReset} />
             </ButtonBox>
 
