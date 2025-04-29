@@ -7,14 +7,14 @@ import DEFAULT from '../api/default';
 import formatNumber from '../utils/converter';
 
 const slideFadeIn = keyframes`
-  from {
-    opacity: 0;
-    transform: translateY(10px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
 `;
 
 const Container = styled.div`
