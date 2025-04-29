@@ -14,12 +14,15 @@ import PasswordInput from '../components/input/PasswordInput';
 import LongButton from '../components/button/LongButton';
 import HelperText from '../components/HelperText';
 import ToastMessage from '../components/ToastMessage';
+import Loader from '../components/Loader';
 
 
 const Container = styled.div`
     display: flex;
     flex-direction: column;
     align-items: center;
+
+    position: relative;
 
     margin: 0;
     padding: 0;
@@ -81,6 +84,22 @@ const ProfileImageInputText = styled.div`
     line-height: 17px;
     color: rgba(0, 0, 0, 0.6);
 `;
+
+const LoadingBackground = styled.div`
+    width: 100%;
+    height: 100%;
+
+    position: absolute;
+
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+
+    z-index: 999;
+
+    background-color: rgba(0, 0, 0, 0.5);
+`
 
 
 const Join = () => {
@@ -510,6 +529,11 @@ const Join = () => {
             {emailAuthModalDisplay && <EmailAuthModal email={email} closeModal={showEmailAuthModal} validEmail={validEmail} setValidEmail={setValidEmail} />}
 
             {toastMessageDisplay && <ToastMessage firstText={toastMessageFirstText} secondText={toastMessageSecondText} isSuccess={joinSuccess} />}
+            {joinLoading &&
+                <LoadingBackground>
+                    <Loader fontColor='white' />
+                </LoadingBackground>
+            }
         </Container>
 
     )
