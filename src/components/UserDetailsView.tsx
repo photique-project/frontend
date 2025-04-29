@@ -18,7 +18,7 @@ import alertIcon from '../assets/alert.png';
 
 
 const Container = styled.div`
-    width: 80%;
+    width: 60%;
     height: 100%;
 
     position: relative;
