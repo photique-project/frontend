@@ -33,7 +33,6 @@ import loadingIcon from '../assets/loading-large.png';
 
 
 
-
 const Container = styled.div`
     display: flex;
     flex-direction: column;
