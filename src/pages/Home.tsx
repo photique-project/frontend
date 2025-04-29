@@ -589,9 +589,7 @@ const Home = () => {
     }
 
     // 홈페이지 마운트하면 단일작품 첫 페이지 요청
-    useEffect(function handleSingleWorkPageInitRequest() {
-        handleSingleWorkPageRequest();
-    }, []);
+
 
     useEffect(function handleSingleWorkPageResponse() {
         // 이전 요청에 대한 값이 남아있을 수 있으므로 loading으로 상태변화 체크
@@ -870,7 +868,7 @@ const Home = () => {
         setIsComposing(false); // 한글 입력 종료
     };
 
-    // 정렬조건 수정 시 다시 검색 이펙트
+    // 첫 요청 + 정렬조건 수정 시 다시 검색 이펙트
     useEffect(function hadnleSearchAfterChangingOrderCondition() {
         handleSearch();
     }, [sortingTarget, sortingOrder]);
