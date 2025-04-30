@@ -351,10 +351,14 @@ const Header: React.FC<HeaderProps> = (props) => {
     }, [isComplete]) // 인증요청 완료됐을 때 해당 이펙트 실행
 
     useEffect(function requestNotificationService() {
+        let retryCount = 0;
+
         function connectSSE() {
             const eventSource = new EventSource(ENDPOINTS.NOTIFICATION.CONNECTION(userDetails.id));
 
-            eventSource.onopen = function () { };
+            eventSource.onopen = function () {
+                retryCount = 0;
+            };
 
             eventSource.onmessage = function (event) {
                 if (event.data === 'new') {
@@ -369,9 +373,13 @@ const Header: React.FC<HeaderProps> = (props) => {
 
             eventSource.onerror = function (event) {
                 eventSource.close();
-                setTimeout(() => {
-                    connectSSE(); // 다시 연결 시도
-                }, 1000)
+
+                if (retryCount < 5) {
+                    retryCount++;
+                    setTimeout(() => {
+                        connectSSE(); // 다시 연결 시도
+                    }, 1000);
+                }
             }
 
             eventSourceRef.current = eventSource;
