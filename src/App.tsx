@@ -53,7 +53,7 @@ function App() {
 
   useEffect(() => {
     const userAgent = navigator.userAgent || navigator.vendor || window.opener;
-    if (/android/i.test(userAgent) || /iPhone|iPod/i.test(userAgent)) {
+    if (/android/i.test(userAgent) || /iPhone|iPod/i.test(userAgent) || /iPad/i.test(userAgent) || /Tablet/i.test(userAgent)) {
       setIsMobile(true);
     }
   }, []);
