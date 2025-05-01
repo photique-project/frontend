@@ -22,15 +22,14 @@
 | 홈 | <img src="https://github.com/user-attachments/assets/8ee6af0a-39d3-4e4e-b951-3e7a66504943" width="400"/> |
 | 회원가입 | <img src="https://github.com/user-attachments/assets/8bd9139e-9bcb-4fc3-ae13-a1f37fc43353" width="400"/> |
 | 비밀번호 찾기 | <img src="https://github.com/user-attachments/assets/f944c453-9d4e-4fe0-9ced-aa280ffc6f55" width="400"/> |
-| 마이페이지 | <img src="https://github.com/user-attachments/assets/d0bc1f64-74bb-4819-8cbb-36d80e6235b6" width="400"/> |
+| 마이페이지 | <img src="https://github.com/user-attachments/assets/4c133f3b-5611-4742-a92a-83da68bde123" width="400"/> |
 | 단일작품 검색 | <img src="https://github.com/user-attachments/assets/ff3ac0bb-9713-4e71-9ee9-0923cf9654b4" width="400"/> |
-| 단일작품 생성 | <img src="" width="400"/> |
-| 단일작품 수정 | <img src="" width="400"/> |
-| 단일작품 상세조회 | <img src="" width="400"/> |
+| 단일작품 생성 | <img src="https://github.com/user-attachments/assets/7a46f105-39c7-48f7-b600-1802129c7fc7" width="400"/> |
+| 단일작품 수정 | <img src="https://github.com/user-attachments/assets/d317ffe9-f88d-4b4e-a9cd-ad9c22d47098" width="400"/> |
+| 단일작품 상세조회 | <img src="https://github.com/user-attachments/assets/b6f5973d-bea6-429e-b008-455eb0aef13b" width="400"/> |
 | 전시회 검색 | <img src="https://github.com/user-attachments/assets/9cff1d8a-a8f0-42db-aa91-7bd6c1dc9b76" width="400"/> |
-| 단일작품 생성 | <img src="" width="400"/> |
-| 단일작품 상세조회 | <img src="" width="400"/> |
-
+| 전시회 생성 | <img src="https://github.com/user-attachments/assets/f6dc2d44-d319-446f-9568-5aa5dbd2e0e6" width="400"/> |
+| 전시회 상세조회 | <img src="https://github.com/user-attachments/assets/ac66740d-dd80-40d2-9f52-d41b64a05749" width="400"/> |
 
 <br><br>
 
