@@ -45,10 +45,28 @@
 <br><br>
 
 # 🙋🏻 How to Use
-1. git clone 
+1. 로컬환경에 저장소 가져오기
 ```bash
 git clone https://github.com/photique-project/frontend.git
 ```
 2. 클론받은 저장소를 vscode로 열기
-
 <img width="500" alt="스크" src="https://github.com/user-attachments/assets/9d68353f-432c-4b6e-a74d-234913dbc894" />
+
+3. 프로젝트 의존성 설치
+```bash
+npm install
+```
+4. 환경변수 파일 추가<br>
+```
+REACT_APP_API_BASE_URL=http://localhost:8080 
+```
+- .env라는 파일 이름으로 프로젝트 루트 디렉터리에 생성
+- 해당 파일 안에 위 텍스트 작성
+    - [http://~] 부분은 API 서버의 IP:PORT
+
+5. 실행
+```bash
+npm start
+```
+- 프로젝트를 오픈한 vscode 터머널에서 위 명령어 입력
+- 브라우저를 열고 주소창에 http://localhost:3000으로 접속
