@@ -18,6 +18,7 @@
 <br><br>
 
 # 🚀 CI/CD Pipeline
+![frontend-deployment](https://github.com/user-attachments/assets/8d04c430-618a-4f91-8ecc-0fd22d810a8f)
 
 
 <br><br>
