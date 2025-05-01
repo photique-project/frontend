@@ -4,7 +4,7 @@
 
 <br>
 
-[![Frontend](https://img.shields.io/badge/GitHub-Organization-white?logo=github&style=flat)](https://github.com/photique-project)<br>
+[![Organization](https://img.shields.io/badge/GitHub-Organization-white?logo=github&style=flat)](https://github.com/photique-project)<br>
 [![Backend](https://img.shields.io/badge/GitHub-Backend-green?logo=github&style=flat)](https://github.com/photique-project/backend)
 
 <br><br>
