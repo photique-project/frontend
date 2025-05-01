@@ -69,4 +69,4 @@ REACT_APP_API_BASE_URL=http://localhost:8080
 npm start
 ```
 - 프로젝트를 오픈한 vscode 터머널에서 위 명령어 입력
-- 브라우저를 열고 주소창에 http://localhost:3000으로 접속
+- 브라우저를 열고 주소창에 http://localhost:3000 로 접속
