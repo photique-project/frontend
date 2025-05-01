@@ -45,3 +45,8 @@
 <br><br>
 
 # 🙋🏻 How to Use
+1. git clone 
+```bash
+git clone https://github.com/photique-project/frontend.git
+```
+2. 클론받은 저장소를 vscode로 열기
