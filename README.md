@@ -18,8 +18,12 @@
 <br><br>
 
 # 🚀 CI/CD Pipeline
-![frontend-deployment](https://github.com/user-attachments/assets/8d04c430-618a-4f91-8ecc-0fd22d810a8f)
-
+<img src="https://github.com/user-attachments/assets/8d04c430-618a-4f91-8ecc-0fd22d810a8f" alt="frontend-deployment" width="500"/><br>
+배포 프로세스는 다음과 같습니다.
+1. 로컬에서 commit
+2. 원격 저장소로 push
+3. 깃헙 액션 실행 브랜치로 PR
+4. 빌드한 리액트 디렉터리를 nginx 정적파일 제공 경로에 저장
 
 <br><br>
 
