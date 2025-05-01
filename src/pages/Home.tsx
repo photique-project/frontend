@@ -853,7 +853,7 @@ const Home = () => {
         const top = (window.innerHeight - height) / 2;
 
         window.open(
-            ' https://discord.gg/ZXk4zCExDz',  // 여기에 디스코드 초대 링크 입력
+            'https://discord.gg/ZXk4zCExDz',  // 여기에 디스코드 초대 링크 입력
             '_blank',
             `width=${width},height=${height},left=${left},top=${top},resizable=yes,scrollbars=yes`
         );
