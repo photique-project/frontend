@@ -54,7 +54,7 @@ git clone https://github.com/photique-project/frontend.git
 
 2. 클론받은 저장소를 vscode로 열기
 <img width="500" alt="스크" src="https://github.com/user-attachments/assets/9d68353f-432c-4b6e-a74d-234913dbc894" />
-
+<br>
 
 <br>
 
