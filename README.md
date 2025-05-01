@@ -10,17 +10,8 @@
 <br><br>
 
 # 🛠️ Tech Stack
-![TypeScript](https://img.shields.io/badge/TypeScript-3178C6?logo=typescript&logoColor=white&style=flat) -> 정적 타입을 통해 높은 코드 안정성 작성
-
-![styled-components](https://img.shields.io/badge/styled--components-CF649A?logo=styled-components&logoColor=white&style=flat)
-
-![React](https://img.shields.io/badge/React-61DAFB?logo=react&logoColor=black&style=flat)
-
-![SSE](https://img.shields.io/badge/SSE-FF9900?logo=sse&style=flat) 
-
-![Zustand](https://img.shields.io/badge/Zustand-8D6CAB?&style=flat) 
-
-![STOMP](https://img.shields.io/badge/STOMP-6DB33F?style=flat)
+![TypeScript](https://img.shields.io/badge/TypeScript-3178C6?logo=typescript&logoColor=white&style=flat) ![styled-components](https://img.shields.io/badge/styled--components-CF649A?logo=styled-components&logoColor=white&style=flat) ![React](https://img.shields.io/badge/React-61DAFB?logo=react&logoColor=black&style=flat)<br>
+![SSE](https://img.shields.io/badge/SSE-FF9900?logo=sse&style=flat) ![Zustand](https://img.shields.io/badge/Zustand-8D6CAB?&style=flat) ![STOMP](https://img.shields.io/badge/STOMP-6DB33F?style=flat)
 
 
 
