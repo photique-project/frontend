@@ -11,7 +11,7 @@
 
 # 🛠️ Tech Stack
 ![TypeScript](https://img.shields.io/badge/TypeScript-3178C6?logo=typescript&logoColor=white&style=flat) ![styled-components](https://img.shields.io/badge/styled--components-CF649A?logo=styled-components&logoColor=white&style=flat) ![React](https://img.shields.io/badge/React-61DAFB?logo=react&logoColor=black&style=flat)<br>
-![SSE](https://img.shields.io/badge/SSE-FF9900?logo=sse&style=flat) ![Zustand](https://img.shields.io/badge/Zustand-8D6CAB?&style=flat) ![STOMP](https://img.shields.io/badge/STOMP-6DB33F?style=flat)
+![SSE](https://img.shields.io/badge/SSE-FF9900?logo=sse&style=flat) ![Zustand](https://img.shields.io/badge/Zustand-8D6CAB?&style=flat) ![WebSocket](https://img.shields.io/badge/WebSocket-2C9AB7?style=flat) ![STOMP](https://img.shields.io/badge/STOMP-6DB33F?style=flat)
 
 
 
