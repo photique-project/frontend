@@ -18,16 +18,16 @@
 # 🏞️ Pages
 | 페이지 | 화면 |
 |--------|------|
-| 소개 | <img src="" width="400"/> |
-| 홈 | <img src="" width="400"/> |
-| 회원가입 | <img src="" width="400"/> |
-| 비밀번호 찾기 | <img src="" width="400"/> |
-| 마이페이지 | <img src="" width="400"/> |
-| 단일작품 검색 | <img src="" width="400"/> |
+| 소개 | <img src="https://github.com/user-attachments/assets/2d70418f-752e-445f-9a6d-c072c45378de" width="400"/> |
+| 홈 | <img src="https://github.com/user-attachments/assets/8ee6af0a-39d3-4e4e-b951-3e7a66504943" width="400"/> |
+| 회원가입 | <img src="https://github.com/user-attachments/assets/8bd9139e-9bcb-4fc3-ae13-a1f37fc43353" width="400"/> |
+| 비밀번호 찾기 | <img src="https://github.com/user-attachments/assets/f944c453-9d4e-4fe0-9ced-aa280ffc6f55" width="400"/> |
+| 마이페이지 | <img src="https://github.com/user-attachments/assets/d0bc1f64-74bb-4819-8cbb-36d80e6235b6" width="400"/> |
+| 단일작품 검색 | <img src="https://github.com/user-attachments/assets/ff3ac0bb-9713-4e71-9ee9-0923cf9654b4" width="400"/> |
 | 단일작품 생성 | <img src="" width="400"/> |
 | 단일작품 수정 | <img src="" width="400"/> |
 | 단일작품 상세조회 | <img src="" width="400"/> |
-| 전시회 검색 | <img src="" width="400"/> |
+| 전시회 검색 | <img src="https://github.com/user-attachments/assets/9cff1d8a-a8f0-42db-aa91-7bd6c1dc9b76" width="400"/> |
 | 단일작품 생성 | <img src="" width="400"/> |
 | 단일작품 상세조회 | <img src="" width="400"/> |
 
