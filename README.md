@@ -18,15 +18,22 @@
 # 🏞️ Pages
 | 페이지 | 화면 |
 |--------|------|
-| 메인 페이지 | <img src="" width="400"/> |
-| 로그인 페이지 | <img src="" width="400"/> |
+| 소개 | <img src="" width="400"/> |
+| 홈 | <img src="" width="400"/> |
+| 회원가입 | <img src="" width="400"/> |
+| 비밀번호 찾기 | <img src="" width="400"/> |
 | 마이페이지 | <img src="" width="400"/> |
-| 전시 상세 페이지 | <img src="" width="400"/> |
-
-
+| 단일작품 검색 | <img src="" width="400"/> |
+| 단일작품 생성 | <img src="" width="400"/> |
+| 단일작품 수정 | <img src="" width="400"/> |
+| 단일작품 상세조회 | <img src="" width="400"/> |
+| 전시회 검색 | <img src="" width="400"/> |
+| 단일작품 생성 | <img src="" width="400"/> |
+| 단일작품 상세조회 | <img src="" width="400"/> |
 
 
 <br><br>
+
 
 # 🚀 CI/CD Pipeline
 <img src="https://github.com/user-attachments/assets/8d04c430-618a-4f91-8ecc-0fd22d810a8f" alt="frontend-deployment" width="500"/><br>
