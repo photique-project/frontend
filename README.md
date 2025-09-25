@@ -1,6 +1,8 @@
-# 📖 Summary
-> photique 프로젝트의 클라이언트입니다. Typescript + React 기반으로 작성되었으며, 최적화를 고려하지 않았습니다.
+## 📖 Summary
+> photique 프로젝트의 클라이언트입니다.
 
+> [!NOTE]
+> 현재 백엔드 테스트 코드 작성과 전반적인 리팩토링이 진행되고 있습니다. 그로 인해서, 프론트엔드의 백엔드 API 호출 부분이 맞지 않을 수 있습니다. 백엔드 테스트 코드 작성과 리팩토링이 완료되면 프론트엔트 코드 수정과 리팩토링이 진행될 예정입니다.
 
 <br>
 
@@ -9,13 +11,13 @@
 
 <br><br>
 
-# 🛠️ Tech Stack
+## 🛠️ Tech Stack
 ![TypeScript](https://img.shields.io/badge/TypeScript-3178C6?logo=typescript&logoColor=white&style=flat) ![styled-components](https://img.shields.io/badge/styled--components-CF649A?logo=styled-components&logoColor=white&style=flat) ![React](https://img.shields.io/badge/React-61DAFB?logo=react&logoColor=black&style=flat)<br>
-![SSE](https://img.shields.io/badge/SSE-FF9900?logo=sse&style=flat) ![Zustand](https://img.shields.io/badge/Zustand-8D6CAB?&style=flat) ![WebSocket](https://img.shields.io/badge/WebSocket-2C9AB7?style=flat) ![STOMP](https://img.shields.io/badge/STOMP-6DB33F?style=flat)
+![Zustand](https://img.shields.io/badge/Zustand-8D6CAB?&style=flat) ![WebSocket](https://img.shields.io/badge/WebSocket-2C9AB7?style=flat) ![STOMP](https://img.shields.io/badge/STOMP-6DB33F?style=flat)
 
 <br><br>
 
-# 🏞️ Pages
+## 🏞️ Pages
 | 페이지 | 화면 |
 |--------|------|
 | 소개 | <img src="https://github.com/user-attachments/assets/2d70418f-752e-445f-9a6d-c072c45378de" width="400"/> |
@@ -34,7 +36,7 @@
 <br><br>
 
 
-# 🚀 CI/CD Pipeline
+## 🚀 CI/CD Pipeline
 <img src="https://github.com/user-attachments/assets/8d04c430-618a-4f91-8ecc-0fd22d810a8f" alt="frontend-deployment" width="500"/><br>
 배포 프로세스는 다음과 같습니다.
 1. 로컬에서 commit
@@ -43,44 +45,3 @@
 4. 빌드한 리액트 디렉터리를 nginx 정적파일 제공 경로에 저장
 
 <br><br>
-
-# 🙋🏻 How to Use
-1. 로컬환경에 저장소 가져오기
-```bash
-git clone https://github.com/photique-project/frontend.git
-```
-
-<br>
-
-2. 클론받은 저장소를 vscode로 열기
-<img width="500" alt="스크" src="https://github.com/user-attachments/assets/9d68353f-432c-4b6e-a74d-234913dbc894" />
-<br>
-
-<br>
-
-
-3. 프로젝트 의존성 설치
-```bash
-npm install
-```
-
-<br>
-
-4. 환경변수 파일 추가<br>
-```
-REACT_APP_API_BASE_URL=http://localhost:8080 
-```
-- .env라는 파일 이름으로 프로젝트 루트 디렉터리에 생성
-- 해당 파일 안에 위 텍스트 작성
-    - [http://~] 부분은 API 서버의 IP:PORT
-
-<br>
-
-5. 실행
-```bash
-npm start
-```
-- 프로젝트를 오픈한 vscode 터머널에서 위 명령어 입력
-- 브라우저를 열고 주소창에 http://localhost:3000 로 접속
-
-<br>
